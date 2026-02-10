@@ -103,6 +103,18 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .prio-title .prio-count{font-family:'Space Mono',monospace;color:var(--red);font-size:12px}
 .prio-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--bg2);border:1px solid var(--brd);margin-bottom:6px;transition:all .2s;animation:fadeSlideIn .25s ease forwards;opacity:0;cursor:pointer}
 .prio-card:hover{background:var(--bg3)}
+/* Hero card – the #1 most urgent */
+.prio-card.hero{padding:14px 16px;border-width:2px;border-color:var(--red);background:var(--red-s);box-shadow:0 0 20px rgba(255,71,87,0.08),0 4px 16px rgba(0,0,0,0.15)}
+.prio-card.hero .prio-name{font-size:16px;font-weight:700}
+.prio-card.hero .prio-meta{font-size:12px}
+.prio-card.hero .prio-cat-dot{height:36px;width:5px}
+.prio-card.hero .prio-check{width:44px;height:44px;font-size:20px;border-radius:12px}
+.prio-card.hero .prio-days{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--red);margin-right:4px;line-height:1}
+.prio-card.hero .prio-days-lbl{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px}
+/* Runner-up cards (2nd, 3rd) */
+.prio-card.runner{border-color:var(--brd2);background:var(--bg3)}
+.prio-card.runner .prio-name{font-size:14px;font-weight:600}
+/* Remaining cards stay default */
 .prio-cat-dot{width:4px;height:28px;border-radius:2px;flex-shrink:0}
 .prio-info{flex:1;min-width:0}
 .prio-name{font-size:13px;font-weight:500;margin-bottom:2px;display:flex;align-items:center;gap:6px}
@@ -111,6 +123,8 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .prio-check{width:36px;height:36px;border:2px solid var(--grn);background:var(--grn-s);color:var(--t1);font-size:16px;font-weight:700;border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
 .prio-check:active{transform:scale(.93)}
 .prio-check.pop{animation:checkPop .5s ease}
+/* Pinned indicator */
+.prio-pin{font-size:10px;color:var(--acc);margin-left:2px}
 /* Expanded action row under prio card */
 .prio-expand{display:flex;align-items:center;gap:6px;padding:8px 12px 4px;animation:fadeSlideIn .15s ease forwards;opacity:0}
 .prio-expand-btn{padding:6px 12px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--t2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px;transition:all .15s}
@@ -261,7 +275,7 @@ const DEFAULTS=[
 let S={
   tasks:[],customCats:[],theme:'dark',expandedCat:null,sort:'urgency',
   modal:null,datePicking:null,expandedTask:null,
-  user:null,syncStatus:'offline',profileOpen:false,hiddenFromPrio:new Set(),
+  user:null,syncStatus:'offline',profileOpen:false,hiddenFromPrio:new Set(),liftedToPrio:new Set(),
   household:null,householdId:null,
 };
 let _unsub=null,_hhUnsub=null;
@@ -396,18 +410,21 @@ function rStats(od,sn,kl,allK){
 
 function rPrio(){
   const all=allTasks();
-  const urgent=all.filter(t=>urg(t)>=.75&&!S.hiddenFromPrio.has(t.id));
-  // Sort by days left (most overdue first)
+  // Include urgent + manually lifted (that aren't hidden)
+  const urgent=all.filter(t=>(urg(t)>=.75||S.liftedToPrio.has(t.id))&&!S.hiddenFromPrio.has(t.id));
   urgent.sort((a,b)=>dleft(a)-dleft(b));
   if(!urgent.length)return'';
   let h=`<div class="prio-section"><div class="prio-title">Att göra <span class="prio-count">${urgent.length}</span></div>`;
   urgent.forEach((t,i)=>{
     const u=urg(t),cat=getCats().find(c=>c.id===t.category),ds=dsince(t.lastDone),dl=ds!==null?t.frequencyDays-ds:0;
-    const shared=isShared(t.category);
-    const isExp=S.expandedTask===t.id;
-    h+=`<div><div class="prio-card" style="animation-delay:${i*.03}s${isExp?';border-color:var(--brd2);border-radius:10px 10px '+(S.datePicking===t.id?'0 0':'10px 10px'):''}"><div class="prio-cat-dot" style="background:${ccol(t.category)}"></div><div class="prio-info" data-action="toggleTask" data-id="${t.id}"><div class="prio-name">${t.name} <span class="prio-badge" style="background:${ubg(u)};color:${ucc(u)}">${ulab(u)}</span></div><div class="prio-meta">${cat?cat.icon+' '+cat.label:''}${shared?' · 👥':''} · <span style="color:${dl<=0?'var(--red)':'var(--org)'};font-weight:600">${dl<=0?Math.abs(dl)+'d över':dl+'d kvar'}</span></div></div><button class="prio-check" data-action="checkTask" data-id="${t.id}">✓</button></div>`;
+    const shared=isShared(t.category);const isExp=S.expandedTask===t.id;const isLifted=S.liftedToPrio.has(t.id)&&urg(t)<.75;
+    // Visual tier: 0=hero, 1-2=runner, rest=default
+    const tier=i===0?'hero':i<=2?'runner':'';
+    // Hero gets a big days display
+    const daysHtml=tier==='hero'?`<div style="text-align:center;margin-right:4px"><div class="prio-days">${dl<=0?Math.abs(dl):dl}</div><div class="prio-days-lbl">${dl<=0?'över':'kvar'}</div></div>`:'';
+    h+=`<div><div class="prio-card ${tier}" style="animation-delay:${i*.03}s${isExp?';border-radius:10px 10px '+(S.datePicking===t.id?'0 0':'10px 10px'):''}"><div class="prio-cat-dot" style="background:${ccol(t.category)}"></div><div class="prio-info" data-action="toggleTask" data-id="${t.id}"><div class="prio-name">${t.name} ${isLifted?'<span class="prio-pin">📌</span>':''}<span class="prio-badge" style="background:${ubg(u)};color:${ucc(u)}">${ulab(u)}</span></div><div class="prio-meta">${cat?cat.icon+' '+cat.label:''}${shared?' · 👥':''} · <span style="color:${dl<=0?'var(--red)':'var(--org)'};font-weight:600">${dl<=0?Math.abs(dl)+'d över':dl+'d kvar'}</span></div></div>${daysHtml}<button class="prio-check" data-action="checkTask" data-id="${t.id}">✓</button></div>`;
     if(isExp){
-      h+=`<div class="prio-expand"><button class="prio-expand-btn" data-action="editTask" data-id="${t.id}">✏️ Redigera</button><button class="prio-expand-btn" data-action="pickDate" data-id="${t.id}">📅 Ange datum</button><button class="prio-expand-btn" data-action="hidePrio" data-id="${t.id}">↓ Dölj</button></div>`;
+      h+=`<div class="prio-expand"><button class="prio-expand-btn" data-action="editTask" data-id="${t.id}">✏️ Redigera</button><button class="prio-expand-btn" data-action="pickDate" data-id="${t.id}">📅 Ange datum</button>${isLifted?`<button class="prio-expand-btn" data-action="unliftPrio" data-id="${t.id}">📌 Av-pinna</button>`:`<button class="prio-expand-btn" data-action="hidePrio" data-id="${t.id}">↓ Dölj</button>`}</div>`;
       if(S.datePicking===t.id){
         h+=`<div class="date-pick" style="padding:4px 12px 8px"><input type="date" id="dp-${t.id}" value="${today()}" max="${today()}"><button style="background:var(--acc);color:#fff" data-action="confirmDate" data-id="${t.id}">Spara</button><button style="background:var(--bg2);color:var(--t2);border:1px solid var(--brd)" data-action="cancelDate">Avbryt</button></div>`;
       }
@@ -444,7 +461,8 @@ function rTaskView(){
     const isExp=S.expandedTask===t.id;
     h+=`<div class="task" style="animation-delay:${i*.04}s;border-left:3px solid ${ucl}"><div class="task-top"><div class="task-info" data-action="toggleTask" data-id="${t.id}"><div class="task-name">${t.name} <span class="task-badge" style="background:${ubg(u)};color:${ucc(u)}">${ulab(u)}</span></div><div class="task-meta"><span>Var ${t.frequencyDays}:e dag</span><span class="dot">·</span><span style="color:${ucc(u)}">${tago(t.lastDone)}</span>${ds!==null?`<span class="dot">·</span><span style="color:${dl<=0?'var(--red)':dl<=1?'var(--org)':'var(--t2)'};font-weight:${dl<=0?600:400}">${dl<=0?Math.abs(dl)+'d över':dl+'d kvar'}</span>`:''}</div></div><button class="check-btn" data-action="checkTask" data-id="${t.id}" style="border-color:${ucl};background:${ubg(u)}">✓</button></div>`;
     if(isExp){
-      h+=`<div class="task-expand"><button class="task-expand-btn" data-action="editTask" data-id="${t.id}">✏️ Redigera</button><button class="task-expand-btn" data-action="pickDate" data-id="${t.id}">📅 Ange datum</button>${!t.isProtected?`<button class="task-expand-btn del" data-action="deleteTask" data-id="${t.id}">🗑 Ta bort</button>`:''}</div>`;
+      const isLifted=S.liftedToPrio.has(t.id);
+      h+=`<div class="task-expand">${isLifted?`<button class="task-expand-btn" data-action="unliftPrio" data-id="${t.id}">📌 Av-pinna</button>`:`<button class="task-expand-btn" data-action="liftPrio" data-id="${t.id}">↑ Lyft upp</button>`}<button class="task-expand-btn" data-action="editTask" data-id="${t.id}">✏️ Redigera</button><button class="task-expand-btn" data-action="pickDate" data-id="${t.id}">📅 Ange datum</button>${!t.isProtected?`<button class="task-expand-btn del" data-action="deleteTask" data-id="${t.id}">🗑 Ta bort</button>`:''}</div>`;
       if(S.datePicking===t.id){
         h+=`<div class="date-pick"><input type="date" id="dp-${t.id}" value="${today()}" max="${today()}"><button style="background:var(--acc);color:#fff" data-action="confirmDate" data-id="${t.id}">Spara</button><button style="background:var(--bg2);color:var(--t2);border:1px solid var(--brd)" data-action="cancelDate">Avbryt</button></div>`;
       }
@@ -505,7 +523,9 @@ function H(e){
     case 'setSort':S.sort=el.dataset.sort;R();break;
     case 'toggleTask':S.expandedTask=S.expandedTask===el.dataset.id?null:el.dataset.id;S.datePicking=null;R();break;
     case 'hidePrio':S.hiddenFromPrio.add(el.dataset.id);S.expandedTask=null;R();break;
-    case 'checkTask':{e.stopPropagation();const f=findTask(el.dataset.id);if(f){f.task.lastDone=new Date().toISOString();S.hiddenFromPrio.delete(f.task.id);S.expandedTask=null;el.classList.add('pop');save();setTimeout(R,450)}break}
+    case 'liftPrio':S.liftedToPrio.add(el.dataset.id);S.hiddenFromPrio.delete(el.dataset.id);S.expandedTask=null;R();break;
+    case 'unliftPrio':S.liftedToPrio.delete(el.dataset.id);S.expandedTask=null;R();break;
+    case 'checkTask':{e.stopPropagation();const f=findTask(el.dataset.id);if(f){f.task.lastDone=new Date().toISOString();S.hiddenFromPrio.delete(f.task.id);S.liftedToPrio.delete(f.task.id);S.expandedTask=null;el.classList.add('pop');save();setTimeout(R,450)}break}
     case 'pickDate':e.stopPropagation();S.datePicking=S.datePicking===el.dataset.id?null:el.dataset.id;R();break;
     case 'confirmDate':{const inp=document.getElementById('dp-'+el.dataset.id);if(inp?.value){const f=findTask(el.dataset.id);if(f){f.task.lastDone=new Date(inp.value+'T12:00:00').toISOString();S.datePicking=null;S.expandedTask=null;S.hiddenFromPrio.delete(f.task.id);save();R()}}break}
     case 'cancelDate':S.datePicking=null;R();break;
