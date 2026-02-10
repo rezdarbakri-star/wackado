@@ -27,7 +27,7 @@
   --ov:rgba(0,0,0,0.7);--sh:0 2px 12px rgba(0,0,0,0.2);
   --c-cnt:#FF6B6B;--c-fit:#51CF66;--c-hem:#339AF0;--c-per:#DA77F2;
   --c-biz:#FFD43B;--c-rec:#74C0FC;--c-oth:#868E96;
-  --vac:linear-gradient(135deg,#6366F1,#06B6D4);--glow:rgba(81,207,102,0.3);
+  --glow:rgba(81,207,102,0.3);
 }
 [data-theme="light"]{
   --bg:#FFF5F7;--bg2:rgba(255,255,255,0.85);--bg3:rgba(255,255,255,1);
@@ -42,34 +42,33 @@
   --ov:rgba(255,245,247,0.85);--sh:0 2px 16px rgba(140,100,120,0.08);
   --c-cnt:#D4798C;--c-fit:#7BC5A0;--c-hem:#7BAED4;--c-per:#B88DC4;
   --c-biz:#D4C07B;--c-rec:#7BB8D4;--c-oth:#A8A0AC;
-  --vac:linear-gradient(135deg,#C084A0,#7BB8D4);--glow:rgba(123,197,160,0.3);
+  --glow:rgba(123,197,160,0.3);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{height:100%;overflow-y:scroll}
 body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-serif;color:var(--t1);-webkit-font-smoothing:antialiased;transition:background .4s,color .4s}
 .app{max-width:520px;margin:0 auto;padding:0 16px 100px;position:relative}
 
-/* ── Header ── */
 .hdr{padding:env(safe-area-inset-top,8px) 0 0;position:sticky;top:0;z-index:20;background:var(--bg);transition:background .4s}
 .hdr-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0 8px}
 .hdr-left{display:flex;align-items:center;gap:10px}
 .logo{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;letter-spacing:3px;color:var(--t1)}
 .logo-z{font-size:18px}
-/* Compact profile chip */
 .profile-chip{display:flex;align-items:center;gap:6px;padding:4px 8px 4px 4px;border-radius:20px;background:var(--bg2);border:1px solid var(--brd);cursor:pointer;transition:all .2s;position:relative}
 .profile-chip:hover{background:var(--bg3)}
 .profile-chip img{width:26px;height:26px;border-radius:50%;object-fit:cover}
 .profile-chip .sync-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.sync-dot.synced{background:var(--grn)}
-.sync-dot.syncing{background:var(--yel);animation:blink 1.2s ease infinite}
-.sync-dot.offline{background:var(--t3)}
+.sync-dot.synced{background:var(--grn)}.sync-dot.syncing{background:var(--yel);animation:blink 1.2s ease infinite}.sync-dot.offline{background:var(--t3)}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.profile-drop{position:absolute;top:calc(100% + 6px);right:0;background:var(--bg-modal);border:1px solid var(--brd2);border-radius:12px;padding:12px;min-width:200px;box-shadow:0 8px 30px rgba(0,0,0,.4);z-index:30;animation:fadeIn .15s ease}
+.profile-drop{position:absolute;top:calc(100% + 6px);right:0;background:var(--bg-modal);border:1px solid var(--brd2);border-radius:12px;padding:12px;min-width:220px;box-shadow:0 8px 30px rgba(0,0,0,.4);z-index:30;animation:fadeIn .15s ease}
 .profile-drop .p-name{font-size:13px;font-weight:600;margin-bottom:2px}
-.profile-drop .p-email{font-size:11px;color:var(--t3);margin-bottom:8px}
-.profile-drop .p-sync{font-size:11px;color:var(--t2);margin-bottom:10px;display:flex;align-items:center;gap:5px}
-.p-signout{width:100%;padding:8px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--t2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
-.p-signout:hover{background:var(--red-s);color:var(--red);border-color:var(--red-s)}
+.profile-drop .p-email{font-size:11px;color:var(--t3);margin-bottom:6px}
+.profile-drop .p-sync{font-size:11px;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.p-divider{height:1px;background:var(--brd);margin:8px 0}
+.p-btn{width:100%;padding:8px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--t2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;margin-bottom:6px;text-align:left;display:flex;align-items:center;gap:6px}
+.p-btn:hover{background:var(--bg3);color:var(--t1)}
+.p-btn.danger:hover{background:var(--red-s);color:var(--red);border-color:var(--red-s)}
+.p-hh-badge{font-size:10px;padding:2px 6px;border-radius:5px;background:var(--acc-g);color:var(--acc);font-weight:600;margin-left:auto}
 .signin-btn{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:10px;border:1px solid rgba(66,133,244,.3);background:rgba(66,133,244,.08);color:var(--t1);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
 .signin-btn:hover{background:rgba(66,133,244,.15)}
 .signin-btn svg{width:16px;height:16px;flex-shrink:0}
@@ -80,18 +79,28 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .add-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px var(--acc-g)}
 .add-btn span{font-size:18px;line-height:1}
 
-/* ── Inline stats ── */
-.stats-inline{display:flex;align-items:center;gap:12px;padding:4px 0 10px;font-size:12px;color:var(--t3);border-bottom:1px solid var(--brd);margin-bottom:12px}
-.stats-inline .si{display:flex;align-items:center;gap:4px}
+/* Vacation slim */
+.vac-strip{display:flex;align-items:center;gap:8px;padding:6px 0 8px;cursor:pointer;transition:opacity .2s;border-bottom:1px solid var(--brd)}
+.vac-strip:hover{opacity:.8}
+.vac-strip .vac-ico{font-size:14px;flex-shrink:0}
+.vac-strip .vac-prog{flex:1;height:3px;background:var(--bg-in);border-radius:2px;overflow:hidden;min-width:40px}
+.vac-strip .vac-prog-fill{height:100%;border-radius:2px;background:var(--acc);transition:width .6s ease}
+.vac-strip .vac-txt{font-size:12px;font-family:'Space Mono',monospace;font-weight:600;color:var(--acc);white-space:nowrap}
+.vac-strip .vac-lbl{font-size:11px;color:var(--t3);white-space:nowrap}
+.vac-empty-s{display:flex;align-items:center;gap:6px;padding:6px 0 8px;cursor:pointer;font-size:12px;color:var(--t3);border-bottom:1px solid var(--brd);transition:color .2s}
+.vac-empty-s:hover{color:var(--acc)}
+
+/* Stats inline */
+.stats-inline{display:flex;align-items:center;gap:12px;padding:4px 0 10px;font-size:12px;color:var(--t3)}
+.si{display:flex;align-items:center;gap:4px}
 .si-num{font-family:'Space Mono',monospace;font-weight:700;font-size:13px}
-.si-num.red{color:var(--red)}.si-num.org{color:var(--org)}.si-num.grn{color:var(--grn)}
-.si-num.muted{color:var(--tm)}
+.si-num.red{color:var(--red)}.si-num.org{color:var(--org)}.si-num.grn{color:var(--grn)}.si-num.muted{color:var(--tm)}
 .si-dot{width:6px;height:6px;border-radius:50%}
 .all-clear{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--grn);font-weight:500;animation:softGlow 3s ease infinite}
 @keyframes softGlow{0%,100%{text-shadow:0 0 8px var(--glow)}50%{text-shadow:0 0 16px var(--glow)}}
 
-/* ── Priority section ── */
-.prio-section{margin-bottom:14px}
+/* Priority */
+.prio-section{margin-bottom:0}
 .prio-title{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .prio-title .prio-count{font-family:'Space Mono',monospace;color:var(--red);font-size:12px}
 .prio-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--bg2);border:1px solid var(--brd);margin-bottom:6px;transition:all .2s;animation:fadeSlideIn .25s ease forwards;opacity:0}
@@ -99,7 +108,7 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .prio-cat-dot{width:4px;height:28px;border-radius:2px;flex-shrink:0}
 .prio-info{flex:1;min-width:0}
 .prio-name{font-size:13px;font-weight:500;margin-bottom:2px;display:flex;align-items:center;gap:6px}
-.prio-meta{font-size:11px;color:var(--t2)}
+.prio-meta{font-size:11px;color:var(--t2);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
 .prio-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;text-transform:uppercase;letter-spacing:.5px}
 .prio-actions{display:flex;align-items:center;gap:4px;flex-shrink:0}
 .prio-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--t2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
@@ -107,19 +116,18 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .prio-btn.check{width:36px;height:36px;border:2px solid var(--grn);background:var(--grn-s);color:var(--t1);font-size:16px;font-weight:700;border-radius:9px}
 .prio-btn.check:active{transform:scale(.93)}
 .prio-btn.check.pop{animation:checkPop .5s ease}
+/* Assigned avatar on task */
+.assign-av{width:22px;height:22px;border-radius:50%;object-fit:cover;border:2px solid var(--brd2);cursor:pointer;transition:all .15s}
+.assign-av:hover{transform:scale(1.1);border-color:var(--acc)}
+.assign-any{width:22px;height:22px;border-radius:50%;border:2px dashed var(--brd2);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--t3);cursor:pointer;transition:all .15s}
+.assign-any:hover{border-color:var(--acc);color:var(--acc)}
 
-/* ── Vacation (slim) ── */
-.vac-strip{display:flex;align-items:center;gap:8px;padding:6px 0 8px;cursor:pointer;transition:opacity .2s;border-bottom:1px solid var(--brd)}
-.vac-strip:hover{opacity:.8}
-.vac-strip .vac-ico{font-size:14px;flex-shrink:0}
-.vac-strip .vac-prog{flex:1;height:3px;background:var(--bg-in);border-radius:2px;overflow:hidden;min-width:40px}
-.vac-strip .vac-prog-fill{height:100%;border-radius:2px;background:var(--acc);transition:width .6s ease}
-.vac-strip .vac-txt{font-size:12px;font-family:'Space Mono',monospace;font-weight:600;color:var(--acc);white-space:nowrap}
-.vac-strip .vac-label{font-size:11px;color:var(--t3);white-space:nowrap}
-.vac-empty-s{display:flex;align-items:center;gap:6px;padding:6px 0 8px;cursor:pointer;font-size:12px;color:var(--t3);border-bottom:1px solid var(--brd);transition:color .2s}
-.vac-empty-s:hover{color:var(--acc)}
+/* Divider */
+.divider{display:flex;align-items:center;gap:10px;padding:14px 0 10px}
+.divider-line{flex:1;height:1px;background:var(--brd)}
+.divider-text{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--tm);font-weight:600}
 
-/* ── Categories ── */
+/* Categories */
 .cats{display:flex;flex-direction:column;gap:6px}
 .cat{border-radius:12px;padding:12px 14px;background:var(--bg2);border:1px solid var(--brd);cursor:pointer;transition:all .25s;box-shadow:var(--sh);overflow:hidden}
 .cat:hover{background:var(--bg3);transform:translateY(-1px)}
@@ -127,14 +135,18 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .cat-l{display:flex;align-items:center;gap:8px}
 .cat-ico{font-size:18px}
 .cat-nm{font-size:14px;font-weight:600}
+.cat-shared{font-size:10px;color:var(--acc);margin-left:2px}
 .cat-r{display:flex;align-items:center;gap:8px}
 .cat-stat{font-size:10px;font-weight:600;padding:3px 8px;border-radius:7px;text-transform:uppercase;letter-spacing:.5px}
 .cat-cnt{font-size:11px;color:var(--t3);font-family:'Space Mono',monospace}
 .cat-arr{color:var(--t3);font-size:11px;transition:transform .25s}
 .cat-prog{height:3px;background:var(--bg-in);border-radius:2px;margin-top:8px;overflow:hidden}
 .cat-prog-fill{height:100%;border-radius:2px;transition:width .5s ease,background .3s}
+/* Assignment summary on shared cats */
+.cat-assign{display:flex;gap:3px;align-items:center}
+.cat-assign img{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--bg)}
 
-/* ── Task view ── */
+/* Tasks */
 .task-list{padding:8px 0 4px;display:flex;flex-direction:column;gap:6px}
 .task{border-radius:10px;padding:12px;background:var(--bg);border:1px solid var(--brd);transition:all .2s;animation:fadeSlideIn .25s ease forwards;opacity:0}
 .task:hover{border-color:var(--brd2)}
@@ -148,23 +160,19 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .task-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--t2);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .task-btn:hover{transform:scale(1.05);background:var(--bg3)}
 .check-btn{width:40px;height:40px;border-radius:10px;border:2px solid var(--grn);background:var(--grn-s);color:var(--t1);font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.check-btn:hover{transform:scale(1.08)}
-.check-btn:active{transform:scale(.95)}
-.check-btn.pop{animation:checkPop .5s ease}
+.check-btn:hover{transform:scale(1.08)}.check-btn:active{transform:scale(.95)}.check-btn.pop{animation:checkPop .5s ease}
 .task-prog{height:2px;background:var(--bg-in);border-radius:2px;margin-top:8px;overflow:hidden}
 .task-prog-fill{height:100%;border-radius:2px;transition:width .5s ease}
 .date-pick{margin-top:6px;display:flex;align-items:center;gap:6px;animation:fadeSlideIn .2s ease forwards;opacity:0}
 .date-pick input{padding:6px 10px;border-radius:8px;border:1px solid var(--brd2);background:var(--bg-in);color:var(--t1);font-family:'DM Sans',sans-serif;font-size:13px}
 .date-pick button{padding:6px 12px;border-radius:8px;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
 
-/* ── Sort ── */
 .sort-row{display:flex;align-items:center;gap:4px;margin-bottom:4px;padding:6px 0}
 .sort-label{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-right:4px}
 .sort-btn{padding:5px 10px;border-radius:6px;font-size:12px;border:none;background:transparent;color:var(--t3);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
-.sort-btn:hover{background:var(--bg2)}
-.sort-btn.on{background:var(--bg3);color:var(--t1)}
+.sort-btn:hover{background:var(--bg2)}.sort-btn.on{background:var(--bg3);color:var(--t1)}
 
-/* ── Modal ── */
+/* Modal */
 .mo{position:fixed;inset:0;background:var(--ov);z-index:100;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .15s ease;backdrop-filter:blur(6px)}
 @media(min-width:500px){.mo{align-items:center}}
 .md{background:var(--bg-modal);border-radius:20px 20px 0 0;padding:24px 20px env(safe-area-inset-bottom,20px);width:100%;max-width:460px;max-height:90vh;overflow-y:auto;animation:slideUp .25s ease;border:1px solid var(--brd);box-shadow:0 -8px 40px rgba(0,0,0,.3)}
@@ -172,24 +180,41 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .md-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
 .md-title{font-size:18px;font-weight:600}
 .md-close{width:36px;height:36px;border-radius:10px;border:none;background:var(--bg2);color:var(--t2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.fg{margin-bottom:18px}
-.fl{display:block;font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:500}
+.fg{margin-bottom:18px}.fl{display:block;font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:500}
 .fi{width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--brd2);background:var(--bg-in);color:var(--t1);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border .2s}
 .fi:focus{border-color:var(--acc)}
 .cg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.co{padding:9px 8px;border-radius:9px;font-size:12px;text-align:center;border:1px solid var(--brd);cursor:pointer;background:var(--bg2);color:var(--t2);font-family:'DM Sans',sans-serif;transition:all .15s}
-.co.sel{font-weight:600}
+.co{padding:9px 8px;border-radius:9px;font-size:12px;text-align:center;border:1px solid var(--brd);cursor:pointer;background:var(--bg2);color:var(--t2);font-family:'DM Sans',sans-serif;transition:all .15s}.co.sel{font-weight:600}
 .fr{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .fb{width:42px;height:42px;border-radius:10px;border:1px solid var(--brd);font-size:13px;font-weight:600;cursor:pointer;font-family:'Space Mono',monospace;background:var(--bg2);color:var(--t2);transition:all .15s;display:flex;align-items:center;justify-content:center}
 .fb.sel{border-color:var(--acc);background:rgba(99,102,241,.12);color:var(--acc)}
 .fh{font-size:12px;color:var(--t3);margin-top:6px;font-style:italic}
 .br{display:flex;gap:10px;margin-top:8px}
 .bp{flex:1;padding:13px;border-radius:12px;border:none;background:var(--acc);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
-.bp:hover{box-shadow:0 4px 16px var(--acc-g)}
-.bp:disabled{opacity:.4;cursor:not-allowed}
+.bp:hover{box-shadow:0 4px 16px var(--acc-g)}.bp:disabled{opacity:.4;cursor:not-allowed}
 .bd{padding:13px 16px;border-radius:12px;border:1px solid var(--red-s);background:var(--red-s);color:var(--red);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
 .bd:hover{background:rgba(255,71,87,.15)}
 .bs{flex:1;padding:13px;border-radius:12px;border:1px solid var(--brd);background:var(--bg2);color:var(--t1);font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* Household modal extras */
+.hh-code{font-family:'Space Mono',monospace;font-size:28px;font-weight:700;letter-spacing:6px;text-align:center;color:var(--acc);padding:16px;background:var(--acc-g);border-radius:12px;margin-bottom:16px;user-select:all}
+.hh-members{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.hh-member{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:var(--bg-in)}
+.hh-member img{width:30px;height:30px;border-radius:50%}
+.hh-member-name{font-size:13px;font-weight:500;flex:1}
+.hh-member-you{font-size:10px;color:var(--acc);font-weight:600;text-transform:uppercase}
+.hh-cat-toggle{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;background:var(--bg-in);margin-bottom:6px}
+.hh-cat-toggle .hh-cat-l{display:flex;align-items:center;gap:8px;font-size:13px}
+.toggle{width:40px;height:22px;border-radius:11px;background:var(--tm);position:relative;cursor:pointer;transition:background .2s;border:none;padding:0;flex-shrink:0}
+.toggle.on{background:var(--acc)}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left .2s}
+.toggle.on::after{left:20px}
+/* Assign picker in modal */
+.assign-row{display:flex;gap:8px;flex-wrap:wrap}
+.assign-opt{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:9px;border:1px solid var(--brd);background:var(--bg2);cursor:pointer;font-size:12px;color:var(--t2);transition:all .15s}
+.assign-opt:hover{background:var(--bg3)}
+.assign-opt.sel{border-color:var(--acc);color:var(--acc);font-weight:600}
+.assign-opt img{width:20px;height:20px;border-radius:50%}
 
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
@@ -237,27 +262,169 @@ const DEFAULTS=[
 // ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
-let S={tasks:[],theme:'dark',expandedCat:null,sort:'urgency',modal:null,datePicking:null,user:null,syncStatus:'offline',profileOpen:false,hiddenFromPrio:new Set()};
-let _unsub=null;
+let S={
+  tasks:[],theme:'dark',expandedCat:null,sort:'urgency',
+  modal:null,datePicking:null,user:null,syncStatus:'offline',
+  profileOpen:false,hiddenFromPrio:new Set(),
+  // Household
+  household:null, // {code, members:[{uid,name,photo}], sharedCats:[], tasks:[]}
+  householdId:null,
+};
+let _unsub=null,_hhUnsub=null;
 
 // ═══════════════════════════════════════════════════════════════
 // PERSISTENCE
 // ═══════════════════════════════════════════════════════════════
-function saveLocal(){try{localStorage.setItem('puls',JSON.stringify({tasks:S.tasks,theme:S.theme}))}catch(e){}}
-function loadLocal(){try{const d=JSON.parse(localStorage.getItem('puls'));if(d?.tasks){S.tasks=d.tasks;ensV()}else S.tasks=DEFAULTS.map(t=>({...t}));if(d?.theme)S.theme=d.theme}catch(e){S.tasks=DEFAULTS.map(t=>({...t}))}}
+function saveLocal(){try{localStorage.setItem('puls',JSON.stringify({tasks:S.tasks,theme:S.theme,householdId:S.householdId}))}catch(e){}}
+function loadLocal(){
+  try{
+    const d=JSON.parse(localStorage.getItem('puls'));
+    if(d?.tasks){S.tasks=d.tasks;ensV()}else S.tasks=DEFAULTS.map(t=>({...t}));
+    if(d?.theme)S.theme=d.theme;
+    if(d?.householdId)S.householdId=d.householdId;
+  }catch(e){S.tasks=DEFAULTS.map(t=>({...t}))}
+}
 function ensV(){if(!S.tasks.find(t=>t.id==='__vacation__'))S.tasks.push({...VTASK});const v=S.tasks.find(t=>t.id==='__vacation__');if(v)v.isProtected=true}
-async function saveCloud(){if(!S.user)return;S.syncStatus='syncing';R();try{await db.collection('users').doc(S.user.uid).set({tasks:S.tasks,theme:S.theme,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});S.syncStatus='synced'}catch(e){S.syncStatus='offline'}R()}
-function save(){saveLocal();clearTimeout(save._t);save._t=setTimeout(saveCloud,600)}
+
+async function saveCloud(){
+  if(!S.user)return;
+  S.syncStatus='syncing';R();
+  try{
+    await db.collection('users').doc(S.user.uid).set({
+      tasks:S.tasks,theme:S.theme,householdId:S.householdId||null,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    },{merge:true});
+    S.syncStatus='synced';
+  }catch(e){S.syncStatus='offline'}
+  R();
+}
+
+async function saveHousehold(){
+  if(!S.household||!S.householdId)return;
+  try{
+    await db.collection('households').doc(S.householdId).set({
+      members:S.household.members,
+      sharedCats:S.household.sharedCats||[],
+      tasks:S.household.tasks||[],
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    },{merge:true});
+  }catch(e){console.error('HH save:',e)}
+}
+
+function save(){saveLocal();clearTimeout(save._t);save._t=setTimeout(()=>{saveCloud();if(S.household)saveHousehold()},600)}
 save._t=null;
-function startSync(){if(_unsub)_unsub();if(!S.user)return;_unsub=db.collection('users').doc(S.user.uid).onSnapshot(s=>{if(s.exists){const d=s.data();if(d.tasks){S.tasks=d.tasks;ensV();saveLocal()}if(d.theme)S.theme=d.theme;S.syncStatus='synced';R()}},e=>{S.syncStatus='offline';R()})}
-async function mergeUp(){if(!S.user)return;const s=await db.collection('users').doc(S.user.uid).get();if(s.exists&&s.data().tasks?.length>0)return;await saveCloud()}
+
+function startSync(){
+  if(_unsub)_unsub();if(!S.user)return;
+  _unsub=db.collection('users').doc(S.user.uid).onSnapshot(s=>{
+    if(s.exists){
+      const d=s.data();
+      if(d.tasks){S.tasks=d.tasks;ensV();saveLocal()}
+      if(d.theme)S.theme=d.theme;
+      if(d.householdId&&d.householdId!==S.householdId){S.householdId=d.householdId;startHHSync()}
+      S.syncStatus='synced';R();
+    }
+  },e=>{S.syncStatus='offline';R()});
+}
+
+function startHHSync(){
+  if(_hhUnsub)_hhUnsub();if(!S.householdId)return;
+  _hhUnsub=db.collection('households').doc(S.householdId).onSnapshot(s=>{
+    if(s.exists){
+      S.household={code:S.householdId,...s.data()};
+      R();
+    }else{S.household=null;S.householdId=null;saveLocal();R()}
+  },e=>{console.error('HH sync:',e)});
+}
+
+async function mergeUp(){if(!S.user)return;const s=await db.collection('users').doc(S.user.uid).get();if(s.exists&&s.data().tasks?.length>0){if(s.data().householdId){S.householdId=s.data().householdId}return}await saveCloud()}
 
 // ═══════════════════════════════════════════════════════════════
 // AUTH
 // ═══════════════════════════════════════════════════════════════
 async function gSignIn(){try{await auth.signInWithPopup(gProv)}catch(e){if(e.code==='auth/popup-blocked')await auth.signInWithRedirect(gProv);else console.error(e)}}
-async function gSignOut(){if(_unsub){_unsub();_unsub=null}await auth.signOut();S.user=null;S.syncStatus='offline';S.profileOpen=false;R()}
-auth.onAuthStateChanged(async u=>{S.user=u;if(u){S.syncStatus='syncing';R();await mergeUp();startSync()}else{S.syncStatus='offline';if(_unsub){_unsub();_unsub=null}R()}});
+async function gSignOut(){if(_unsub){_unsub();_unsub=null}if(_hhUnsub){_hhUnsub();_hhUnsub=null}await auth.signOut();S.user=null;S.syncStatus='offline';S.profileOpen=false;S.household=null;R()}
+auth.onAuthStateChanged(async u=>{S.user=u;if(u){S.syncStatus='syncing';R();await mergeUp();startSync();if(S.householdId)startHHSync()}else{S.syncStatus='offline';if(_unsub){_unsub();_unsub=null}if(_hhUnsub){_hhUnsub();_hhUnsub=null}R()}});
+
+// ═══════════════════════════════════════════════════════════════
+// HOUSEHOLD
+// ═══════════════════════════════════════════════════════════════
+function genHHCode(){const c='ABCDEFGHJKLMNPRSTUVWXYZ23456789';let r='';for(let i=0;i<6;i++)r+=c[Math.floor(Math.random()*c.length)];return r}
+
+async function createHousehold(){
+  if(!S.user)return;
+  const code=genHHCode();
+  const me={uid:S.user.uid,name:S.user.displayName||'Du',photo:S.user.photoURL||''};
+  await db.collection('households').doc(code).set({members:[me],sharedCats:[],tasks:[],createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  S.householdId=code;
+  await saveCloud();
+  startHHSync();
+}
+
+async function joinHousehold(code){
+  if(!S.user)return false;
+  code=code.toUpperCase().trim();
+  const snap=await db.collection('households').doc(code).get();
+  if(!snap.exists)return false;
+  const data=snap.data();
+  if(data.members.length>=2)return false; // Max 2
+  if(data.members.find(m=>m.uid===S.user.uid))return false; // Already in
+  const me={uid:S.user.uid,name:S.user.displayName||'Du',photo:S.user.photoURL||''};
+  data.members.push(me);
+  await db.collection('households').doc(code).update({members:data.members});
+  S.householdId=code;
+  await saveCloud();
+  startHHSync();
+  return true;
+}
+
+async function leaveHousehold(){
+  if(!S.householdId||!S.user||!S.household)return;
+  const remaining=S.household.members.filter(m=>m.uid!==S.user.uid);
+  if(remaining.length===0){
+    await db.collection('households').doc(S.householdId).delete();
+  }else{
+    await db.collection('households').doc(S.householdId).update({members:remaining});
+  }
+  if(_hhUnsub){_hhUnsub();_hhUnsub=null}
+  S.householdId=null;S.household=null;
+  await saveCloud();R();
+}
+
+function toggleSharedCat(catId){
+  if(!S.household)return;
+  const sc=S.household.sharedCats||[];
+  const idx=sc.indexOf(catId);
+  if(idx>=0)sc.splice(idx,1);else sc.push(catId);
+  S.household.sharedCats=sc;
+  saveHousehold();R();
+}
+
+function isSharedCat(catId){return S.household?.sharedCats?.includes(catId)||false}
+
+function getHHPartner(){
+  if(!S.household||!S.user)return null;
+  return S.household.members.find(m=>m.uid!==S.user.uid)||null;
+}
+
+function getHHMember(uid){return S.household?.members?.find(m=>m.uid===uid)||null}
+
+// Get all tasks (personal + shared)
+function allTasks(){
+  const personal=S.tasks.filter(t=>t.id!=='__vacation__');
+  const shared=(S.household?.tasks||[]);
+  return[...personal,...shared];
+}
+
+function allTasksWithVac(){
+  return[...S.tasks,...(S.household?.tasks||[])];
+}
+
+// Category tasks: if shared, from household; else from personal
+function ctasks(catId){
+  if(isSharedCat(catId)) return(S.household?.tasks||[]).filter(t=>t.category===catId);
+  return S.tasks.filter(t=>t.category===catId&&t.id!=='__vacation__');
+}
 
 // ═══════════════════════════════════════════════════════════════
 // UTILS
@@ -268,15 +435,23 @@ const urg=t=>{const ds=dsince(t.lastDone);return ds===null?1:ds/t.frequencyDays}
 const ucol=u=>{const s=getComputedStyle(document.documentElement);if(u>=1)return s.getPropertyValue('--red').trim();if(u>=.75)return s.getPropertyValue('--org').trim();if(u>=.5)return s.getPropertyValue('--yel').trim();return s.getPropertyValue('--grn').trim()};
 const ulab=u=>u>=1?'Förfallen':u>=.75?'Snart':u>=.5?'På gång':'Klart';
 const ubg=u=>u>=1?'var(--red-s)':u>=.75?'var(--org-s)':u>=.5?'var(--yel-s)':'var(--grn-s)';
-const uc=u=>u>=1?'var(--red)':u>=.75?'var(--org)':u>=.5?'var(--yel)':'var(--grn)';
+const ucc=u=>u>=1?'var(--red)':u>=.75?'var(--org)':u>=.5?'var(--yel)':'var(--grn)';
 const tago=d=>{if(!d)return'Aldrig';const ds=dsince(d);return ds===0?'Idag':ds===1?'Igår':ds+' dagar sedan'};
 const ccol=id=>{const c=CATS.find(x=>x.id===id);return c?`var(${c.v})`:'var(--t3)'};
-const ctasks=id=>S.tasks.filter(t=>t.category===id&&t.id!=='__vacation__');
 const curg=id=>{const t=ctasks(id);return t.length?Math.max(...t.map(urg)):0};
 const cratio=id=>{const t=ctasks(id);if(!t.length)return 1;return t.filter(x=>urg(x)<.75).length/t.length};
 const today=()=>new Date().toISOString().split('T')[0];
 const ffreq=d=>{d=parseInt(d);return d===1?'dag':d===7?'vecka':d===14?'annan vecka':d===30?'månad':d+':e dag'};
 const GSVG=`<svg viewBox="0 0 48 48" style="width:16px;height:16px"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>`;
+
+// Find task in either personal or household
+function findTask(id){
+  let t=S.tasks.find(x=>x.id===id);
+  if(t)return{task:t,source:'personal'};
+  t=(S.household?.tasks||[]).find(x=>x.id===id);
+  if(t)return{task:t,source:'household'};
+  return null;
+}
 
 // ═══════════════════════════════════════════════════════════════
 // RENDER
@@ -285,64 +460,101 @@ function R(){
   const app=document.getElementById('app');if(!app)return;
   document.documentElement.setAttribute('data-theme',S.theme);
   document.getElementById('metaTheme').content=S.theme==='dark'?'#0A0A0F':'#FFF5F7';
-  const all=S.tasks.filter(t=>t.id!=='__vacation__');
+  const all=allTasks();
   const od=all.filter(t=>urg(t)>=1).length;
   const sn=all.filter(t=>{const u=urg(t);return u>=.75&&u<1}).length;
   const kl=all.filter(t=>urg(t)<.5).length;
   const allK=od===0&&sn===0;
-  app.innerHTML=rHeader()+rStats(od,sn,kl,allK)+rPrio()+(S.expandedCat?rTaskView():rCats())+(S.modal?rModal():'');
+
+  let html=rHeader()+rStats(od,sn,kl,allK);
+  if(S.expandedCat){
+    html+=rTaskView();
+  }else{
+    html+=rPrio()+rDivider()+rCats();
+  }
+  html+=S.modal?rModal():'';
+  app.innerHTML=html;
   bind();
 }
 
 function rHeader(){
   let prof='';
   if(S.user){
-    prof=`<div class="profile-chip" data-action="toggleProfile">${S.user.photoURL?`<img src="${S.user.photoURL}" referrerpolicy="no-referrer">`:'<span style="font-size:14px">👤</span>'}<div class="sync-dot ${S.syncStatus}"></div></div>`;
-    if(S.profileOpen) prof+=`<div class="profile-drop"><div class="p-name">${S.user.displayName||'Inloggad'}</div><div class="p-email">${S.user.email||''}</div><div class="p-sync"><div class="sync-dot ${S.syncStatus}" style="width:6px;height:6px"></div> ${{synced:'Synkad med molnet',syncing:'Synkar...',offline:'Offline'}[S.syncStatus]}</div><button class="p-signout" data-action="signOut">Logga ut</button></div>`;
-  } else {
+    const hhBadge=S.household?`<span class="p-hh-badge">🏠</span>`:'';
+    prof=`<div class="profile-chip" data-action="toggleProfile">${S.user.photoURL?`<img src="${S.user.photoURL}" referrerpolicy="no-referrer">`:'<span style="font-size:14px">👤</span>'}${hhBadge}<div class="sync-dot ${S.syncStatus}"></div></div>`;
+    if(S.profileOpen){
+      const syncTxt={synced:'Synkad',syncing:'Synkar...',offline:'Offline'}[S.syncStatus];
+      let hhInfo='';
+      if(S.household){
+        const partner=getHHPartner();
+        hhInfo=`<div class="p-divider"></div><button class="p-btn" data-action="openHousehold">🏠 Hushåll <span class="p-hh-badge">${S.householdId}</span></button>`;
+      }else{
+        hhInfo=`<div class="p-divider"></div><button class="p-btn" data-action="openHousehold">🏠 Skapa/gå med i hushåll</button>`;
+      }
+      prof+=`<div class="profile-drop"><div class="p-name">${S.user.displayName||'Inloggad'}</div><div class="p-email">${S.user.email||''}</div><div class="p-sync"><div class="sync-dot ${S.syncStatus}" style="width:6px;height:6px"></div> ${syncTxt}</div>${hhInfo}<div class="p-divider"></div><button class="p-btn danger" data-action="signOut">Logga ut</button></div>`;
+    }
+  }else{
     prof=`<button class="signin-btn" data-action="signIn">${GSVG} Logga in</button>`;
   }
   return `<header class="hdr"><div class="hdr-row"><div class="hdr-left"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1></div><div class="hdr-actions"><div style="position:relative">${prof}</div><button class="icon-btn" data-action="toggleTheme">${S.theme==='dark'?'☀️':'🌙'}</button><button class="add-btn" data-action="addTask"><span>+</span> <span class="plus-label">Ny</span></button></div></div>${rVacation()}</header>`;
 }
 
+function rVacation(){
+  const vt=S.tasks.find(t=>t.id==='__vacation__');if(!vt)return'';
+  if(!vt.lastDone)return`<div class="vac-empty-s" data-action="editVacation"><span>🏖️</span> <span>Ställ in semester →</span></div>`;
+  const ds=dsince(vt.lastDone),dl=Math.max(0,vt.frequencyDays-ds),p=Math.min(ds/vt.frequencyDays,1),ov=dl===0;
+  return`<div class="vac-strip" data-action="editVacation"><span class="vac-ico">🏖️</span><span class="vac-lbl">Semester</span><div class="vac-prog"><div class="vac-prog-fill" style="width:${p*100}%"></div></div><span class="vac-txt">${ov?'🎉 Dags!':dl+'d'}</span></div>`;
+}
+
 function rStats(od,sn,kl,allK){
-  if(allK) return `<div class="stats-inline"><div class="all-clear">✨ Alla pulser i fas – snyggt jobbat!</div></div>`;
+  if(allK)return`<div class="stats-inline"><div class="all-clear">✨ Alla pulser i fas – snyggt jobbat!</div></div>`;
   let h='<div class="stats-inline">';
-  if(od>0) h+=`<div class="si"><div class="si-dot" style="background:var(--red)"></div><span class="si-num ${od>0?'red':'muted'}">${od}</span> förfallna</div>`;
-  if(sn>0) h+=`<div class="si"><div class="si-dot" style="background:var(--org)"></div><span class="si-num ${sn>0?'org':'muted'}">${sn}</span> snart</div>`;
+  if(od>0)h+=`<div class="si"><div class="si-dot" style="background:var(--red)"></div><span class="si-num red">${od}</span> förfallna</div>`;
+  if(sn>0)h+=`<div class="si"><div class="si-dot" style="background:var(--org)"></div><span class="si-num org">${sn}</span> snart</div>`;
   h+=`<div class="si"><div class="si-dot" style="background:var(--grn)"></div><span class="si-num grn">${kl}</span> klart</div>`;
   return h+'</div>';
 }
 
 function rPrio(){
-  const all=S.tasks.filter(t=>t.id!=='__vacation__');
-  const urgent=all.filter(t=>urg(t)>=.75 && !S.hiddenFromPrio.has(t.id)).sort((a,b)=>urg(b)-urg(a));
-  if(!urgent.length) return '';
+  const all=allTasks();
+  const urgent=all.filter(t=>urg(t)>=.75&&!S.hiddenFromPrio.has(t.id)).sort((a,b)=>urg(b)-urg(a));
+  if(!urgent.length)return'';
   let h=`<div class="prio-section"><div class="prio-title">Att göra <span class="prio-count">${urgent.length}</span></div>`;
   urgent.forEach((t,i)=>{
     const u=urg(t),cat=CATS.find(c=>c.id===t.category),ds=dsince(t.lastDone),dl=ds!==null?t.frequencyDays-ds:0;
-    h+=`<div class="prio-card" style="animation-delay:${i*.03}s"><div class="prio-cat-dot" style="background:${ccol(t.category)}"></div><div class="prio-info"><div class="prio-name">${t.name} <span class="prio-badge" style="background:${ubg(u)};color:${uc(u)}">${ulab(u)}</span></div><div class="prio-meta">${cat?cat.icon+' '+cat.label:''} · ${tago(t.lastDone)}${ds!==null?` · <span style="color:${dl<=0?'var(--red)':'var(--org)'};font-weight:${dl<=0?600:400}">${dl<=0?Math.abs(dl)+'d över':dl+'d kvar'}</span>`:''}</div></div><div class="prio-actions"><button class="prio-btn" data-action="hidePrio" data-id="${t.id}" title="Dölj">↓</button><button class="prio-btn check" data-action="checkTask" data-id="${t.id}" title="Klar!">✓</button></div></div>`;
+    const shared=isSharedCat(t.category);
+    let assignHtml='';
+    if(shared&&S.household){
+      const a=t.assignedTo;
+      if(a){const m=getHHMember(a);assignHtml=m?.photo?`<img class="assign-av" data-action="cycleAssign" data-id="${t.id}" src="${m.photo}" referrerpolicy="no-referrer" title="${m.name}">`:`<div class="assign-any" data-action="cycleAssign" data-id="${t.id}" title="${m?.name||'?'}">${(m?.name||'?')[0]}</div>`}
+      else{assignHtml=`<div class="assign-any" data-action="cycleAssign" data-id="${t.id}" title="Vem som helst">👤</div>`}
+    }
+    h+=`<div class="prio-card" style="animation-delay:${i*.03}s"><div class="prio-cat-dot" style="background:${ccol(t.category)}"></div><div class="prio-info"><div class="prio-name">${t.name} <span class="prio-badge" style="background:${ubg(u)};color:${ucc(u)}">${ulab(u)}</span></div><div class="prio-meta">${cat?cat.icon+' '+cat.label:''}${shared?' · 👥':''} · ${tago(t.lastDone)}${ds!==null?` · <span style="color:${dl<=0?'var(--red)':'var(--org)'};font-weight:${dl<=0?600:400}">${dl<=0?Math.abs(dl)+'d över':dl+'d kvar'}</span>`:''}</div></div><div class="prio-actions">${assignHtml}<button class="prio-btn" data-action="hidePrio" data-id="${t.id}" title="Dölj">↓</button><button class="prio-btn check" data-action="checkTask" data-id="${t.id}" title="Klar!">✓</button></div></div>`;
   });
   return h+'</div>';
 }
 
-function rVacation(){
-  const vt=S.tasks.find(t=>t.id==='__vacation__');if(!vt)return'';
-  if(!vt.lastDone) return `<div class="vac-empty-s" data-action="editVacation"><span>🏖️</span> <span>Ställ in semester →</span></div>`;
-  const ds=dsince(vt.lastDone),dl=Math.max(0,vt.frequencyDays-ds),p=Math.min(ds/vt.frequencyDays,1),ov=dl===0;
-  return `<div class="vac-strip" data-action="editVacation"><span class="vac-ico">🏖️</span><span class="vac-label">Semester</span><div class="vac-prog"><div class="vac-prog-fill" style="width:${p*100}%"></div></div><span class="vac-txt">${ov?'🎉 Dags!':dl+'d'}</span></div>`;
+function rDivider(){
+  return`<div class="divider"><div class="divider-line"></div><div class="divider-text">Kategorier</div><div class="divider-line"></div></div>`;
 }
 
 function rCats(){
   let h='<div class="cats">';
   for(const cat of CATS){
     const ts=ctasks(cat.id);if(!ts.length)continue;
-    const wu=curg(cat.id),rat=cratio(cat.id),cc=ccol(cat.id),ucl=ucol(wu);
+    const wu=curg(cat.id),rat=cratio(cat.id),ucl=ucol(wu);
     const kc=ts.filter(t=>urg(t)<.75).length;
     const st=kc===ts.length?'✓ Klart':`${kc}/${ts.length}`;
     const sb=kc===ts.length?'var(--grn-s)':ubg(wu);
-    const sc=kc===ts.length?'var(--grn)':uc(wu);
-    h+=`<div class="cat" data-action="expandCat" data-cat="${cat.id}"><div class="cat-top"><div class="cat-l"><span class="cat-ico">${cat.icon}</span><span class="cat-nm">${cat.label}</span></div><div class="cat-r"><span class="cat-stat" style="background:${sb};color:${sc}">${st}</span><span class="cat-cnt">${ts.length}</span><span class="cat-arr">▶</span></div></div><div class="cat-prog"><div class="cat-prog-fill" style="width:${rat*100}%;background:${rat===1?'var(--grn)':ucl}"></div></div></div>`;
+    const sc=kc===ts.length?'var(--grn)':ucc(wu);
+    const shared=isSharedCat(cat.id);
+    // Assignment summary for shared cats
+    let assignSummary='';
+    if(shared&&S.household){
+      const avatars=S.household.members.map(m=>m.photo?`<img src="${m.photo}" referrerpolicy="no-referrer">`:'').filter(Boolean).join('');
+      if(avatars)assignSummary=`<div class="cat-assign">${avatars}</div>`;
+    }
+    h+=`<div class="cat" data-action="expandCat" data-cat="${cat.id}"><div class="cat-top"><div class="cat-l"><span class="cat-ico">${cat.icon}</span><span class="cat-nm">${cat.label}</span>${shared?'<span class="cat-shared">👥</span>':''}</div><div class="cat-r">${assignSummary}<span class="cat-stat" style="background:${sb};color:${sc}">${st}</span><span class="cat-cnt">${ts.length}</span><span class="cat-arr">▶</span></div></div><div class="cat-prog"><div class="cat-prog-fill" style="width:${rat*100}%;background:${rat===1?'var(--grn)':ucl}"></div></div></div>`;
   }
   return h+'</div>';
 }
@@ -350,20 +562,60 @@ function rCats(){
 function rTaskView(){
   const cat=CATS.find(c=>c.id===S.expandedCat);if(!cat)return'';
   const ts=ctasks(cat.id),sorted=[...ts].sort((a,b)=>S.sort==='urgency'?urg(b)-urg(a):a.name.localeCompare(b.name,'sv'));
-  let h=`<div style="margin-bottom:10px"><button class="cat" data-action="collapseCat" style="margin-bottom:4px;border-color:${ccol(cat.id)}30"><div class="cat-top"><div class="cat-l"><span style="font-size:13px;color:var(--t3);margin-right:3px">←</span><span class="cat-ico">${cat.icon}</span><span class="cat-nm">${cat.label}</span></div><div class="cat-r"><span class="cat-cnt">${ts.length} uppgifter</span></div></div></button><div class="sort-row"><span class="sort-label">Sortera:</span><button class="sort-btn ${S.sort==='urgency'?'on':''}" data-action="setSort" data-sort="urgency">Brådskande</button><button class="sort-btn ${S.sort==='name'?'on':''}" data-action="setSort" data-sort="name">Namn</button></div></div><div class="task-list">`;
+  const shared=isSharedCat(cat.id);
+  let h=`<div style="margin-bottom:10px"><button class="cat" data-action="collapseCat" style="margin-bottom:4px;border-color:${ccol(cat.id)}30"><div class="cat-top"><div class="cat-l"><span style="font-size:13px;color:var(--t3);margin-right:3px">←</span><span class="cat-ico">${cat.icon}</span><span class="cat-nm">${cat.label}</span>${shared?'<span class="cat-shared">👥 Delad</span>':''}</div><div class="cat-r"><span class="cat-cnt">${ts.length} uppgifter</span></div></div></button><div class="sort-row"><span class="sort-label">Sortera:</span><button class="sort-btn ${S.sort==='urgency'?'on':''}" data-action="setSort" data-sort="urgency">Brådskande</button><button class="sort-btn ${S.sort==='name'?'on':''}" data-action="setSort" data-sort="name">Namn</button></div></div><div class="task-list">`;
   sorted.forEach((t,i)=>{
     const u=urg(t),ds=dsince(t.lastDone),dl=ds!==null?t.frequencyDays-ds:0,ucl=ucol(u),pct=Math.min(u*100,100);
-    h+=`<div class="task" style="animation-delay:${i*.04}s;border-left:3px solid ${ucl}"><div class="task-top"><div class="task-info"><div class="task-name">${t.name} <span class="task-badge" style="background:${ubg(u)};color:${uc(u)}">${ulab(u)}</span></div><div class="task-meta"><span>Var ${t.frequencyDays}:e dag</span><span class="dot">·</span><span style="color:${uc(u)}">${tago(t.lastDone)}</span>${ds!==null?`<span class="dot">·</span><span style="color:${dl<=0?'var(--red)':dl<=1?'var(--org)':'var(--t2)'};font-weight:${dl<=0?600:400}">${dl<=0?Math.abs(dl)+'d över':dl+'d kvar'}</span>`:''}</div></div><div class="task-actions"><button class="task-btn" data-action="editTask" data-id="${t.id}">✏️</button><button class="task-btn" data-action="pickDate" data-id="${t.id}">📅</button><button class="check-btn" data-action="checkTask" data-id="${t.id}" style="border-color:${ucl};background:${ubg(u)}">✓</button></div></div>${S.datePicking===t.id?`<div class="date-pick" style="animation-delay:0s"><input type="date" id="dp-${t.id}" value="${today()}" max="${today()}"><button style="background:var(--acc);color:#fff" data-action="confirmDate" data-id="${t.id}">Spara</button><button style="background:var(--bg2);color:var(--t2);border:1px solid var(--brd)" data-action="cancelDate">Avbryt</button></div>`:''}<div class="task-prog"><div class="task-prog-fill" style="width:${pct}%;background:${ucl}"></div></div></div>`;
+    let assignHtml='';
+    if(shared&&S.household){
+      const a=t.assignedTo;
+      if(a){const m=getHHMember(a);assignHtml=m?.photo?`<img class="assign-av" data-action="cycleAssign" data-id="${t.id}" src="${m.photo}" referrerpolicy="no-referrer">`:`<div class="assign-any" data-action="cycleAssign" data-id="${t.id}">${(m?.name||'?')[0]}</div>`}
+      else{assignHtml=`<div class="assign-any" data-action="cycleAssign" data-id="${t.id}">👤</div>`}
+    }
+    h+=`<div class="task" style="animation-delay:${i*.04}s;border-left:3px solid ${ucl}"><div class="task-top"><div class="task-info"><div class="task-name">${t.name} <span class="task-badge" style="background:${ubg(u)};color:${ucc(u)}">${ulab(u)}</span></div><div class="task-meta"><span>Var ${t.frequencyDays}:e dag</span><span class="dot">·</span><span style="color:${ucc(u)}">${tago(t.lastDone)}</span>${ds!==null?`<span class="dot">·</span><span style="color:${dl<=0?'var(--red)':dl<=1?'var(--org)':'var(--t2)'};font-weight:${dl<=0?600:400}">${dl<=0?Math.abs(dl)+'d över':dl+'d kvar'}</span>`:''}</div></div><div class="task-actions">${assignHtml}<button class="task-btn" data-action="editTask" data-id="${t.id}">✏️</button><button class="task-btn" data-action="pickDate" data-id="${t.id}">📅</button><button class="check-btn" data-action="checkTask" data-id="${t.id}" style="border-color:${ucl};background:${ubg(u)}">✓</button></div></div>${S.datePicking===t.id?`<div class="date-pick"><input type="date" id="dp-${t.id}" value="${today()}" max="${today()}"><button style="background:var(--acc);color:#fff" data-action="confirmDate" data-id="${t.id}">Spara</button><button style="background:var(--bg2);color:var(--t2);border:1px solid var(--brd)" data-action="cancelDate">Avbryt</button></div>`:''}<div class="task-prog"><div class="task-prog-fill" style="width:${pct}%;background:${ucl}"></div></div></div>`;
   });
   return h+'</div>';
 }
 
 function rModal(){
   const m=S.modal;if(!m)return'';
-  if(m.type==='confirm') return `<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><h3 style="font-size:18px;margin-bottom:8px;font-weight:600">Ta bort uppgift?</h3><p style="color:var(--t2);font-size:14px;margin-bottom:20px">Kan inte ångras.</p><div class="br"><button class="bs" data-action="closeModal">Avbryt</button><button class="bp" style="background:var(--red)" data-action="confirmDelete" data-id="${m.taskId}">Ta bort</button></div></div></div>`;
-  if(m.type==='vacation'){const vt=S.tasks.find(t=>t.id==='__vacation__');return `<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">🏖️ Semester</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Var X:e dag</label><input class="fi" type="number" id="vf" value="${vt?vt.frequencyDays:90}" min="1"><p class="fh" style="margin-top:6px">T.ex. 90 = var 3:e månad</p></div><div class="fg"><label class="fl">Senaste semester</label><input class="fi" type="date" id="vl" value="${vt?.lastDone?vt.lastDone.split('T')[0]:today()}" max="${today()}"></div><div class="br"><button class="bp" data-action="saveVacation">Spara</button></div></div></div>`}
+
+  // Confirm delete
+  if(m.type==='confirm')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><h3 style="font-size:18px;margin-bottom:8px;font-weight:600">Ta bort uppgift?</h3><p style="color:var(--t2);font-size:14px;margin-bottom:20px">Kan inte ångras.</p><div class="br"><button class="bs" data-action="closeModal">Avbryt</button><button class="bp" style="background:var(--red)" data-action="confirmDelete" data-id="${m.taskId}">Ta bort</button></div></div></div>`;
+
+  // Vacation
+  if(m.type==='vacation'){const vt=S.tasks.find(t=>t.id==='__vacation__');return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">🏖️ Semester</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Var X:e dag</label><input class="fi" type="number" id="vf" value="${vt?vt.frequencyDays:90}" min="1"><p class="fh" style="margin-top:6px">T.ex. 90 = var 3:e månad</p></div><div class="fg"><label class="fl">Senaste semester</label><input class="fi" type="date" id="vl" value="${vt?.lastDone?vt.lastDone.split('T')[0]:today()}" max="${today()}"></div><div class="br"><button class="bp" data-action="saveVacation">Spara</button></div></div></div>`}
+
+  // Household
+  if(m.type==='household'){
+    let content='';
+    if(S.household){
+      // Show household info
+      const membersHtml=S.household.members.map(mem=>`<div class="hh-member">${mem.photo?`<img src="${mem.photo}" referrerpolicy="no-referrer">`:'<span style="font-size:20px">👤</span>'}<span class="hh-member-name">${mem.name}</span>${mem.uid===S.user?.uid?'<span class="hh-member-you">Du</span>':''}</div>`).join('');
+      const catsHtml=CATS.filter(c=>c.id!=='recovery').map(c=>{
+        const on=isSharedCat(c.id);
+        return`<div class="hh-cat-toggle"><div class="hh-cat-l"><span>${c.icon}</span><span>${c.label}</span></div><button class="toggle ${on?'on':''}" data-action="toggleSharedCat" data-cat="${c.id}"></button></div>`;
+      }).join('');
+      content=`<div class="md-head"><h2 class="md-title">🏠 Hushåll</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Dela denna kod</label><div class="hh-code">${S.householdId}</div></div><div class="fg"><label class="fl">Medlemmar</label><div class="hh-members">${membersHtml}</div></div><div class="fg"><label class="fl">Delade kategorier</label><p style="font-size:12px;color:var(--t3);margin-bottom:10px">Tasks i delade kategorier synkas mellan er.</p>${catsHtml}</div><div class="br"><button class="bd" data-action="leaveHousehold">Lämna hushåll</button></div>`;
+    }else{
+      // Create or join
+      content=`<div class="md-head"><h2 class="md-title">🏠 Hushåll</h2><button class="md-close" data-action="closeModal">✕</button></div><p style="font-size:13px;color:var(--t2);margin-bottom:20px">Koppla ihop med en partner för att dela uppgifter som städning, inköp och mer.</p><div class="fg"><button class="bp" data-action="createHousehold" style="margin-bottom:12px">Skapa nytt hushåll</button><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div class="divider-line" style="flex:1;height:1px;background:var(--brd)"></div><span style="font-size:11px;color:var(--tm)">ELLER</span><div class="divider-line" style="flex:1;height:1px;background:var(--brd)"></div></div><label class="fl">Gå med i hushåll</label><div style="display:flex;gap:8px"><input class="fi" id="hh-code-input" placeholder="Ange 6-siffrig kod" maxlength="6" style="text-transform:uppercase;letter-spacing:3px;font-family:'Space Mono',monospace;text-align:center"><button class="bp" data-action="joinHousehold" style="flex:0 0 auto;padding:13px 20px">Gå med</button></div><p id="hh-error" style="font-size:12px;color:var(--red);margin-top:8px;display:none">Kod hittades inte eller hushållet är fullt.</p></div>`;
+    }
+    return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()">${content}</div></div>`;
+  }
+
+  // Task modal
   const t=m.task||{},isE=!!t.id;
-  return `<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny uppgift'}</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Namn</label><input class="fi" id="tn" value="${t.name||''}" placeholder="T.ex. Publicera på TikTok" autofocus></div><div class="fg"><label class="fl">Kategori</label><div class="cg">${CATS.map(c=>{const sel=(t.category||S.expandedCat||'content')===c.id;return`<button class="co ${sel?'sel':''}" data-action="setCat" data-cat="${c.id}" style="${sel?`border-color:${ccol(c.id)};color:${ccol(c.id)};font-weight:600`:''}">${c.icon} ${c.label}</button>`}).join('')}</div></div><div class="fg"><label class="fl">Frekvens (dagar)</label><div class="fr">${[1,2,3,7,14,21,30].map(d=>`<button class="fb ${parseInt(t.frequencyDays||7)===d?'sel':''}" data-action="setFreq" data-freq="${d}">${d}</button>`).join('')}<input class="fi" style="width:65px;text-align:center" id="tf" type="number" min="1" value="${t.frequencyDays||7}"></div><p class="fh">= var ${ffreq(t.frequencyDays||7)}</p></div>${isE?`<div class="fg"><label class="fl">Senast gjord</label><input class="fi" type="date" id="tl" value="${t.lastDone?t.lastDone.split('T')[0]:''}" max="${today()}"></div>`:''}<div class="br">${isE&&!t.isProtected?`<button class="bd" data-action="deleteTask" data-id="${t.id}">🗑 Ta bort</button>`:''}<button class="bp" data-action="saveTask">${isE?'Spara':'Lägg till'}</button></div></div></div>`;
+  const shared=isSharedCat(t.category||S.expandedCat||'content');
+  let assignField='';
+  if(shared&&S.household&&isE){
+    const members=[{uid:null,name:'Vem som helst',photo:null},...S.household.members];
+    assignField=`<div class="fg"><label class="fl">Tilldelad</label><div class="assign-row">${members.map(mem=>{
+      const sel=(t.assignedTo||null)===(mem.uid);
+      return`<button class="assign-opt ${sel?'sel':''}" data-action="setAssign" data-uid="${mem.uid||''}">${mem.photo?`<img src="${mem.photo}" referrerpolicy="no-referrer">`:'👤'} ${mem.uid===S.user?.uid?'Jag':mem.name}</button>`;
+    }).join('')}</div></div>`;
+  }
+  return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny uppgift'}</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Namn</label><input class="fi" id="tn" value="${t.name||''}" placeholder="T.ex. Publicera på TikTok" autofocus></div><div class="fg"><label class="fl">Kategori</label><div class="cg">${CATS.map(c=>{const sel=(t.category||S.expandedCat||'content')===c.id;const sh=isSharedCat(c.id);return`<button class="co ${sel?'sel':''}" data-action="setCat" data-cat="${c.id}" style="${sel?`border-color:${ccol(c.id)};color:${ccol(c.id)};font-weight:600`:''}">${c.icon} ${c.label}${sh?' 👥':''}</button>`}).join('')}</div></div><div class="fg"><label class="fl">Frekvens (dagar)</label><div class="fr">${[1,2,3,7,14,21,30].map(d=>`<button class="fb ${parseInt(t.frequencyDays||7)===d?'sel':''}" data-action="setFreq" data-freq="${d}">${d}</button>`).join('')}<input class="fi" style="width:65px;text-align:center" id="tf" type="number" min="1" value="${t.frequencyDays||7}"></div><p class="fh">= var ${ffreq(t.frequencyDays||7)}</p></div>${isE?`<div class="fg"><label class="fl">Senast gjord</label><input class="fi" type="date" id="tl" value="${t.lastDone?t.lastDone.split('T')[0]:''}" max="${today()}"></div>`:''}${assignField}<div class="br">${isE&&!t.isProtected?`<button class="bd" data-action="deleteTask" data-id="${t.id}">🗑 Ta bort</button>`:''}<button class="bp" data-action="saveTask">${isE?'Spara':'Lägg till'}</button></div></div></div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -374,7 +626,6 @@ function bind(){
   const fi=document.getElementById('tf');
   if(fi)fi.addEventListener('input',()=>{const h=fi.closest('.fg')?.querySelector('.fh');if(h)h.textContent='= var '+ffreq(fi.value||'7');document.querySelectorAll('.fb').forEach(b=>b.classList.toggle('sel',b.dataset.freq===fi.value))});
   const af=document.querySelector('[autofocus]');if(af)setTimeout(()=>af.focus(),50);
-  // Close profile on outside click
   document.addEventListener('click',e=>{if(S.profileOpen&&!e.target.closest('.profile-chip')&&!e.target.closest('.profile-drop')){S.profileOpen=false;R()}},{once:true});
 }
 
@@ -382,7 +633,7 @@ function H(e){
   const el=e.currentTarget,a=el.dataset.action;
   switch(a){
     case 'toggleTheme':S.theme=S.theme==='dark'?'light':'dark';save();R();break;
-    case 'toggleProfile':S.profileOpen=!S.profileOpen;R();break;
+    case 'toggleProfile':e.stopPropagation();S.profileOpen=!S.profileOpen;R();break;
     case 'signIn':gSignIn();break;
     case 'signOut':gSignOut();break;
     case 'addTask':S.modal={type:'task'};pNav();R();break;
@@ -391,37 +642,103 @@ function H(e){
     case 'setSort':S.sort=el.dataset.sort;R();break;
     case 'hidePrio':S.hiddenFromPrio.add(el.dataset.id);R();break;
     case 'checkTask':{
-      const t=S.tasks.find(x=>x.id===el.dataset.id);
-      if(t){t.lastDone=new Date().toISOString();S.hiddenFromPrio.delete(t.id);el.classList.add('pop');save();setTimeout(R,450)}
+      const f=findTask(el.dataset.id);
+      if(f){f.task.lastDone=new Date().toISOString();S.hiddenFromPrio.delete(f.task.id);el.classList.add('pop');save();setTimeout(R,450)}
       break;
     }
     case 'pickDate':S.datePicking=S.datePicking===el.dataset.id?null:el.dataset.id;R();break;
-    case 'confirmDate':{const inp=document.getElementById('dp-'+el.dataset.id);if(inp?.value){const t=S.tasks.find(x=>x.id===el.dataset.id);if(t){t.lastDone=new Date(inp.value+'T12:00:00').toISOString();S.datePicking=null;S.hiddenFromPrio.delete(t.id);save();R()}}break;}
+    case 'confirmDate':{const inp=document.getElementById('dp-'+el.dataset.id);if(inp?.value){const f=findTask(el.dataset.id);if(f){f.task.lastDone=new Date(inp.value+'T12:00:00').toISOString();S.datePicking=null;S.hiddenFromPrio.delete(f.task.id);save();R()}}break;}
     case 'cancelDate':S.datePicking=null;R();break;
-    case 'editTask':{const t=S.tasks.find(x=>x.id===el.dataset.id);if(t){S.modal={type:'task',task:{...t}};pNav();R()}break;}
+    case 'editTask':{const f=findTask(el.dataset.id);if(f){S.modal={type:'task',task:{...f.task},source:f.source};pNav();R()}break;}
     case 'closeModal':S.modal=null;R();break;
     case 'editVacation':S.modal={type:'vacation'};pNav();R();break;
     case 'saveVacation':{const f=parseInt(document.getElementById('vf').value)||90,ld=document.getElementById('vl').value;let vt=S.tasks.find(t=>t.id==='__vacation__');if(!vt){vt={...VTASK};S.tasks.push(vt)}vt.frequencyDays=f;vt.lastDone=ld?new Date(ld+'T12:00:00').toISOString():new Date().toISOString();S.modal=null;save();R();break;}
     case 'setCat':{document.querySelectorAll('.co').forEach(b=>{b.classList.remove('sel');b.removeAttribute('style')});el.classList.add('sel');el.style.cssText=`border-color:${ccol(el.dataset.cat)};color:${ccol(el.dataset.cat)};font-weight:600`;document.querySelector('.cg').dataset.selected=el.dataset.cat;break;}
     case 'setFreq':{const f=el.dataset.freq;document.getElementById('tf').value=f;document.querySelectorAll('.fb').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');const h=el.closest('.fg').querySelector('.fh');if(h)h.textContent='= var '+ffreq(f);break;}
+    case 'setAssign':{
+      const uid=el.dataset.uid||null;
+      if(S.modal?.task)S.modal.task.assignedTo=uid||null;
+      document.querySelectorAll('.assign-opt').forEach(b=>b.classList.remove('sel'));
+      el.classList.add('sel');
+      break;
+    }
+    case 'cycleAssign':{
+      const f=findTask(el.dataset.id);
+      if(f&&S.household){
+        const members=[null,...S.household.members.map(m=>m.uid)];
+        const cur=f.task.assignedTo||null;
+        const idx=members.indexOf(cur);
+        f.task.assignedTo=members[(idx+1)%members.length]||null;
+        save();R();
+      }
+      break;
+    }
     case 'saveTask':{
       const ne=document.getElementById('tn'),fe=document.getElementById('tf');
-      const sc=document.querySelector('.cg')?.dataset.selected||document.querySelector('.co.sel')?.dataset.cat||S.expandedCat||'content';
-      const n=ne?.value?.trim();if(!n){ne?.focus();return}const f=Math.max(1,parseInt(fe?.value)||7);
-      if(S.modal.task?.id){const t=S.tasks.find(x=>x.id===S.modal.task.id);if(t){t.name=n;t.category=sc;t.frequencyDays=f;const lde=document.getElementById('tl');if(lde?.value)t.lastDone=new Date(lde.value+'T12:00:00').toISOString();else if(lde&&!lde.value)t.lastDone=null}}
-      else S.tasks.push({id:gid(),name:n,category:sc,frequencyDays:f,lastDone:null});
+      const selCat=document.querySelector('.cg')?.dataset.selected||document.querySelector('.co.sel')?.dataset.cat||S.expandedCat||'content';
+      const n=ne?.value?.trim();if(!n){ne?.focus();return}const freq=Math.max(1,parseInt(fe?.value)||7);
+      const shared=isSharedCat(selCat);
+
+      if(S.modal.task?.id){
+        // Edit existing
+        const f=findTask(S.modal.task.id);
+        if(f){
+          const t=f.task;
+          const wasShared=f.source==='household';
+          const nowShared=shared;
+          t.name=n;t.category=selCat;t.frequencyDays=freq;
+          if(S.modal.task.assignedTo!==undefined)t.assignedTo=S.modal.task.assignedTo;
+          const lde=document.getElementById('tl');
+          if(lde?.value)t.lastDone=new Date(lde.value+'T12:00:00').toISOString();
+          else if(lde&&!lde.value)t.lastDone=null;
+          // Move between personal/household if category sharing changed
+          if(!wasShared&&nowShared&&S.household){
+            S.tasks=S.tasks.filter(x=>x.id!==t.id);
+            S.household.tasks.push(t);
+          }else if(wasShared&&!nowShared&&S.household){
+            S.household.tasks=S.household.tasks.filter(x=>x.id!==t.id);
+            S.tasks.push(t);
+          }
+        }
+      }else{
+        // Add new
+        const newTask={id:gid(),name:n,category:selCat,frequencyDays:freq,lastDone:null,assignedTo:null};
+        if(shared&&S.household){
+          S.household.tasks.push(newTask);
+        }else{
+          S.tasks.push(newTask);
+        }
+      }
       S.modal=null;save();R();break;
     }
-    case 'deleteTask':S.modal={type:'confirm',taskId:el.dataset.id};R();break;
-    case 'confirmDelete':S.tasks=S.tasks.filter(t=>t.id!==el.dataset.id);S.modal=null;save();R();break;
+    case 'deleteTask':{S.modal={type:'confirm',taskId:el.dataset.id};R();break;}
+    case 'confirmDelete':{
+      const id=el.dataset.id;
+      S.tasks=S.tasks.filter(t=>t.id!==id);
+      if(S.household)S.household.tasks=(S.household.tasks||[]).filter(t=>t.id!==id);
+      S.modal=null;save();R();break;
+    }
+    case 'openHousehold':S.profileOpen=false;S.modal={type:'household'};pNav();R();break;
+    case 'createHousehold':createHousehold().then(()=>{R()});break;
+    case 'joinHousehold':{
+      const inp=document.getElementById('hh-code-input');
+      const err=document.getElementById('hh-error');
+      if(inp?.value){
+        joinHousehold(inp.value).then(ok=>{
+          if(!ok&&err){err.style.display='block'}
+          else{S.modal={type:'household'};R()}
+        });
+      }
+      break;
+    }
+    case 'leaveHousehold':leaveHousehold().then(()=>{S.modal=null;R()});break;
+    case 'toggleSharedCat':toggleSharedCat(el.dataset.cat);break;
   }
 }
 
-// NAV
 function pNav(){history.pushState({},'');}
 window.addEventListener('popstate',()=>{if(S.modal){S.modal=null;R()}else if(S.expandedCat){S.expandedCat=null;S.datePicking=null;R()}});
 
-// INIT
 document.addEventListener('DOMContentLoaded',()=>{
   loadLocal();
   if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
