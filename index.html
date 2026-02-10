@@ -108,18 +108,16 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .prio-btn.check:active{transform:scale(.93)}
 .prio-btn.check.pop{animation:checkPop .5s ease}
 
-/* ── Vacation ── */
-.vac-bar{border-radius:12px;padding:12px 14px;margin-bottom:12px;background:var(--vac);position:relative;overflow:hidden;cursor:pointer;transition:transform .2s}
-.vac-bar:hover{transform:translateY(-1px)}
-.vac-bar::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 20px,rgba(255,255,255,.03) 20px,rgba(255,255,255,.03) 40px)}
-.vac-top{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
-.vac-label{font-size:13px;font-weight:600;color:rgba(255,255,255,.9);display:flex;align-items:center;gap:6px}
-.vac-num{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:#fff}
-.vac-sub{font-size:10px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px}
-.vac-prog{height:3px;background:rgba(255,255,255,.15);border-radius:2px;margin-top:8px;position:relative;z-index:1;overflow:hidden}
-.vac-prog-fill{height:100%;border-radius:2px;background:rgba(255,255,255,.65);transition:width .6s ease}
-.vac-empty{border:1.5px dashed var(--brd2);border-radius:12px;padding:14px;text-align:center;cursor:pointer;margin-bottom:12px;transition:all .2s;color:var(--t3);font-size:13px}
-.vac-empty:hover{border-color:var(--acc);color:var(--acc)}
+/* ── Vacation (slim) ── */
+.vac-strip{display:flex;align-items:center;gap:8px;padding:6px 0 8px;cursor:pointer;transition:opacity .2s;border-bottom:1px solid var(--brd)}
+.vac-strip:hover{opacity:.8}
+.vac-strip .vac-ico{font-size:14px;flex-shrink:0}
+.vac-strip .vac-prog{flex:1;height:3px;background:var(--bg-in);border-radius:2px;overflow:hidden;min-width:40px}
+.vac-strip .vac-prog-fill{height:100%;border-radius:2px;background:var(--acc);transition:width .6s ease}
+.vac-strip .vac-txt{font-size:12px;font-family:'Space Mono',monospace;font-weight:600;color:var(--acc);white-space:nowrap}
+.vac-strip .vac-label{font-size:11px;color:var(--t3);white-space:nowrap}
+.vac-empty-s{display:flex;align-items:center;gap:6px;padding:6px 0 8px;cursor:pointer;font-size:12px;color:var(--t3);border-bottom:1px solid var(--brd);transition:color .2s}
+.vac-empty-s:hover{color:var(--acc)}
 
 /* ── Categories ── */
 .cats{display:flex;flex-direction:column;gap:6px}
@@ -292,7 +290,7 @@ function R(){
   const sn=all.filter(t=>{const u=urg(t);return u>=.75&&u<1}).length;
   const kl=all.filter(t=>urg(t)<.5).length;
   const allK=od===0&&sn===0;
-  app.innerHTML=rHeader()+rStats(od,sn,kl,allK)+rPrio()+rVacation()+(S.expandedCat?rTaskView():rCats())+(S.modal?rModal():'');
+  app.innerHTML=rHeader()+rStats(od,sn,kl,allK)+rPrio()+(S.expandedCat?rTaskView():rCats())+(S.modal?rModal():'');
   bind();
 }
 
@@ -304,7 +302,7 @@ function rHeader(){
   } else {
     prof=`<button class="signin-btn" data-action="signIn">${GSVG} Logga in</button>`;
   }
-  return `<header class="hdr"><div class="hdr-row"><div class="hdr-left"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1></div><div class="hdr-actions"><div style="position:relative">${prof}</div><button class="icon-btn" data-action="toggleTheme">${S.theme==='dark'?'☀️':'🌙'}</button><button class="add-btn" data-action="addTask"><span>+</span> <span class="plus-label">Ny</span></button></div></div></header>`;
+  return `<header class="hdr"><div class="hdr-row"><div class="hdr-left"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1></div><div class="hdr-actions"><div style="position:relative">${prof}</div><button class="icon-btn" data-action="toggleTheme">${S.theme==='dark'?'☀️':'🌙'}</button><button class="add-btn" data-action="addTask"><span>+</span> <span class="plus-label">Ny</span></button></div></div>${rVacation()}</header>`;
 }
 
 function rStats(od,sn,kl,allK){
@@ -330,9 +328,9 @@ function rPrio(){
 
 function rVacation(){
   const vt=S.tasks.find(t=>t.id==='__vacation__');if(!vt)return'';
-  if(!vt.lastDone) return `<div class="vac-empty" data-action="editVacation">🏖️ Ställ in semester – ditt ljus i tunneln</div>`;
+  if(!vt.lastDone) return `<div class="vac-empty-s" data-action="editVacation"><span>🏖️</span> <span>Ställ in semester →</span></div>`;
   const ds=dsince(vt.lastDone),dl=Math.max(0,vt.frequencyDays-ds),p=Math.min(ds/vt.frequencyDays,1),ov=dl===0;
-  return `<div class="vac-bar" data-action="editVacation"><div class="vac-top"><div class="vac-label">🏖️ Semester</div><div style="text-align:right"><div class="vac-num">${ov?'🎉 Dags!':dl}</div><div class="vac-sub">${ov?'Njut!':'dagar kvar'}</div></div></div><div class="vac-prog"><div class="vac-prog-fill" style="width:${p*100}%"></div></div></div>`;
+  return `<div class="vac-strip" data-action="editVacation"><span class="vac-ico">🏖️</span><span class="vac-label">Semester</span><div class="vac-prog"><div class="vac-prog-fill" style="width:${p*100}%"></div></div><span class="vac-txt">${ov?'🎉 Dags!':dl+'d'}</span></div>`;
 }
 
 function rCats(){
