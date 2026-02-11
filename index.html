@@ -69,9 +69,11 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .p-btn:hover{background:var(--bg3);color:var(--t1)}
 .p-btn.danger:hover{background:var(--red-s);color:var(--red);border-color:var(--red-s)}
 .p-hh-badge{font-size:10px;padding:2px 6px;border-radius:5px;background:var(--acc-g);color:var(--acc);font-weight:600;margin-left:auto}
-.signin-btn{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:10px;border:1px solid rgba(66,133,244,.3);background:rgba(66,133,244,.08);color:var(--t1);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
-.signin-btn:hover{background:rgba(66,133,244,.15)}
-.signin-btn svg{width:16px;height:16px;flex-shrink:0}
+.signin-btn{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:10px;border:1px solid var(--brd2);background:var(--bg2);color:var(--t1);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.signin-btn:hover{background:var(--bg3)}
+/* Auth provider buttons */
+.auth-provider-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 16px;border-radius:10px;border:1px solid var(--brd2);background:var(--bg-in);color:var(--t1);font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.auth-provider-btn:hover{background:var(--bg3);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,0.1)}
 .hdr-actions{display:flex;align-items:center;gap:6px}
 .icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--brd);background:var(--bg2);color:var(--t2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .icon-btn:hover{background:var(--bg3);transform:translateY(-1px)}
@@ -253,7 +255,12 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 // FIREBASE
 // ═══════════════════════════════════════════════════════════════
 firebase.initializeApp({apiKey:"AIzaSyD-n66FkaZuWkLN8r2i-iMBv-FBXklwLbM",authDomain:"puls-whack-a-do.firebaseapp.com",projectId:"puls-whack-a-do",storageBucket:"puls-whack-a-do.firebasestorage.app",messagingSenderId:"348032853742",appId:"1:348032853742:web:2a9b573470f28c5dedf5ff",measurementId:"G-Q6W3PVF0ZY"});
-const auth=firebase.auth(),db=firebase.firestore(),gProv=new firebase.auth.GoogleAuthProvider();
+const auth=firebase.auth(),db=firebase.firestore();
+const gProv=new firebase.auth.GoogleAuthProvider();
+const msProv=new firebase.auth.OAuthProvider('microsoft.com');
+msProv.setCustomParameters({prompt:'select_account'});
+const appleProv=new firebase.auth.OAuthProvider('apple.com');
+appleProv.addScope('email');appleProv.addScope('name');
 db.enablePersistence({synchronizeTabs:true}).catch(e=>console.log('P:',e.code));
 
 // ═══════════════════════════════════════════════════════════════
@@ -326,8 +333,9 @@ async function mergeUp(){if(!S.user)return;const s=await db.collection('users').
 // ═══════════════════════════════════════════════════════════════
 // AUTH
 // ═══════════════════════════════════════════════════════════════
-async function gSignIn(){try{await auth.signInWithPopup(gProv)}catch(e){if(e.code==='auth/popup-blocked')await auth.signInWithRedirect(gProv);else console.error(e)}}
-async function gSignOut(){if(_unsub){_unsub();_unsub=null}if(_hhUnsub){_hhUnsub();_hhUnsub=null}await auth.signOut();S.user=null;S.syncStatus='offline';S.profileOpen=false;S.household=null;R()}
+async function authWithProvider(prov){try{await auth.signInWithPopup(prov)}catch(e){if(e.code==='auth/popup-blocked')await auth.signInWithRedirect(prov);else if(e.code==='auth/account-exists-with-different-credential'){const methods=await auth.fetchSignInMethodsForEmail(e.email);S.modal={type:'authError',msg:`Det kontot är redan kopplat via ${methods[0]}. Logga in med den metoden istället.`};R()}else{console.error(e);S.modal={type:'authError',msg:e.message};R()}}}
+async function emailSignIn(email,pass){try{await auth.signInWithEmailAndPassword(email,pass)}catch(e){if(e.code==='auth/user-not-found'||e.code==='auth/invalid-credential'){try{await auth.createUserWithEmailAndPassword(email,pass)}catch(e2){S.modal={type:'authError',msg:e2.code==='auth/weak-password'?'Lösenordet måste vara minst 6 tecken.':e2.code==='auth/email-already-in-use'?'E-postadressen används redan med en annan inloggning.':e2.message};R()}}else{S.modal={type:'authError',msg:e.code==='auth/wrong-password'?'Fel lösenord.':e.code==='auth/invalid-email'?'Ogiltig e-postadress.':e.message};R()}}}
+async function doSignOut(){if(_unsub){_unsub();_unsub=null}if(_hhUnsub){_hhUnsub();_hhUnsub=null}await auth.signOut();S.user=null;S.syncStatus='offline';S.profileOpen=false;S.household=null;R()}
 auth.onAuthStateChanged(async u=>{S.user=u;if(u){S.syncStatus='syncing';R();await mergeUp();startSync();if(S.householdId)startHHSync()}else{S.syncStatus='offline';if(_unsub){_unsub();_unsub=null}if(_hhUnsub){_hhUnsub();_hhUnsub=null}R()}});
 
 // ═══════════════════════════════════════════════════════════════
@@ -384,7 +392,6 @@ const curg=id=>{const t=ctasks(id);return t.length?Math.max(...t.map(urg)):0};
 const cratio=id=>{const t=ctasks(id);if(!t.length)return 1;return t.filter(x=>urg(x)<.75).length/t.length};
 const today=()=>new Date().toISOString().split('T')[0];
 const ffreq=d=>{d=parseInt(d);return d===1?'dag':d===7?'vecka':d===14?'annan vecka':d===30?'månad':d+':e dag'};
-const GSVG=`<svg viewBox="0 0 48 48" style="width:16px;height:16px"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>`;
 
 // ═══════════════════════════════════════════════════════════════
 // SORT: by days left (most overdue first)
@@ -421,7 +428,7 @@ function rHeader(){
       const hhBtn=S.household?`<button class="p-btn" data-action="openHousehold">🏠 Hushåll <span class="p-hh-badge">${S.householdId}</span></button>`:`<button class="p-btn" data-action="openHousehold">🏠 Skapa/gå med i hushåll</button>`;
       prof+=`<div class="profile-drop"><div class="p-name">${S.user.displayName||'Inloggad'}</div><div class="p-email">${S.user.email||''}</div><div class="p-sync"><div class="sync-dot ${S.syncStatus}" style="width:6px;height:6px"></div> ${st}</div><div class="p-divider"></div>${hhBtn}<div class="p-divider"></div><button class="p-btn danger" data-action="signOut">Logga ut</button></div>`;
     }
-  }else{prof=`<button class="signin-btn" data-action="signIn">${GSVG} Logga in</button>`}
+  }else{prof=`<button class="signin-btn" data-action="openAuth">🔑 Logga in</button>`}
   return`<header class="hdr"><div class="hdr-row"><div class="hdr-left"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1></div><div class="hdr-actions"><div style="position:relative">${prof}</div><button class="icon-btn" data-action="toggleTheme">${S.theme==='dark'?'☀️':'🌙'}</button></div></div>${rVacation()}</header>`;
 }
 
@@ -520,6 +527,8 @@ function rTaskView(){
 function rModal(){
   const m=S.modal;if(!m)return'';
   if(m.type==='confirm')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><h3 style="font-size:18px;margin-bottom:8px;font-weight:600">Ta bort uppgift?</h3><p style="color:var(--t2);font-size:14px;margin-bottom:20px">Kan inte ångras.</p><div class="br"><button class="bs" data-action="closeModal">Avbryt</button><button class="bp" style="background:var(--red)" data-action="confirmDelete" data-id="${m.taskId}">Ta bort</button></div></div></div>`;
+  if(m.type==='authError')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">Inloggningsproblem</h2><button class="md-close" data-action="closeModal">✕</button></div><p style="color:var(--t2);font-size:14px;margin-bottom:16px">${m.msg||'Något gick fel.'}</p><div class="br"><button class="bp" data-action="openAuth">Försök igen</button></div></div></div>`;
+  if(m.type==='auth')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">Logga in</h2><button class="md-close" data-action="closeModal">✕</button></div><p style="font-size:13px;color:var(--t2);margin-bottom:18px">Logga in för att synka mellan enheter och dela med hushåll.</p><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px"><button class="auth-provider-btn" data-action="signInGoogle"><svg viewBox="0 0 48 48" style="width:18px;height:18px;flex-shrink:0"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Google</button><button class="auth-provider-btn ms" data-action="signInMicrosoft"><svg viewBox="0 0 21 21" style="width:18px;height:18px;flex-shrink:0"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg> Microsoft</button><button class="auth-provider-btn apple" data-action="signInApple"><svg viewBox="0 0 24 24" style="width:18px;height:18px;flex-shrink:0;fill:var(--t1)"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.52-3.23 0-1.44.62-2.2.44-3.06-.4C3.79 16.17 4.36 9.02 8.7 8.76c1.26.07 2.13.72 2.87.76.83-.17 2.08-.84 3.52-.72 1.59.14 2.78.82 3.54 2.07-3.24 1.93-2.47 6.17.62 7.35-.56 1.44-1.28 2.86-2.2 4.06zM12.05 8.67c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg> Apple</button></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><div style="flex:1;height:1px;background:var(--brd)"></div><span style="font-size:11px;color:var(--tm)">ELLER</span><div style="flex:1;height:1px;background:var(--brd)"></div></div><div class="fg"><label class="fl">E-post</label><input class="fi" id="auth-email" type="email" placeholder="din@epost.se"></div><div class="fg"><label class="fl">Lösenord</label><input class="fi" id="auth-pass" type="password" placeholder="Minst 6 tecken"></div><p id="auth-err" style="font-size:12px;color:var(--red);margin-bottom:8px;display:none"></p><div class="br"><button class="bp" data-action="signInEmail">Logga in / Skapa konto</button></div></div></div>`;
   if(m.type==='vacation'){const vt=S.tasks.find(t=>t.id==='__vacation__');return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">🏖️ Semester</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Var X:e dag</label><input class="fi" type="number" id="vf" value="${vt?vt.frequencyDays:90}" min="1"><p class="fh" style="margin-top:6px">T.ex. 90 = var 3:e månad</p></div><div class="fg"><label class="fl">Senaste semester</label><input class="fi" type="date" id="vl" value="${vt?.lastDone?vt.lastDone.split('T')[0]:today()}" max="${today()}"></div><div class="br"><button class="bp" data-action="saveVacation">Spara</button></div></div></div>`}
   if(m.type==='household'){
     let c='';
@@ -560,8 +569,12 @@ function H(e){
   switch(a){
     case 'toggleTheme':S.theme=S.theme==='dark'?'light':'dark';save();R();break;
     case 'toggleProfile':e.stopPropagation();S.profileOpen=!S.profileOpen;R();break;
-    case 'signIn':gSignIn();break;
-    case 'signOut':gSignOut();break;
+    case 'openAuth':S.modal={type:'auth'};pNav();R();break;
+    case 'signInGoogle':S.modal=null;R();authWithProvider(gProv);break;
+    case 'signInMicrosoft':S.modal=null;R();authWithProvider(msProv);break;
+    case 'signInApple':S.modal=null;R();authWithProvider(appleProv);break;
+    case 'signInEmail':{const em=document.getElementById('auth-email')?.value?.trim();const pw=document.getElementById('auth-pass')?.value;if(!em||!pw){const err=document.getElementById('auth-err');if(err){err.textContent='Fyll i e-post och lösenord.';err.style.display='block'}return}S.modal=null;R();emailSignIn(em,pw);break}
+    case 'signOut':doSignOut();break;
     case 'addTask':S.modal={type:'task'};pNav();R();break;
     case 'expandCat':S.expandedCat=el.dataset.cat;S.datePicking=null;S.expandedTask=null;pNav();R();break;
     case 'collapseCat':S.expandedCat=null;S.datePicking=null;S.expandedTask=null;R();break;
