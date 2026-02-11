@@ -101,20 +101,25 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .prio-section{margin-bottom:0}
 .prio-title{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .prio-title .prio-count{font-family:'Space Mono',monospace;color:var(--red);font-size:12px}
-.prio-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--bg2);border:1px solid var(--brd);margin-bottom:6px;transition:all .2s;animation:fadeSlideIn .25s ease forwards;opacity:0;cursor:pointer}
-.prio-card:hover{background:var(--bg3)}
-/* Hero card – the #1 most urgent */
-.prio-card.hero{padding:14px 16px;border-width:2px;border-color:var(--red);background:var(--red-s);box-shadow:0 0 20px rgba(255,71,87,0.08),0 4px 16px rgba(0,0,0,0.15)}
+/* ALL prio cards – elevated from categories */
+.prio-card{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:var(--bg3);border:1.5px solid var(--brd2);margin-bottom:6px;transition:all .2s;animation:fadeSlideIn .25s ease forwards;opacity:0;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.prio-card:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+/* Days number – on every prio card */
+.prio-days-box{text-align:center;min-width:42px;flex-shrink:0}
+.prio-days{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;line-height:1}
+.prio-days-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
+/* Hero – #1 most urgent, extra punch */
+.prio-card.hero{padding:16px;border-width:2px;border-color:var(--red);background:var(--red-s);box-shadow:0 0 24px rgba(255,71,87,0.1),0 4px 16px rgba(0,0,0,0.15)}
 .prio-card.hero .prio-name{font-size:16px;font-weight:700}
 .prio-card.hero .prio-meta{font-size:12px}
 .prio-card.hero .prio-cat-dot{height:36px;width:5px}
 .prio-card.hero .prio-check{width:44px;height:44px;font-size:20px;border-radius:12px}
-.prio-card.hero .prio-days{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--red);margin-right:4px;line-height:1}
-.prio-card.hero .prio-days-lbl{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px}
-/* Runner-up cards (2nd, 3rd) */
+.prio-card.hero .prio-days{font-size:24px;color:var(--red)}
+.prio-card.hero .prio-action-btn{width:36px;height:36px;font-size:16px}
+/* Runner-up – #2-3 */
 .prio-card.runner{border-color:var(--brd2);background:var(--bg3)}
 .prio-card.runner .prio-name{font-size:14px;font-weight:600}
-/* Remaining cards stay default */
+.prio-card.runner .prio-days{font-size:18px}
 .prio-cat-dot{width:4px;height:28px;border-radius:2px;flex-shrink:0}
 .prio-info{flex:1;min-width:0}
 .prio-name{font-size:13px;font-weight:500;margin-bottom:2px;display:flex;align-items:center;gap:6px}
@@ -125,6 +130,20 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .prio-check.pop{animation:checkPop .5s ease}
 /* Pinned indicator */
 .prio-pin{font-size:10px;color:var(--acc);margin-left:2px}
+/* Shared task highlight */
+.prio-card.shared-task{border-left:3px solid var(--acc);background:rgba(99,102,241,0.06)}
+.prio-card.shared-task.hero{border-left:4px solid var(--acc)}
+.shared-tag{font-size:9px;font-weight:600;padding:2px 5px;border-radius:4px;background:var(--acc-g);color:var(--acc);letter-spacing:.3px}
+.task.shared-task{border-left-color:var(--acc) !important;background:rgba(99,102,241,0.03)}
+/* Days box in task cards (category view) */
+.task-days-box{text-align:center;min-width:38px;flex-shrink:0}
+.task-days{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;line-height:1}
+.task-days-lbl{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.3px;margin-top:2px}
+/* Inline action btn (↑↓📌) next to check */
+.prio-action-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--t2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.prio-action-btn:hover{background:var(--bg3);color:var(--t1);transform:scale(1.08)}
+.prio-action-btn:active{transform:scale(.93)}
+.prio-card.hero .prio-action-btn{width:36px;height:36px;font-size:16px}
 /* Expanded action row under prio card */
 .prio-expand{display:flex;align-items:center;gap:6px;padding:8px 12px 4px;animation:fadeSlideIn .15s ease forwards;opacity:0}
 .prio-expand-btn{padding:6px 12px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--t2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px;transition:all .15s}
@@ -322,7 +341,25 @@ function genHHCode(){const c='ABCDEFGHJKLMNPRSTUVWXYZ23456789';let r='';for(let 
 async function createHH(){if(!S.user)return;const code=genHHCode();const me={uid:S.user.uid,name:S.user.displayName||'Du',photo:S.user.photoURL||''};await db.collection('households').doc(code).set({members:[me],sharedCats:[],tasks:[],createdAt:firebase.firestore.FieldValue.serverTimestamp()});S.householdId=code;await saveCloud();startHHSync()}
 async function joinHH(code){if(!S.user)return false;code=code.toUpperCase().trim();const snap=await db.collection('households').doc(code).get();if(!snap.exists)return false;const d=snap.data();if(d.members.length>=2||d.members.find(m=>m.uid===S.user.uid))return false;d.members.push({uid:S.user.uid,name:S.user.displayName||'Du',photo:S.user.photoURL||''});await db.collection('households').doc(code).update({members:d.members});S.householdId=code;await saveCloud();startHHSync();return true}
 async function leaveHH(){if(!S.householdId||!S.user||!S.household)return;const r=S.household.members.filter(m=>m.uid!==S.user.uid);if(r.length===0)await db.collection('households').doc(S.householdId).delete();else await db.collection('households').doc(S.householdId).update({members:r});if(_hhUnsub){_hhUnsub();_hhUnsub=null}S.householdId=null;S.household=null;await saveCloud();R()}
-function toggleSharedCat(cid){if(!S.household)return;const sc=S.household.sharedCats||[];const i=sc.indexOf(cid);if(i>=0)sc.splice(i,1);else sc.push(cid);S.household.sharedCats=sc;saveHH();R()}
+function toggleSharedCat(cid){
+  if(!S.household)return;
+  const sc=S.household.sharedCats||[];const i=sc.indexOf(cid);
+  if(i>=0){
+    // Unsharing: move household tasks in this cat back to personal
+    const moving=(S.household.tasks||[]).filter(t=>t.category===cid);
+    S.household.tasks=(S.household.tasks||[]).filter(t=>t.category!==cid);
+    moving.forEach(t=>S.tasks.push(t));
+    sc.splice(i,1);
+  }else{
+    // Sharing: move personal tasks in this cat to household
+    const moving=S.tasks.filter(t=>t.category===cid&&t.id!=='__vacation__');
+    S.tasks=S.tasks.filter(t=>t.category!==cid||t.id==='__vacation__');
+    moving.forEach(t=>{t.assignedTo=t.assignedTo||null;S.household.tasks.push(t)});
+    sc.push(cid);
+  }
+  S.household.sharedCats=sc;
+  saveHH();saveLocal();saveCloud();R();
+}
 function isShared(cid){return S.household?.sharedCats?.includes(cid)||false}
 function getPartner(){return S.household?.members?.find(m=>m.uid!==S.user?.uid)||null}
 function getMember(uid){return S.household?.members?.find(m=>m.uid===uid)||null}
@@ -421,10 +458,14 @@ function rPrio(){
     // Visual tier: 0=hero, 1-2=runner, rest=default
     const tier=i===0?'hero':i<=2?'runner':'';
     // Hero gets a big days display
-    const daysHtml=tier==='hero'?`<div style="text-align:center;margin-right:4px"><div class="prio-days">${dl<=0?Math.abs(dl):dl}</div><div class="prio-days-lbl">${dl<=0?'över':'kvar'}</div></div>`:'';
-    h+=`<div><div class="prio-card ${tier}" style="animation-delay:${i*.03}s${isExp?';border-radius:10px 10px '+(S.datePicking===t.id?'0 0':'10px 10px'):''}"><div class="prio-cat-dot" style="background:${ccol(t.category)}"></div><div class="prio-info" data-action="toggleTask" data-id="${t.id}"><div class="prio-name">${t.name} ${isLifted?'<span class="prio-pin">📌</span>':''}<span class="prio-badge" style="background:${ubg(u)};color:${ucc(u)}">${ulab(u)}</span></div><div class="prio-meta">${cat?cat.icon+' '+cat.label:''}${shared?' · 👥':''} · <span style="color:${dl<=0?'var(--red)':'var(--org)'};font-weight:600">${dl<=0?Math.abs(dl)+'d över':dl+'d kvar'}</span></div></div>${daysHtml}<button class="prio-check" data-action="checkTask" data-id="${t.id}">✓</button></div>`;
+    // Days display on EVERY prio card, colored by urgency
+    const daysVal=dl<=0?Math.abs(dl):dl;
+    const daysColor=dl<=0?'var(--red)':dl<=2?'var(--org)':'var(--yel)';
+    const daysLabel=ds===null?'ny':dl<=0?'över':'kvar';
+    const daysHtml=`<div class="prio-days-box"><div class="prio-days" style="color:${daysColor}">${ds===null?'–':daysVal}</div><div class="prio-days-lbl">${daysLabel}</div></div>`;
+    h+=`<div><div class="prio-card ${tier}${shared?' shared-task':''}" style="animation-delay:${i*.03}s${isExp?';border-radius:10px 10px '+(S.datePicking===t.id?'0 0':'10px 10px'):''}"><div class="prio-cat-dot" style="background:${ccol(t.category)}"></div><div class="prio-info" data-action="toggleTask" data-id="${t.id}"><div class="prio-name">${t.name} ${isLifted?'<span class="prio-pin">📌</span>':''}${shared?'<span class="shared-tag">👥</span>':''}<span class="prio-badge" style="background:${ubg(u)};color:${ucc(u)}">${ulab(u)}</span></div><div class="prio-meta">${cat?cat.icon+' '+cat.label:''} · ${tago(t.lastDone)}</div></div>${daysHtml}<div style="display:flex;align-items:center;gap:4px">${isLifted?`<button class="prio-action-btn" data-action="unliftPrio" data-id="${t.id}" title="Av-pinna">📌</button>`:`<button class="prio-action-btn" data-action="hidePrio" data-id="${t.id}" title="Skicka ner">↓</button>`}<button class="prio-check" data-action="checkTask" data-id="${t.id}">✓</button></div></div>`;
     if(isExp){
-      h+=`<div class="prio-expand"><button class="prio-expand-btn" data-action="editTask" data-id="${t.id}">✏️ Redigera</button><button class="prio-expand-btn" data-action="pickDate" data-id="${t.id}">📅 Ange datum</button>${isLifted?`<button class="prio-expand-btn" data-action="unliftPrio" data-id="${t.id}">📌 Av-pinna</button>`:`<button class="prio-expand-btn" data-action="hidePrio" data-id="${t.id}">↓ Dölj</button>`}</div>`;
+      h+=`<div class="prio-expand"><button class="prio-expand-btn" data-action="editTask" data-id="${t.id}">✏️ Redigera</button><button class="prio-expand-btn" data-action="pickDate" data-id="${t.id}">📅 Ange datum</button></div>`;
       if(S.datePicking===t.id){
         h+=`<div class="date-pick" style="padding:4px 12px 8px"><input type="date" id="dp-${t.id}" value="${today()}" max="${today()}"><button style="background:var(--acc);color:#fff" data-action="confirmDate" data-id="${t.id}">Spara</button><button style="background:var(--bg2);color:var(--t2);border:1px solid var(--brd)" data-action="cancelDate">Avbryt</button></div>`;
       }
@@ -459,10 +500,14 @@ function rTaskView(){
   sorted.forEach((t,i)=>{
     const u=urg(t),ds=dsince(t.lastDone),dl=ds!==null?t.frequencyDays-ds:0,ucl=ucol(u),pct=Math.min(u*100,100);
     const isExp=S.expandedTask===t.id;
-    h+=`<div class="task" style="animation-delay:${i*.04}s;border-left:3px solid ${ucl}"><div class="task-top"><div class="task-info" data-action="toggleTask" data-id="${t.id}"><div class="task-name">${t.name} <span class="task-badge" style="background:${ubg(u)};color:${ucc(u)}">${ulab(u)}</span></div><div class="task-meta"><span>Var ${t.frequencyDays}:e dag</span><span class="dot">·</span><span style="color:${ucc(u)}">${tago(t.lastDone)}</span>${ds!==null?`<span class="dot">·</span><span style="color:${dl<=0?'var(--red)':dl<=1?'var(--org)':'var(--t2)'};font-weight:${dl<=0?600:400}">${dl<=0?Math.abs(dl)+'d över':dl+'d kvar'}</span>`:''}</div></div><button class="check-btn" data-action="checkTask" data-id="${t.id}" style="border-color:${ucl};background:${ubg(u)}">✓</button></div>`;
+    const isLifted=S.liftedToPrio.has(t.id);
+    const daysVal=dl<=0?Math.abs(dl):dl;
+    const daysColor=dl<=0?'var(--red)':dl<=2?'var(--org)':u>=.5?'var(--yel)':'var(--grn)';
+    const daysLabel=ds===null?'ny':dl<=0?'över':'kvar';
+    h+=`<div class="task${shared?' shared-task':''}" style="animation-delay:${i*.04}s;border-left:3px solid ${shared?'var(--acc)':ucl}"><div class="task-top"><div class="task-info" data-action="toggleTask" data-id="${t.id}"><div class="task-name">${t.name} ${isLifted?'<span class="prio-pin">📌</span>':''}${shared?'<span class="shared-tag">👥</span>':''}<span class="task-badge" style="background:${ubg(u)};color:${ucc(u)}">${ulab(u)}</span></div><div class="task-meta"><span>Var ${t.frequencyDays}:e dag</span><span class="dot">·</span><span style="color:${ucc(u)}">${tago(t.lastDone)}</span></div></div><div class="task-days-box"><div class="task-days" style="color:${daysColor}">${ds===null?'–':daysVal}</div><div class="task-days-lbl">${daysLabel}</div></div><div style="display:flex;align-items:center;gap:4px">${isLifted?`<button class="prio-action-btn" data-action="unliftPrio" data-id="${t.id}" title="Av-pinna">📌</button>`:`<button class="prio-action-btn" data-action="liftPrio" data-id="${t.id}" title="Lyft upp">↑</button>`}<button class="check-btn" data-action="checkTask" data-id="${t.id}" style="border-color:${ucl};background:${ubg(u)}">✓</button></div></div>`;
     if(isExp){
-      const isLifted=S.liftedToPrio.has(t.id);
-      h+=`<div class="task-expand">${isLifted?`<button class="task-expand-btn" data-action="unliftPrio" data-id="${t.id}">📌 Av-pinna</button>`:`<button class="task-expand-btn" data-action="liftPrio" data-id="${t.id}">↑ Lyft upp</button>`}<button class="task-expand-btn" data-action="editTask" data-id="${t.id}">✏️ Redigera</button><button class="task-expand-btn" data-action="pickDate" data-id="${t.id}">📅 Ange datum</button>${!t.isProtected?`<button class="task-expand-btn del" data-action="deleteTask" data-id="${t.id}">🗑 Ta bort</button>`:''}</div>`;
+      const isLiftedExp=S.liftedToPrio.has(t.id);
+      h+=`<div class="task-expand"><button class="task-expand-btn" data-action="editTask" data-id="${t.id}">✏️ Redigera</button><button class="task-expand-btn" data-action="pickDate" data-id="${t.id}">📅 Ange datum</button>${!t.isProtected?`<button class="task-expand-btn del" data-action="deleteTask" data-id="${t.id}">🗑 Ta bort</button>`:''}</div>`;
       if(S.datePicking===t.id){
         h+=`<div class="date-pick"><input type="date" id="dp-${t.id}" value="${today()}" max="${today()}"><button style="background:var(--acc);color:#fff" data-action="confirmDate" data-id="${t.id}">Spara</button><button style="background:var(--bg2);color:var(--t2);border:1px solid var(--brd)" data-action="cancelDate">Avbryt</button></div>`;
       }
@@ -522,9 +567,9 @@ function H(e){
     case 'collapseCat':S.expandedCat=null;S.datePicking=null;S.expandedTask=null;R();break;
     case 'setSort':S.sort=el.dataset.sort;R();break;
     case 'toggleTask':S.expandedTask=S.expandedTask===el.dataset.id?null:el.dataset.id;S.datePicking=null;R();break;
-    case 'hidePrio':S.hiddenFromPrio.add(el.dataset.id);S.expandedTask=null;R();break;
-    case 'liftPrio':S.liftedToPrio.add(el.dataset.id);S.hiddenFromPrio.delete(el.dataset.id);S.expandedTask=null;R();break;
-    case 'unliftPrio':S.liftedToPrio.delete(el.dataset.id);S.expandedTask=null;R();break;
+    case 'hidePrio':e.stopPropagation();S.hiddenFromPrio.add(el.dataset.id);S.expandedTask=null;R();break;
+    case 'liftPrio':e.stopPropagation();S.liftedToPrio.add(el.dataset.id);S.hiddenFromPrio.delete(el.dataset.id);S.expandedTask=null;R();break;
+    case 'unliftPrio':e.stopPropagation();S.liftedToPrio.delete(el.dataset.id);S.expandedTask=null;R();break;
     case 'checkTask':{e.stopPropagation();const f=findTask(el.dataset.id);if(f){f.task.lastDone=new Date().toISOString();S.hiddenFromPrio.delete(f.task.id);S.liftedToPrio.delete(f.task.id);S.expandedTask=null;el.classList.add('pop');save();setTimeout(R,450)}break}
     case 'pickDate':e.stopPropagation();S.datePicking=S.datePicking===el.dataset.id?null:el.dataset.id;R();break;
     case 'confirmDate':{const inp=document.getElementById('dp-'+el.dataset.id);if(inp?.value){const f=findTask(el.dataset.id);if(f){f.task.lastDone=new Date(inp.value+'T12:00:00').toISOString();S.datePicking=null;S.expandedTask=null;S.hiddenFromPrio.delete(f.task.id);save();R()}}break}
