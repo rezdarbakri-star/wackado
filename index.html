@@ -105,39 +105,29 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .prio-section{margin-bottom:0}
 .prio-title{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .prio-title .prio-count{font-family:'Space Mono',monospace;color:var(--red);font-size:12px}
-/* ALL prio cards – urgency-colored border, clearly elevated */
-.prio-card{display:flex;align-items:center;gap:10px;padding:14px;border-radius:12px;background:var(--bg3);border:2px solid var(--org);margin-bottom:6px;transition:all .2s;animation:fadeSlideIn .25s ease forwards;opacity:0;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
-.prio-card:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,0.2)}
-/* Overdue cards – red border + tinted bg */
-.prio-card.urg-over{border-color:var(--red);background:var(--red-s);box-shadow:0 0 20px rgba(255,71,87,0.08),0 2px 12px rgba(0,0,0,0.15)}
-/* Soon cards – orange border + tinted bg */
-.prio-card.urg-soon{border-color:var(--org);background:var(--org-s);box-shadow:0 0 16px rgba(255,140,66,0.06),0 2px 12px rgba(0,0,0,0.12)}
-/* Pinned cards – accent border */
-.prio-card.urg-pinned{border-color:var(--acc);background:rgba(99,102,241,0.06);box-shadow:0 0 16px rgba(99,102,241,0.08),0 2px 12px rgba(0,0,0,0.12)}
-/* Hero – #1 card gets extra size */
-.prio-card.hero .prio-name{font-size:16px;font-weight:700}
-.prio-card.hero .prio-meta{font-size:12px}
-.prio-card.hero .prio-cat-dot{height:36px;width:5px}
-.prio-card.hero .prio-check{width:44px;height:44px;font-size:20px;border-radius:12px}
-.prio-card.hero .prio-days{font-size:24px}
-.prio-card.hero .prio-action-btn{width:36px;height:36px;font-size:16px}
-/* Days number – on every prio card */
-.prio-days-box{text-align:center;min-width:42px;flex-shrink:0}
-.prio-days{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;line-height:1}
-.prio-days-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
-.prio-cat-dot{width:4px;height:28px;border-radius:2px;flex-shrink:0}
+/* ALL prio cards – one bold uniform level */
+.prio-card{display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:12px;background:var(--bg3);border:2px solid var(--brd2);margin-bottom:6px;transition:all .2s;animation:fadeSlideIn .25s ease forwards;opacity:0;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.12)}
+.prio-card:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,0.18)}
+/* Urgency tint via border color only */
+.prio-card.urg-over{border-color:var(--red);background:var(--red-s)}
+.prio-card.urg-soon{border-color:var(--org);background:var(--org-s)}
+.prio-card.urg-pinned{border-color:var(--acc);background:rgba(99,102,241,0.06)}
+/* Days number */
+.prio-days-box{text-align:center;min-width:44px;flex-shrink:0}
+.prio-days{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;line-height:1}
+.prio-days-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.prio-cat-dot{width:4px;height:32px;border-radius:2px;flex-shrink:0}
 .prio-info{flex:1;min-width:0}
-.prio-name{font-size:13px;font-weight:500;margin-bottom:2px;display:flex;align-items:center;gap:6px}
-.prio-meta{font-size:11px;color:var(--t2);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.prio-name{font-size:15px;font-weight:600;margin-bottom:2px;display:flex;align-items:center;gap:6px}
+.prio-meta{font-size:12px;color:var(--t2);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
 .prio-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;text-transform:uppercase;letter-spacing:.5px}
-.prio-check{width:36px;height:36px;border:2px solid var(--grn);background:var(--grn-s);color:var(--t1);font-size:16px;font-weight:700;border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.prio-check{width:42px;height:42px;border:2px solid var(--grn);background:var(--grn-s);color:var(--t1);font-size:18px;font-weight:700;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
 .prio-check:active{transform:scale(.93)}
 .prio-check.pop{animation:checkPop .5s ease}
 /* Pinned indicator */
 .prio-pin{font-size:10px;color:var(--acc);margin-left:2px}
-/* Shared task highlight */
-.prio-card.shared-task{border-left:3px solid var(--acc);background:rgba(99,102,241,0.06)}
-.prio-card.shared-task.hero{border-left:4px solid var(--acc)}
+/* Shared task in prio */
+.prio-card.shared-task{border-left:3px solid var(--acc)}
 .shared-tag{font-size:9px;font-weight:600;padding:2px 5px;border-radius:4px;background:var(--acc-g);color:var(--acc);letter-spacing:.3px}
 .task.shared-task{border-left-color:var(--acc) !important;background:rgba(99,102,241,0.03)}
 /* Days box in task cards (category view) */
@@ -145,7 +135,7 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .task-days{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;line-height:1}
 .task-days-lbl{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.3px;margin-top:2px}
 /* Inline action btn (↑↓📌) next to check */
-.prio-action-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--t2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.prio-action-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--t2);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
 .prio-action-btn:hover{background:var(--bg3);color:var(--t1);transform:scale(1.08)}
 .prio-action-btn:active{transform:scale(.93)}
 /* Expanded action row under prio card */
@@ -467,14 +457,13 @@ function rPrio(){
     const shared=isShared(t.category);const isExp=S.expandedTask===t.id;const isLifted=S.liftedToPrio.has(t.id)&&urg(t)<.75;
     // Urgency class for coloring ALL cards
     const urgCls=isLifted?'urg-pinned':u>=1?'urg-over':'urg-soon';
-    // Hero sizing only for #1
-    const heroSz=i===0?' hero':'';
+
     // Days display on EVERY prio card
     const daysVal=dl<=0?Math.abs(dl):dl;
     const daysColor=dl<=0?'var(--red)':dl<=2?'var(--org)':'var(--yel)';
     const daysLabel=ds===null?'ny':dl<=0?'över':'kvar';
     const daysHtml=`<div class="prio-days-box"><div class="prio-days" style="color:${daysColor}">${ds===null?'–':daysVal}</div><div class="prio-days-lbl">${daysLabel}</div></div>`;
-    h+=`<div><div class="prio-card ${urgCls}${heroSz}${shared?' shared-task':''}" style="animation-delay:${i*.03}s${isExp?';border-radius:10px 10px '+(S.datePicking===t.id?'0 0':'10px 10px'):''}"><div class="prio-cat-dot" style="background:${ccol(t.category)}"></div><div class="prio-info" data-action="toggleTask" data-id="${t.id}"><div class="prio-name">${t.name} ${isLifted?'<span class="prio-pin">📌</span>':''}${shared?'<span class="shared-tag">👥</span>':''}<span class="prio-badge" style="background:${ubg(u)};color:${ucc(u)}">${ulab(u)}</span></div><div class="prio-meta">${cat?cat.icon+' '+cat.label:''} · ${tago(t.lastDone)}</div></div>${daysHtml}<div style="display:flex;align-items:center;gap:4px"><button class="prio-action-btn" data-action="hidePrio" data-id="${t.id}" title="Skicka ner">↓</button><button class="prio-check" data-action="checkTask" data-id="${t.id}">✓</button></div></div>`;
+    h+=`<div><div class="prio-card ${urgCls}${shared?' shared-task':''}" style="animation-delay:${i*.03}s${isExp?';border-radius:10px 10px '+(S.datePicking===t.id?'0 0':'10px 10px'):''}"><div class="prio-cat-dot" style="background:${ccol(t.category)}"></div><div class="prio-info" data-action="toggleTask" data-id="${t.id}"><div class="prio-name">${t.name} ${isLifted?'<span class="prio-pin">📌</span>':''}${shared?'<span class="shared-tag">👥</span>':''}<span class="prio-badge" style="background:${ubg(u)};color:${ucc(u)}">${ulab(u)}</span></div><div class="prio-meta">${cat?cat.icon+' '+cat.label:''} · ${tago(t.lastDone)}</div></div>${daysHtml}<div style="display:flex;align-items:center;gap:4px"><button class="prio-action-btn" data-action="hidePrio" data-id="${t.id}" title="Skicka ner">↓</button><button class="prio-check" data-action="checkTask" data-id="${t.id}">✓</button></div></div>`;
     if(isExp){
       h+=`<div class="prio-expand"><button class="prio-expand-btn" data-action="editTask" data-id="${t.id}">✏️ Redigera</button><button class="prio-expand-btn" data-action="pickDate" data-id="${t.id}">📅 Ange datum</button></div>`;
       if(S.datePicking===t.id){
