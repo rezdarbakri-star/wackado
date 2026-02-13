@@ -242,6 +242,14 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 /* Show done toggle */
 .todo-done-toggle{font-size:12px;color:var(--t3);cursor:pointer;padding:8px 0;transition:color .15s;text-align:center}
 .todo-done-toggle:hover{color:var(--t2)}
+/* Todo groups */
+.todo-group{margin-bottom:14px}
+.todo-group-hdr{display:flex;align-items:center;gap:8px;padding:6px 0;margin-bottom:4px;cursor:pointer}
+.todo-group-hdr:hover .todo-group-name{color:var(--t1)}
+.todo-group-name{font-size:13px;font-weight:600;color:var(--t2);transition:color .15s}
+.todo-group-count{font-family:'Space Mono',monospace;font-size:10px;color:var(--t3);padding:1px 5px;border-radius:4px;background:var(--bg-in)}
+.todo-group-prog{flex:1;height:2px;background:var(--brd);border-radius:1px;overflow:hidden;margin-left:4px}
+.todo-group-prog-fill{height:100%;background:var(--grn);border-radius:1px;transition:width .4s ease}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--brd);border-radius:4px}
 </style>
 </head>
@@ -461,7 +469,7 @@ function rCard(t,i,ctx){
 
   let h=`<div><div class="tc ${urgCls(t)} ${extra}${shared?' shared':''}" style="animation-delay:${i*.03}s">`;
   // THE number: days since
-  h+=`<div class="tc-days"><div class="tc-days-num" style="color:${dayCol(t)}">${daysNum}</div><div class="tc-days-lbl">dagar</div></div>`;
+  h+=`<div class="tc-days"><div class="tc-days-num" style="color:${dayCol(t)}">${daysNum}</div><div class="tc-days-lbl">dagar sen</div></div>`;
   // Signal lamp
   h+=`<div class="tc-lamp ${lampCls(t)}"></div>`;
   // Info
@@ -515,13 +523,30 @@ function rCatView(){
 // TODOS VIEW – one-off tasks
 // ═══════════════════════════════════════════
 function rTodosView(){
-  const pending=S.todos.filter(t=>!t.done);
-  const done=S.todos.filter(t=>t.done);
+  const all=S.todos;
+  const pending=all.filter(t=>!t.done);
+  const done=all.filter(t=>t.done);
   if(!pending.length&&!done.length)return`<div class="todo-empty"><div class="todo-empty-icon">📋</div><div class="todo-empty-text">Inga att-göra-saker ännu</div><div class="todo-empty-sub">Tryck + Ny för att lägga till</div></div>`;
   let h='';
-  // Pending
-  pending.sort((a,b)=>{if(a.dueDate&&b.dueDate)return a.dueDate.localeCompare(b.dueDate);if(a.dueDate)return-1;if(b.dueDate)return 1;return(b.createdAt||'').localeCompare(a.createdAt||'')});
-  pending.forEach((t,i)=>{h+=rTodoCard(t,i,false)});
+  // Group pending todos
+  const ungrouped=pending.filter(t=>!t.group);
+  const groups={};
+  pending.filter(t=>t.group).forEach(t=>{if(!groups[t.group])groups[t.group]=[];groups[t.group].push(t)});
+  // Render grouped
+  const sortTodos=arr=>{arr.sort((a,b)=>{if(a.dueDate&&b.dueDate)return a.dueDate.localeCompare(b.dueDate);if(a.dueDate)return-1;if(b.dueDate)return 1;return(b.createdAt||'').localeCompare(a.createdAt||'')});return arr};
+  let idx=0;
+  for(const[gname,items]of Object.entries(groups)){
+    const doneInGroup=done.filter(t=>t.group===gname).length;
+    const total=items.length+doneInGroup;
+    const pct=total>0?Math.round(doneInGroup/total*100):0;
+    h+=`<div class="todo-group"><div class="todo-group-hdr"><div class="todo-group-name">${gname}</div><span class="todo-group-count">${doneInGroup}/${total}</span><div class="todo-group-prog"><div class="todo-group-prog-fill" style="width:${pct}%"></div></div></div>`;
+    sortTodos(items).forEach(t=>{h+=rTodoCard(t,idx++,false)});
+    h+=`</div>`;
+  }
+  // Ungrouped
+  if(ungrouped.length){
+    sortTodos(ungrouped).forEach(t=>{h+=rTodoCard(t,idx++,false)});
+  }
   // Done section
   if(done.length){
     h+=`<div class="todo-done-toggle" data-action="toggleShowDone">${S.showDone?'▾':'▸'} ${done.length} klara</div>`;
@@ -574,7 +599,15 @@ function rHHModal(){
 
 function rTodoModal(){
   const m=S.modal,t=m.todo||{},isE=!!t.id;
-  return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny att-göra'}</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Vad ska göras?</label><input class="fi" id="todo-name" value="${t.name||''}" placeholder="T.ex. Skicka CV till företaget" autofocus></div><div class="fg"><label class="fl">Anteckning (valfritt)</label><input class="fi" id="todo-note" value="${t.note||''}" placeholder="Detaljer, länk, kontaktinfo..."></div><div class="fg"><label class="fl">Deadline (valfritt)</label><input class="fi" type="date" id="todo-due" value="${t.dueDate||''}"></div><div class="br">${isE?`<button class="bd" data-action="deleteTodoConfirm" data-id="${t.id}">🗑</button>`:''}<button class="bp" data-action="saveTodo">${isE?'Spara':'Lägg till'}</button></div></div></div>`;
+  // Collect existing group names
+  const existingGroups=[...new Set(S.todos.map(x=>x.group).filter(Boolean))];
+  let groupPicker='';
+  if(existingGroups.length){
+    groupPicker=`<div class="fg"><label class="fl">Projekt / grupp (valfritt)</label><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">${existingGroups.map(g=>`<button class="co todo-group-opt ${(t.group||'')===g?'sel':''}" data-action="setTodoGroup" data-group="${g}" style="${(t.group||'')===g?'border-color:var(--acc);color:var(--acc);font-weight:600':''}">${g}</button>`).join('')}<button class="co todo-group-opt ${!t.group?'sel':''}" data-action="setTodoGroup" data-group="" style="${!t.group?'border-color:var(--acc);color:var(--acc);font-weight:600':''}">Ingen</button></div><input class="fi" id="todo-group-new" placeholder="Eller skriv nytt projektnamn..." style="font-size:13px"></div>`;
+  }else{
+    groupPicker=`<div class="fg"><label class="fl">Projekt / grupp (valfritt)</label><input class="fi" id="todo-group-new" value="${t.group||''}" placeholder="T.ex. Skriva en bok, Bokföring..."></div>`;
+  }
+  return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny att-göra'}</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Vad ska göras?</label><input class="fi" id="todo-name" value="${t.name||''}" placeholder="T.ex. Skicka CV till företaget" autofocus></div>${groupPicker}<div class="fg"><label class="fl">Anteckning (valfritt)</label><input class="fi" id="todo-note" value="${t.note||''}" placeholder="Detaljer, länk, kontaktinfo..."></div><div class="fg"><label class="fl">Deadline (valfritt)</label><input class="fi" type="date" id="todo-due" value="${t.dueDate||''}"></div><div class="br">${isE?`<button class="bd" data-action="deleteTodoConfirm" data-id="${t.id}">🗑</button>`:''}<button class="bp" data-action="saveTodo">${isE?'Spara':'Lägg till'}</button></div></div></div>`;
 }
 
 function rTaskModal(){
@@ -664,9 +697,13 @@ function H(e){
       const n=document.getElementById('todo-name')?.value?.trim();if(!n)return;
       const note=document.getElementById('todo-note')?.value?.trim()||'';
       const due=document.getElementById('todo-due')?.value||'';
-      if(S.modal.todo?.id){const t=S.todos.find(x=>x.id===S.modal.todo.id);if(t){t.name=n;t.note=note;t.dueDate=due||null}}
-      else{S.todos.push({id:gid(),name:n,note,dueDate:due||null,done:false,doneAt:null,createdAt:new Date().toISOString()})}
+      const newGroup=document.getElementById('todo-group-new')?.value?.trim()||'';
+      const selGroup=document.querySelector('.todo-group-opt.sel')?.dataset.group;
+      const group=newGroup||selGroup||null;
+      if(S.modal.todo?.id){const t=S.todos.find(x=>x.id===S.modal.todo.id);if(t){t.name=n;t.note=note;t.dueDate=due||null;t.group=group}}
+      else{S.todos.push({id:gid(),name:n,note,group,dueDate:due||null,done:false,doneAt:null,createdAt:new Date().toISOString()})}
       S.modal=null;save();R();break}
+    case 'setTodoGroup':{document.querySelectorAll('.todo-group-opt').forEach(b=>{b.classList.remove('sel');b.style.cssText=''});el.classList.add('sel');el.style.cssText='border-color:var(--acc);color:var(--acc);font-weight:600';const inp=document.getElementById('todo-group-new');if(inp)inp.value='';break}
     case 'toggleShowDone':S.showDone=!S.showDone;R();break;
   }
 }
