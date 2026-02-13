@@ -277,6 +277,9 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .todo-group{margin-bottom:14px}
 .todo-group-hdr{display:flex;align-items:center;gap:8px;padding:6px 0;margin-bottom:4px;cursor:pointer}
 .todo-group-hdr:hover .todo-group-name{color:var(--t1)}
+.grp-arrows{display:flex;flex-direction:column;line-height:1;margin-left:4px;opacity:.3;transition:opacity .2s}
+.todo-group-hdr:hover .grp-arrows{opacity:.7}
+.grp-arrows span:hover{color:var(--acc)!important;opacity:1}
 .todo-group-name{font-size:13px;font-weight:600;color:var(--t2);transition:color .15s}
 .todo-group-count{font-family:'Space Mono',monospace;font-size:10px;color:var(--t3);padding:1px 5px;border-radius:4px;background:var(--bg-in)}
 .todo-group-prog{flex:1;height:2px;background:var(--brd);border-radius:1px;overflow:hidden;margin-left:4px}
@@ -327,7 +330,7 @@ const DEFAULTS=[
 let S={
   tasks:[],customCats:[],theme:'light',expandedCat:null,
   modal:null,datePicking:null,expandedTask:null,showCats:false,
-  tab:'pulser',todos:[],todoGroups:[],collapsedGroups:{},showDone:false,
+  tab:'pulser',todos:[],todoGroups:[],todoHistory:[],collapsedGroups:{},showDone:false,showHistory:false,
   user:null,syncStatus:'offline',profileOpen:false,
   hiddenToday:{},liftedToPrio:new Set(),
   household:null,householdId:null,
@@ -339,12 +342,14 @@ function getCats(){return[...DEFAULT_CATS,...S.customCats]}
 // ═══════════════════════════════════════════
 // PERSISTENCE
 // ═══════════════════════════════════════════
-function saveLocal(){try{localStorage.setItem('puls',JSON.stringify({tasks:S.tasks,todos:S.todos,todoGroups:S.todoGroups,theme:S.theme,householdId:S.householdId,customCats:S.customCats,hiddenToday:S.hiddenToday,onboarded:S.onboarding===-1}))}catch(e){}}
+function saveLocal(){try{localStorage.setItem('puls',JSON.stringify({tasks:S.tasks,todos:S.todos,todoGroups:S.todoGroups,todoHistory:S.todoHistory,collapsedGroups:S.collapsedGroups,theme:S.theme,householdId:S.householdId,customCats:S.customCats,hiddenToday:S.hiddenToday,onboarded:S.onboarding===-1}))}catch(e){}}
 function loadLocal(){
   try{const d=JSON.parse(localStorage.getItem('puls'));
     if(d?.tasks){S.tasks=d.tasks;ensV();S.onboarding=-1}else{S.tasks=DEFAULTS.map(t=>({...t}));S.onboarding=1}
     if(d?.todos)S.todos=d.todos;
     if(d?.todoGroups)S.todoGroups=d.todoGroups;
+    if(d?.collapsedGroups)S.collapsedGroups=d.collapsedGroups;
+    if(d?.todoHistory)S.todoHistory=d.todoHistory;
     if(d?.theme)S.theme=d.theme;if(d?.householdId)S.householdId=d.householdId;
     if(d?.customCats)S.customCats=d.customCats;
     if(d?.hiddenToday){const td=today();S.hiddenToday={};for(const[id,date]of Object.entries(d.hiddenToday)){if(date===td)S.hiddenToday[id]=date}}
@@ -352,13 +357,13 @@ function loadLocal(){
 }
 function ensV(){if(!S.tasks.find(t=>t.id==='__vacation__'))S.tasks.push({...VTASK});const v=S.tasks.find(t=>t.id==='__vacation__');if(v)v.isProtected=true}
 
-async function saveCloud(){if(!S.user||S.user.isAnonymous)return;S.syncStatus='syncing';try{await db.collection('users').doc(S.user.uid).set({tasks:S.tasks,todos:S.todos,todoGroups:S.todoGroups,theme:S.theme,householdId:S.householdId||null,customCats:S.customCats,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});S.syncStatus='synced'}catch(e){S.syncStatus='offline'}}
+async function saveCloud(){if(!S.user||S.user.isAnonymous)return;S.syncStatus='syncing';try{await db.collection('users').doc(S.user.uid).set({tasks:S.tasks,todos:S.todos,todoGroups:S.todoGroups,todoHistory:S.todoHistory,theme:S.theme,householdId:S.householdId||null,customCats:S.customCats,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});S.syncStatus='synced'}catch(e){S.syncStatus='offline'}}
 async function saveHH(){if(!S.household||!S.householdId)return;try{await db.collection('households').doc(S.householdId).set({members:S.household.members,sharedCats:S.household.sharedCats||[],tasks:S.household.tasks||[],updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.error('HH:',e)}}
 function save(){saveLocal();clearTimeout(save._t);save._t=setTimeout(()=>{saveCloud();if(S.household)saveHH()},600)}
 save._t=null;
 
 function startSync(){if(_unsub)_unsub();if(!S.user||S.user.isAnonymous)return;
-  _unsub=db.collection('users').doc(S.user.uid).onSnapshot(s=>{if(s.exists){const d=s.data();if(d.tasks){S.tasks=d.tasks;ensV();saveLocal()}if(d.todos)S.todos=d.todos;if(d.todoGroups)S.todoGroups=d.todoGroups;if(d.theme)S.theme=d.theme;if(d.customCats)S.customCats=d.customCats;if(d.householdId&&d.householdId!==S.householdId){S.householdId=d.householdId;startHHSync()}S.syncStatus='synced';_qR()}},e=>{S.syncStatus='offline';_qR()})}
+  _unsub=db.collection('users').doc(S.user.uid).onSnapshot(s=>{if(s.exists){const d=s.data();if(d.tasks){S.tasks=d.tasks;ensV();saveLocal()}if(d.todos)S.todos=d.todos;if(d.todoGroups)S.todoGroups=d.todoGroups;if(d.todoHistory)S.todoHistory=d.todoHistory;if(d.theme)S.theme=d.theme;if(d.customCats)S.customCats=d.customCats;if(d.householdId&&d.householdId!==S.householdId){S.householdId=d.householdId;startHHSync()}S.syncStatus='synced';_qR()}},e=>{S.syncStatus='offline';_qR()})}
 function startHHSync(){if(_hhUnsub)_hhUnsub();if(!S.householdId)return;
   _hhUnsub=db.collection('households').doc(S.householdId).onSnapshot(s=>{if(s.exists){S.household={code:S.householdId,...s.data()};_qR()}else{S.household=null;S.householdId=null;saveLocal();_qR()}},e=>console.error('HH:',e))}
 // Queued render – debounce snapshot re-renders, skip if modal open
@@ -417,6 +422,23 @@ const lampCls=t=>{const u=urg(t);return u>=1?'red':u>=.75?'org':u>=.5?'yel':'grn
 const dayCol=t=>{const u=urg(t);return u>=1?'var(--red)':u>=.75?'var(--org)':u>=.5?'var(--yel)':'var(--grn)'};
 const ccol=id=>{const c=getCats().find(x=>x.id===id);return c?`var(${c.v})`:'var(--t3)'};
 const today=()=>new Date().toISOString().split('T')[0];
+// Week helpers
+function getWeekId(d){const dt=new Date(d);const day=dt.getDay()||7;dt.setDate(dt.getDate()+4-day);const y=dt.getFullYear();const w=Math.ceil(((dt-new Date(y,0,1))/864e5+1)/7);return y+'-W'+String(w).padStart(2,'0')}
+function getWeekLabel(wid){const[y,w]=wid.split('-W');return'Vecka '+parseInt(w)+', '+y}
+function archiveDoneTodos(){
+  const thisWeek=getWeekId(new Date());
+  const toArchive=S.todos.filter(t=>t.done&&t.doneAt&&getWeekId(t.doneAt)!==thisWeek);
+  if(!toArchive.length)return;
+  for(const t of toArchive){
+    const wid=getWeekId(t.doneAt);
+    let entry=S.todoHistory.find(h=>h.weekId===wid);
+    if(!entry){entry={weekId:wid,label:getWeekLabel(wid),items:[]};S.todoHistory.push(entry)}
+    entry.items.push({name:t.name,group:t.group||null,doneAt:t.doneAt});
+  }
+  S.todos=S.todos.filter(t=>!toArchive.includes(t));
+  S.todoHistory.sort((a,b)=>b.weekId.localeCompare(a.weekId));
+  saveLocal();
+}
 const WEEKDAYS=['Mån','Tis','Ons','Tor','Fre','Lör','Sön'];
 const WEEKDAYS_FULL=['måndag','tisdag','onsdag','torsdag','fredag','lördag','söndag'];
 function ffreqLabel(t){
@@ -680,6 +702,11 @@ function rTodosView(){
   let idx=0;
   // New project input at top
   h+=`<div class="todo-quick-add" style="margin-bottom:10px"><input class="todo-quick-input" id="new-project-input" placeholder="+ Nytt ämne..." style="border-style:dashed" data-action-enter="quickAddProject"></div>`;
+  // Toggle all (only show if groups exist)
+  if(allGroups.length>1){
+    const allCollapsed=allGroups.every(g=>S.collapsedGroups[g]);
+    h+=`<div style="text-align:right;margin-bottom:4px"><span data-action="toggleAllGroups" style="font-size:10px;color:var(--tm);cursor:pointer;text-transform:lowercase">${allCollapsed?'visa alla':'dölj alla'}</span></div>`;
+  }
   // Groups
   for(const gname of allGroups){
     const gAll=all.filter(t=>t.group===gname);
@@ -690,7 +717,7 @@ function rTodosView(){
     const allComplete=total>0&&doneN===total;
     const collapsed=!!S.collapsedGroups[gname];
     const pendingN=gPending.length;
-    h+=`<div class="todo-group"><div class="todo-group-hdr" data-action="toggleGroup" data-gname="${gname}"><span style="font-size:10px;color:var(--tm);margin-right:2px">${collapsed?'▸':'▾'}</span><div class="todo-group-name"${allComplete?' style="color:var(--grn)"':''}>${allComplete?'✓ ':''}${gname}</div>${total>0?`<span class="todo-group-count">${collapsed&&pendingN>0?pendingN+' kvar · ':''}${doneN}/${total}</span><div class="todo-group-prog"><div class="todo-group-prog-fill" style="width:${pct}%${allComplete?';background:var(--grn)':''}"></div></div>`:''}</div>`;
+    h+=`<div class="todo-group"><div class="todo-group-hdr" data-action="toggleGroup" data-gname="${gname}"><span style="font-size:10px;color:var(--tm);margin-right:2px">${collapsed?'▸':'▾'}</span><div class="todo-group-name"${allComplete?' style="color:var(--grn)"':''}>${allComplete?'✓ ':''}${gname}</div>${total>0?`<span class="todo-group-count">${collapsed&&pendingN>0?pendingN+' kvar · ':''}${doneN}/${total}</span><div class="todo-group-prog"><div class="todo-group-prog-fill" style="width:${pct}%${allComplete?';background:var(--grn)':''}"></div></div>`:''}<div class="grp-arrows" onclick="event.stopPropagation()"><span data-action="moveGroup" data-gname="${gname}" data-dir="up" style="font-size:10px;color:var(--tm);cursor:pointer;padding:2px 4px">▲</span><span data-action="moveGroup" data-gname="${gname}" data-dir="down" style="font-size:10px;color:var(--tm);cursor:pointer;padding:2px 4px">▼</span></div></div>`;
     if(!collapsed){
       gPending.forEach(t=>{h+=rTodoCard(t,idx++,false)});
       if(allComplete&&gDone.length){h+=`<div style="font-size:11px;color:var(--t3);padding:4px 0 2px;text-align:center">🎉 Klart!</div>`}
@@ -700,6 +727,21 @@ function rTodosView(){
     h+=`</div>`;
   }
   if(!allGroups.length){h+=`<div style="text-align:center;padding:30px 0;color:var(--tm);font-size:13px">Skapa ditt första ämne ovan</div>`}
+  // History
+  if(S.todoHistory.length){
+    h+=`<div style="margin-top:16px;border-top:1px solid var(--brd);padding-top:10px"><span data-action="toggleHistory" style="font-size:10px;color:var(--tm);cursor:pointer;text-transform:lowercase">${S.showHistory?'▾':'▸'} historik (${S.todoHistory.reduce((s,w)=>s+w.items.length,0)} klara)</span></div>`;
+    if(S.showHistory){
+      for(const week of S.todoHistory){
+        h+=`<div style="margin-top:10px"><div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:6px">📊 ${week.label} <span style="font-weight:400;color:var(--tm)">— ${week.items.length} klara</span></div>`;
+        const byGroup={};week.items.forEach(it=>{const g=it.group||'Övrigt';if(!byGroup[g])byGroup[g]=[];byGroup[g].push(it)});
+        for(const[g,items]of Object.entries(byGroup)){
+          h+=`<div style="font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;padding:4px 0 2px">${g}</div>`;
+          items.forEach(it=>{h+=`<div style="font-size:12px;color:var(--t3);padding:2px 0 2px 12px;text-decoration:line-through">✓ ${it.name}</div>`});
+        }
+        h+=`</div>`;
+      }
+    }
+  }
   return h;
 }
 
@@ -972,7 +1014,19 @@ function H(e){
       S.modal=null;save();R();break}
     case 'setTodoGroup':{document.querySelectorAll('.todo-group-opt').forEach(b=>{b.classList.remove('sel');b.style.cssText=''});el.classList.add('sel');el.style.cssText='border-color:var(--acc);color:var(--acc);font-weight:600';const inp=document.getElementById('todo-group-new');if(inp)inp.value='';break}
     case 'toggleShowDone':S.showDone=!S.showDone;R();break;
-    case 'toggleGroup':{const g=el.dataset.gname;if(S.collapsedGroups[g])delete S.collapsedGroups[g];else S.collapsedGroups[g]=true;R();break}
+    case 'toggleGroup':{const g=el.dataset.gname;if(S.collapsedGroups[g])delete S.collapsedGroups[g];else S.collapsedGroups[g]=true;saveLocal();R();break}
+    case 'toggleAllGroups':{const allGroups=[...new Set([...(S.todoGroups||[]),...S.todos.map(x=>x.group).filter(Boolean)])];const allCollapsed=allGroups.every(g=>S.collapsedGroups[g]);if(allCollapsed){S.collapsedGroups={}}else{allGroups.forEach(g=>S.collapsedGroups[g]=true)}saveLocal();R();break}
+    case 'toggleHistory':S.showHistory=!S.showHistory;R();break;
+    case 'moveGroup':{
+      const g=el.dataset.gname,dir=el.dataset.dir;
+      // Ensure todoGroups has all groups in current order
+      const current=[...new Set([...(S.todoGroups||[]),...S.todos.map(x=>x.group).filter(Boolean)])];
+      S.todoGroups=current;
+      const i=S.todoGroups.indexOf(g);if(i<0)break;
+      const ni=dir==='up'?i-1:i+1;
+      if(ni<0||ni>=S.todoGroups.length)break;
+      [S.todoGroups[i],S.todoGroups[ni]]=[S.todoGroups[ni],S.todoGroups[i]];
+      save();R();break}
     case 'pushCal':{e.stopPropagation();const t=S.todos.find(x=>x.id===el.dataset.id);if(t&&t.dueDate){const d=t.dueDate.replace(/-/g,'');const next=new Date(t.dueDate);next.setDate(next.getDate()+1);const d2=next.toISOString().split('T')[0].replace(/-/g,'');const title=encodeURIComponent((t.group?t.group+': ':'')+t.name);const details=encodeURIComponent(t.note||'');const url=`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${d}/${d2}&details=${details}`;window.open(url,'_blank')}break}
   }
 }
@@ -981,7 +1035,7 @@ function pNav(){history.pushState({},'');}
 window.addEventListener('popstate',()=>{if(S.modal){S.modal=null;R()}else if(S.expandedCat){S.expandedCat=null;S.datePicking=null;S.expandedTask=null;R()}});
 
 document.addEventListener('DOMContentLoaded',()=>{
-  loadLocal();
+  loadLocal();archiveDoneTodos();
   if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
   R();
 });
