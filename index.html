@@ -491,31 +491,28 @@ function rOnboarding(){
 // ONBOARDING STEP 2 ANIMATION
 // ═══════════════════════════════════════════
 let _obAnimTimer=null;
-function stopObAnim(){if(_obAnimTimer){clearInterval(_obAnimTimer);_obAnimTimer=null}}
+function stopObAnim(){if(_obAnimTimer){clearTimeout(_obAnimTimer);_obAnimTimer=null}}
 function initObAnim(){
   stopObAnim();
   const box=document.getElementById('ob-anim');if(!box)return;
   const items=[
-    {id:'gym',name:'Gymma',cat:'💪 Fitness',freq:2,days:0},
-    {id:'stad',name:'Städa hemma',cat:'🏠 Hem',freq:7,days:0},
-    {id:'mat',name:'Handla mat',cat:'🛒 Hem',freq:5,days:0}
+    {id:'gym',name:'Gymma',cat:'💪 Fitness',freq:2,days:0,hero:true},
+    {id:'stad',name:'Städa hemma',cat:'🏠 Hem',freq:7,days:4},
+    {id:'mat',name:'Handla mat',cat:'🛒 Hem',freq:5,days:3}
   ];
   function col(d,f){const u=d/f;return u>=1?'var(--red)':u>=.75?'var(--org)':u>=.5?'var(--yel)':'var(--grn)'}
   function cls(d,f){const u=d/f;return u>=1?'u-red':u>=.75?'u-org':u>=.5?'u-yel':'u-grn'}
   function lamp(d,f){const u=d/f;return u>=1?'red':u>=.75?'org':u>=.5?'yel':'grn'}
-  function renderCards(){
-    // Sort by urgency desc (FLIP animation)
+  function renderCards(highlight){
     const sorted=[...items].sort((a,b)=>(b.days/b.freq)-(a.days/a.freq));
-    // Get old positions
     const oldPos={};box.querySelectorAll('.tc[data-ob]').forEach(el=>{
       oldPos[el.dataset.ob]=el.getBoundingClientRect();
     });
-    // Render new order
     box.innerHTML=sorted.map(it=>{
       const c=col(it.days,it.freq),l=lamp(it.days,it.freq),u=cls(it.days,it.freq);
-      return`<div class="tc ${u}" data-ob="${it.id}" style="animation:none;opacity:1;transition:transform .45s cubic-bezier(.4,0,.2,1)"><div class="tc-days"><div class="tc-days-num" style="color:${c};transition:color .3s">${it.days}</div><div class="tc-days-lbl">dagar sen</div></div><div class="tc-lamp ${l}"></div><div class="tc-info"><div class="tc-name">${it.name}</div><div class="tc-meta">${it.cat}<span class="dot">·</span>var ${it.freq===1?'dag':it.freq+':e dag'}</div></div><div class="tc-actions"><button class="tc-btn check" style="pointer-events:none">✓</button></div></div>`;
+      const hl=highlight===it.id;
+      return`<div class="tc ${u}" data-ob="${it.id}" style="animation:none;opacity:1;transition:transform .6s cubic-bezier(.4,0,.2,1)${hl?';box-shadow:0 0 0 2px '+c:''}"><div class="tc-days"><div class="tc-days-num" style="color:${c};transition:color .5s">${it.days}</div><div class="tc-days-lbl">dagar sen</div></div><div class="tc-lamp ${l}"></div><div class="tc-info"><div class="tc-name">${it.name}</div><div class="tc-meta">${it.cat}<span class="dot">·</span>var ${it.freq===1?'dag':it.freq+':e dag'}</div></div><div class="tc-actions"><button class="tc-btn check" style="pointer-events:none">✓</button></div></div>`;
     }).join('');
-    // FLIP: animate from old position to new
     if(Object.keys(oldPos).length){
       box.querySelectorAll('.tc[data-ob]').forEach(el=>{
         const id=el.dataset.ob;
@@ -526,7 +523,7 @@ function initObAnim(){
             el.style.transform=`translateY(${dy}px)`;
             el.style.transition='none';
             requestAnimationFrame(()=>{requestAnimationFrame(()=>{
-              el.style.transition='transform .45s cubic-bezier(.4,0,.2,1)';
+              el.style.transition='transform .6s cubic-bezier(.4,0,.2,1)';
               el.style.transform='';
             })});
           }
@@ -534,31 +531,55 @@ function initObAnim(){
       });
     }
   }
+  // Narrative sequence: Gymma climbs from 0 to red, gets checked, drops
   renderCards();
-  let tick=0;
-  _obAnimTimer=setInterval(()=>{
-    tick++;
-    // Check if we should "do" a task (reset it)
-    let checked=null;
-    items.forEach(it=>{
-      if(it.days/it.freq>=1.3&&!checked){checked=it.id;it.days=0}
-      else it.days++;
-    });
-    // Flash check animation
-    if(checked){
-      const card=box.querySelector(`[data-ob="${checked}"]`);
+  const steps=[
+    // [delay, action]
+    // Gymma ticks up: 0→1→2→3, climbing through colors
+    [1200, ()=>{items[0].days=1;renderCards('gym')}],
+    [1400, ()=>{items[0].days=2;renderCards('gym')}],   // hits yellow, passes Handla
+    [1400, ()=>{items[0].days=3;renderCards('gym')}],   // hits red, climbs to top
+    // Pause at top — let it breathe
+    [2000, ()=>{
+      // Flash the check button
+      const card=box.querySelector('[data-ob="gym"]');
       if(card){
         const btn=card.querySelector('.tc-btn.check');
-        if(btn){btn.style.background='var(--grn)';btn.style.color='#fff';btn.style.transform='scale(1.3)'}
+        if(btn){btn.style.background='var(--grn)';btn.style.color='#fff';btn.style.transform='scale(1.3)';btn.style.transition='all .3s'}
         card.style.boxShadow='0 0 20px rgba(81,207,102,.5)';
-        setTimeout(()=>{renderCards()},350);
-        return;
+        card.style.transition='box-shadow .3s';
       }
-    }
-    renderCards();
-    // Reset all after a while to keep looping
-    if(tick>25){tick=0;items.forEach(it=>it.days=0);renderCards()}
-  },900);
+    }],
+    // Reset gymma → drops to bottom
+    [800, ()=>{items[0].days=0;renderCards()}],
+    // Meanwhile others tick up
+    [1400, ()=>{items[1].days=5;items[2].days=4;renderCards()}],
+    [1400, ()=>{items[1].days=6;items[2].days=5;renderCards('stad')}],  // Städa climbing
+    [1400, ()=>{items[1].days=7;renderCards('stad')}],  // Städa hits orange/red
+    [1800, ()=>{
+      const card=box.querySelector('[data-ob="stad"]');
+      if(card){
+        const btn=card.querySelector('.tc-btn.check');
+        if(btn){btn.style.background='var(--grn)';btn.style.color='#fff';btn.style.transform='scale(1.3)';btn.style.transition='all .3s'}
+        card.style.boxShadow='0 0 20px rgba(81,207,102,.5)';
+        card.style.transition='box-shadow .3s';
+      }
+    }],
+    [800, ()=>{items[1].days=0;renderCards()}],
+    // Loop: reset everything
+    [2000, ()=>{items[0].days=0;items[1].days=4;items[2].days=3;renderCards();runSequence()}]
+  ];
+  let stepIdx=0;
+  function runSequence(){
+    stepIdx=0;
+    nextStep();
+  }
+  function nextStep(){
+    if(stepIdx>=steps.length)return;
+    const[delay,fn]=steps[stepIdx];
+    _obAnimTimer=setTimeout(()=>{fn();stepIdx++;nextStep()},delay);
+  }
+  runSequence();
 }
 
 function rStats(red,org,grn,allOk){
