@@ -391,7 +391,7 @@ function R(){
   const app=document.getElementById('app');if(!app)return;
   document.documentElement.setAttribute('data-theme',S.theme);
   document.getElementById('metaTheme').content=S.theme==='dark'?'#0A0A0F':'#FFF5F7';
-  let html=rHeader()+rTabs();
+  let html=rHeader()+rTabs()+`<div style="padding:0 0 8px"><button class="add-btn" data-action="addTask" style="width:100%;justify-content:center;height:40px;border-radius:10px;font-size:13px"><span>+</span> Ny ${S.tab==='todos'?'att-göra':'puls'}</button></div>`;
   if(S.tab==='todos'){html+=rTodosView()}
   else{
     const all=allTasks();
@@ -424,7 +424,7 @@ function rHeader(){
       prof+=`<div class="profile-drop"><div class="p-name">${anon?'Anonym':S.user.displayName||'Inloggad'}</div>${!anon?`<div class="p-email">${S.user.email||''}</div>`:''}<div class="p-sync"><div class="sync-dot ${S.syncStatus}" style="width:6px;height:6px"></div> ${st}</div><div class="p-divider"></div>${upgradeBtn}${hhBtn}<button class="p-btn danger" data-action="signOut">Logga ut</button></div>`;
     }
   }else{prof=`<button class="signin-btn" data-action="openAuth">🔑 Logga in</button>`}
-  return`<header class="hdr"><div class="hdr-row"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1><div class="hdr-actions"><div style="position:relative">${prof}</div><button class="icon-btn" data-action="toggleTheme">${S.theme==='dark'?'☀️':'🌙'}</button><button class="add-btn" data-action="addTask"><span>+</span> Ny</button></div></div>${rVacation()}</header>`;
+  return`<header class="hdr"><div class="hdr-row"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1><div class="hdr-actions"><div style="position:relative">${prof}</div><button class="icon-btn" data-action="toggleTheme">${S.theme==='dark'?'☀️':'🌙'}</button></div></div>${rVacation()}</header>`;
 }
 function rVacation(){
   const vt=S.tasks.find(t=>t.id==='__vacation__');if(!vt)return'';
@@ -449,7 +449,7 @@ function rTodo(){
   const items=all.filter(t=>(urg(t)>=.75||S.liftedToPrio.has(t.id))&&!S.hiddenToday[t.id]);
   items.sort((a,b)=>urg(b)-urg(a));
   if(!items.length)return'';
-  let h=`<div style="margin-bottom:4px"><div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px">Att göra <span style="font-family:'Space Mono',monospace;color:var(--red);font-size:12px">${items.length}</span></div>`;
+  let h=`<div style="margin-bottom:4px">`;
   items.forEach((t,i)=>{h+=rCard(t,i,'prio')});
   return h+'</div>';
 }
