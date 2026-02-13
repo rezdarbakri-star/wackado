@@ -160,10 +160,6 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 /* Category expanded */
 .cat-back{display:flex;align-items:center;gap:6px;padding:8px 0;cursor:pointer;font-size:13px;color:var(--t2);margin-bottom:4px}
 .cat-back:hover{color:var(--t1)}
-.sort-row{display:flex;align-items:center;gap:4px;margin-bottom:6px}
-.sort-label{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-right:4px}
-.sort-btn{padding:5px 10px;border-radius:6px;font-size:12px;border:none;background:transparent;color:var(--t3);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
-.sort-btn:hover{background:var(--bg2)}.sort-btn.on{background:var(--bg3);color:var(--t1)}
 
 /* ═════════ MODALS ═════════ */
 .mo{position:fixed;inset:0;background:var(--ov);z-index:100;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .15s ease;backdrop-filter:blur(6px)}
@@ -292,7 +288,7 @@ const DEFAULTS=[
 // STATE
 // ═══════════════════════════════════════════
 let S={
-  tasks:[],customCats:[],theme:'dark',expandedCat:null,sort:'urgency',
+  tasks:[],customCats:[],theme:'dark',expandedCat:null,
   modal:null,datePicking:null,expandedTask:null,showCats:false,
   tab:'pulser', // 'pulser' or 'todos'
   todos:[],showDone:false,
@@ -377,7 +373,6 @@ const today=()=>new Date().toISOString().split('T')[0];
 const ffreq=d=>{d=parseInt(d);return d===1?'dag':d===7?'vecka':d===14?'annan vecka':d===30?'månad':d+':e dag'};
 
 function sortTasks(arr){
-  if(S.sort==='name')return[...arr].sort((a,b)=>a.name.localeCompare(b.name,'sv'));
   return[...arr].sort((a,b)=>urg(b)-urg(a));
 }
 
@@ -508,7 +503,7 @@ function rCatView(){
   const cat=getCats().find(c=>c.id===S.expandedCat);if(!cat)return'';
   const ts=ctasks(cat.id),sorted=sortTasks(ts);
   const shared=isShared(cat.id);
-  let h=`<div><div class="cat-back" data-action="collapseCat">← ${cat.icon} ${cat.label}${shared?' <span class="shared-tag">👥</span>':''} <span style="color:var(--t3);margin-left:auto;font-size:11px">${ts.length}</span></div><div class="sort-row"><span class="sort-label">Sortera:</span><button class="sort-btn ${S.sort==='urgency'?'on':''}" data-action="setSort" data-sort="urgency">Brådskande</button><button class="sort-btn ${S.sort==='name'?'on':''}" data-action="setSort" data-sort="name">Namn</button></div>`;
+  let h=`<div><div class="cat-back" data-action="collapseCat">← ${cat.icon} ${cat.label}${shared?' <span class="shared-tag">👥</span>':''} <span style="color:var(--t3);margin-left:auto;font-size:11px">${ts.length}</span></div>`;
   sorted.forEach((t,i)=>{h+=rCard(t,i,'cat')});
   return h+'</div>';
 }
@@ -622,7 +617,6 @@ function H(e){
     case 'toggleCats':S.showCats=!S.showCats;R();break;
     case 'expandCat':S.expandedCat=el.dataset.cat;S.datePicking=null;S.expandedTask=null;pNav();R();break;
     case 'collapseCat':S.expandedCat=null;S.datePicking=null;S.expandedTask=null;R();break;
-    case 'setSort':S.sort=el.dataset.sort;R();break;
     case 'toggleTask':S.expandedTask=S.expandedTask===el.dataset.id?null:el.dataset.id;S.datePicking=null;R();break;
     case 'hideToday':e.stopPropagation();S.hiddenToday[el.dataset.id]=today();S.expandedTask=null;save();R();break;
     case 'liftPrio':e.stopPropagation();S.liftedToPrio.add(el.dataset.id);delete S.hiddenToday[el.dataset.id];S.expandedTask=null;R();break;
