@@ -158,6 +158,15 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .cat-chip .cc-urg{color:var(--red)}
 
 /* Category expanded */
+.freq-tabs{display:flex;gap:4px;margin-bottom:10px}
+.freq-tab{flex:1;padding:7px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--t3);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;text-align:center;transition:all .2s}
+.freq-tab.on{background:var(--bg3);color:var(--t1);border-color:var(--brd2);font-weight:600}
+.weekday-grid{display:flex;gap:4px}
+.wd-btn{flex:1;padding:8px 0;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--t3);font-size:12px;cursor:pointer;text-align:center;font-family:'DM Sans',sans-serif;transition:all .15s}
+.wd-btn:hover{background:var(--bg3)}.wd-btn.sel{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:600}
+.md-grid{display:flex;flex-wrap:wrap;gap:4px}
+.md-btn{width:38px;height:34px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--t3);font-size:12px;cursor:pointer;font-family:'Space Mono',monospace;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.md-btn:hover{background:var(--bg3)}.md-btn.sel{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:600}
 .cat-back{display:flex;align-items:center;gap:6px;padding:8px 0;cursor:pointer;font-size:13px;color:var(--t2);margin-bottom:4px}
 .cat-back:hover{color:var(--t1)}
 
@@ -392,13 +401,28 @@ function findTask(id){let t=S.tasks.find(x=>x.id===id);if(t)return{task:t,src:'p
 // ═══════════════════════════════════════════
 const gid=()=>Date.now().toString(36)+Math.random().toString(36).substr(2,5);
 const dsince=d=>{if(!d)return null;return Math.floor((new Date()-new Date(d))/864e5)};
-const urg=t=>{const ds=dsince(t.lastDone);return ds===null?1:ds/t.frequencyDays};
-// <50% green, 50-75% yellow, 75-100% orange, >100% red
+// Effective frequency in days for urgency ratio
+function effFreq(t){
+  if(t.freqType==='weekly')return 7;
+  if(t.freqType==='monthly'){
+    const now=new Date();const y=now.getFullYear(),m=now.getMonth();
+    return new Date(y,m+1,0).getDate(); // days in current month
+  }
+  return t.frequencyDays||7;
+}
+const urg=t=>{const ds=dsince(t.lastDone);return ds===null?1:ds/effFreq(t)};
 const urgCls=t=>{const u=urg(t);return u>=1?'u-red':u>=.75?'u-org':u>=.5?'u-yel':'u-grn'};
 const lampCls=t=>{const u=urg(t);return u>=1?'red':u>=.75?'org':u>=.5?'yel':'grn'};
 const dayCol=t=>{const u=urg(t);return u>=1?'var(--red)':u>=.75?'var(--org)':u>=.5?'var(--yel)':'var(--grn)'};
 const ccol=id=>{const c=getCats().find(x=>x.id===id);return c?`var(${c.v})`:'var(--t3)'};
 const today=()=>new Date().toISOString().split('T')[0];
+const WEEKDAYS=['Mån','Tis','Ons','Tor','Fre','Lör','Sön'];
+const WEEKDAYS_FULL=['måndag','tisdag','onsdag','torsdag','fredag','lördag','söndag'];
+function ffreqLabel(t){
+  if(t.freqType==='weekly'&&t.freqWeekday!=null)return'varje '+WEEKDAYS_FULL[t.freqWeekday];
+  if(t.freqType==='monthly'&&t.freqMonthDay)return t.freqMonthDay+':e varje månad';
+  return'var '+ffreq(t.frequencyDays||7);
+}
 const ffreq=d=>{d=parseInt(d);return d===1?'dag':d===7?'vecka':d===14?'annan vecka':d===30?'månad':d+':e dag'};
 
 function sortTasks(arr){
@@ -505,7 +529,7 @@ function rCard(t,i,ctx){
   // Signal lamp
   h+=`<div class="tc-lamp ${lampCls(t)}"></div>`;
   // Info
-  h+=`<div class="tc-info" data-action="toggleTask" data-id="${t.id}"><div class="tc-name">${t.name}${isLifted&&!isPrio?' <span class="prio-pin">📌</span>':''}${shared?' <span class="shared-tag">👥</span>':''}</div><div class="tc-meta">${cat?cat.icon+' '+cat.label:''}<span class="dot">·</span>var ${t.frequencyDays}:e dag</div></div>`;
+  h+=`<div class="tc-info" data-action="toggleTask" data-id="${t.id}"><div class="tc-name">${t.name}${isLifted&&!isPrio?' <span class="prio-pin">📌</span>':''}${shared?' <span class="shared-tag">👥</span>':''}</div><div class="tc-meta">${cat?cat.icon+' '+cat.label:''}<span class="dot">·</span>${ffreqLabel(t)}</div></div>`;
   // Actions
   h+=`<div class="tc-actions">`;
   if(isPrio)h+=`<span style="font-size:10px;color:var(--tm);cursor:pointer;white-space:nowrap" data-action="hideToday" data-id="${t.id}">dölj</span>`;
@@ -646,12 +670,25 @@ function rTaskModal(){
   const m=S.modal,t=m.task||{},isE=!!t.id;
   const allCats=getCats();
   const shared=isShared(t.category||S.expandedCat||'content');
+  const ft=t.freqType||'days';
   let assignF='';
   if(shared&&S.household&&isE){
     const mems=[{uid:null,name:'Vem som helst',photo:null},...S.household.members];
     assignF=`<div class="fg"><label class="fl">Tilldelad</label><div class="assign-row">${mems.map(mem=>`<button class="assign-opt ${(t.assignedTo||null)===(mem.uid)?'sel':''}" data-action="setAssign" data-uid="${mem.uid||''}">${mem.photo?`<img src="${mem.photo}" referrerpolicy="no-referrer">`:'👤'} ${mem.uid===S.user?.uid?'Jag':mem.name}</button>`).join('')}</div></div>`;
   }
-  return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny uppgift'}</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Namn</label><input class="fi" id="tn" value="${t.name||''}" placeholder="T.ex. Gymma" autofocus></div><div class="fg"><label class="fl">Kategori</label><div class="cg" id="catGrid">${allCats.map(c=>{const sel=(t.category||S.expandedCat||'content')===c.id;return`<button class="co ${sel?'sel':''}" data-action="setCat" data-cat="${c.id}" style="${sel?`border-color:${ccol(c.id)};color:${ccol(c.id)};font-weight:600`:''}">${c.icon} ${c.label}</button>`}).join('')}</div><div class="add-cat-row"><input id="new-cat-name" placeholder="Ny kategori..." maxlength="20"><button data-action="addCategory">+ Lägg till</button></div></div><div class="fg"><label class="fl">Frekvens (dagar)</label><div class="fr">${[1,2,3,7,14,21,30].map(d=>`<button class="fb ${parseInt(t.frequencyDays||7)===d?'sel':''}" data-action="setFreq" data-freq="${d}">${d}</button>`).join('')}<input class="fi" style="width:65px;text-align:center" id="tf" type="number" min="1" value="${t.frequencyDays||7}"></div><p class="fh">= var ${ffreq(t.frequencyDays||7)}</p></div>${isE?`<div class="fg"><label class="fl">Senast gjord</label><input class="fi" type="date" id="tl" value="${t.lastDone?t.lastDone.split('T')[0]:''}" max="${today()}"></div>`:''}${assignF}<div class="br">${isE&&!t.isProtected?`<button class="bd" data-action="deleteTask" data-id="${t.id}">🗑</button>`:''}<button class="bp" data-action="saveTask">${isE?'Spara':'Lägg till'}</button></div></div></div>`;
+  // Frequency section
+  let freqHTML=`<div class="fg"><label class="fl">Frekvens</label><div class="freq-tabs"><button class="freq-tab${ft==='days'?' on':''}" data-action="setFreqType" data-ft="days">Dagar</button><button class="freq-tab${ft==='weekly'?' on':''}" data-action="setFreqType" data-ft="weekly">Veckodag</button><button class="freq-tab${ft==='monthly'?' on':''}" data-action="setFreqType" data-ft="monthly">Månad</button></div>`;
+  if(ft==='days'){
+    freqHTML+=`<div class="fr">${[1,2,3,7,14,21,30].map(d=>`<button class="fb ${parseInt(t.frequencyDays||7)===d?'sel':''}" data-action="setFreq" data-freq="${d}">${d}</button>`).join('')}<input class="fi" style="width:65px;text-align:center" id="tf" type="number" min="1" value="${t.frequencyDays||7}"></div><p class="fh">= var ${ffreq(t.frequencyDays||7)}</p>`;
+  }else if(ft==='weekly'){
+    const wd=t.freqWeekday!=null?t.freqWeekday:-1;
+    freqHTML+=`<div class="weekday-grid">${WEEKDAYS.map((d,i)=>`<button class="wd-btn${wd===i?' sel':''}" data-action="setWeekday" data-wd="${i}">${d}</button>`).join('')}</div>`;
+  }else if(ft==='monthly'){
+    const md=t.freqMonthDay||1;
+    freqHTML+=`<div class="md-grid">${[1,5,10,15,20,25].map(d=>`<button class="md-btn${md===d?' sel':''}" data-action="setMonthDay" data-md="${d}">${d}</button>`).join('')}<button class="md-btn${md===99?' sel':''}" data-action="setMonthDay" data-md="99">Sista</button></div>`;
+  }
+  freqHTML+=`</div>`;
+  return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny uppgift'}</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Namn</label><input class="fi" id="tn" value="${t.name||''}" placeholder="T.ex. Gymma" autofocus></div><div class="fg"><label class="fl">Kategori</label><div class="cg" id="catGrid">${allCats.map(c=>{const sel=(t.category||S.expandedCat||'content')===c.id;return`<button class="co ${sel?'sel':''}" data-action="setCat" data-cat="${c.id}" style="${sel?`border-color:${ccol(c.id)};color:${ccol(c.id)};font-weight:600`:''}">${c.icon} ${c.label}</button>`}).join('')}</div><div class="add-cat-row"><input id="new-cat-name" placeholder="Ny kategori..." maxlength="20"><button data-action="addCategory">+ Lägg till</button></div></div>${freqHTML}${isE?`<div class="fg"><label class="fl">Senast gjord</label><input class="fi" type="date" id="tl" value="${t.lastDone?t.lastDone.split('T')[0]:''}" max="${today()}"></div>`:''}${assignF}<div class="br">${isE&&!t.isProtected?`<button class="bd" data-action="deleteTask" data-id="${t.id}">🗑</button>`:''}<button class="bp" data-action="saveTask">${isE?'Spara':'Lägg till'}</button></div></div></div>`;
 }
 
 // ═══════════════════════════════════════════
@@ -781,7 +818,10 @@ function H(e){
     case 'editVacation':S.modal={type:'vacation'};pNav();R();break;
     case 'saveVacation':{const f=parseInt(document.getElementById('vf').value)||90,ld=document.getElementById('vl').value;let vt=S.tasks.find(t=>t.id==='__vacation__');if(!vt){vt={...VTASK};S.tasks.push(vt)}vt.frequencyDays=f;vt.lastDone=ld?new Date(ld+'T12:00:00').toISOString():new Date().toISOString();S.modal=null;save();R();break}
     case 'setCat':{document.querySelectorAll('.co').forEach(b=>{b.classList.remove('sel');b.removeAttribute('style')});el.classList.add('sel');el.style.cssText=`border-color:${ccol(el.dataset.cat)};color:${ccol(el.dataset.cat)};font-weight:600`;document.getElementById('catGrid').dataset.selected=el.dataset.cat;break}
-    case 'setFreq':{const f=el.dataset.freq;document.getElementById('tf').value=f;document.querySelectorAll('.fb').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');const h=el.closest('.fg').querySelector('.fh');if(h)h.textContent='= var '+ffreq(f);break}
+    case 'setFreq':{const f=el.dataset.freq;document.getElementById('tf').value=f;document.querySelectorAll('.fb').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');const h=el.closest('.fg')?.querySelector('.fh');if(h)h.textContent='= var '+ffreq(f);break}
+    case 'setFreqType':{const ft=el.dataset.ft;if(!S.modal.task)S.modal.task={};S.modal.task.freqType=ft;R();break}
+    case 'setWeekday':{if(!S.modal.task)S.modal.task={};S.modal.task.freqWeekday=parseInt(el.dataset.wd);document.querySelectorAll('.wd-btn').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');break}
+    case 'setMonthDay':{if(!S.modal.task)S.modal.task={};S.modal.task.freqMonthDay=parseInt(el.dataset.md);document.querySelectorAll('.md-btn').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');break}
     case 'setAssign':{if(S.modal?.task)S.modal.task.assignedTo=el.dataset.uid||null;document.querySelectorAll('.assign-opt').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');break}
     case 'addCategory':{const inp=document.getElementById('new-cat-name');const name=inp?.value?.trim();if(!name)return;const id=name.toLowerCase().replace(/[^a-zåäö0-9]/g,'_');if(getCats().find(c=>c.id===id))return;const emoji=EMOJI_POOL[S.customCats.length%EMOJI_POOL.length];S.customCats.push({id,label:name,icon:emoji,v:'--c-oth'});save();R();break}
     case 'saveTask':{
@@ -789,15 +829,20 @@ function H(e){
       const sc=document.getElementById('catGrid')?.dataset.selected||document.querySelector('.co.sel')?.dataset.cat||S.expandedCat||'content';
       const n=ne?.value?.trim();if(!n){ne?.focus();return}const freq=Math.max(1,parseInt(fe?.value)||7);
       const shared=isShared(sc);
-      if(S.modal.task?.id){
-        const f=findTask(S.modal.task.id);if(f){const t=f.task;const was=f.src==='h';const now=shared;
+      const mt=S.modal.task||{};
+      const freqType=mt.freqType||'days';
+      const freqWeekday=mt.freqWeekday!=null?mt.freqWeekday:null;
+      const freqMonthDay=mt.freqMonthDay||null;
+      if(mt.id){
+        const f=findTask(mt.id);if(f){const t=f.task;const was=f.src==='h';const now=shared;
           t.name=n;t.category=sc;t.frequencyDays=freq;
-          if(S.modal.task.assignedTo!==undefined)t.assignedTo=S.modal.task.assignedTo;
+          t.freqType=freqType;t.freqWeekday=freqWeekday;t.freqMonthDay=freqMonthDay;
+          if(mt.assignedTo!==undefined)t.assignedTo=mt.assignedTo;
           const lde=document.getElementById('tl');if(lde?.value)t.lastDone=new Date(lde.value+'T12:00:00').toISOString();else if(lde&&!lde.value)t.lastDone=null;
           if(!was&&now&&S.household){S.tasks=S.tasks.filter(x=>x.id!==t.id);S.household.tasks.push(t)}
           else if(was&&!now&&S.household){S.household.tasks=S.household.tasks.filter(x=>x.id!==t.id);S.tasks.push(t)}
         }
-      }else{const nt={id:gid(),name:n,category:sc,frequencyDays:freq,lastDone:null,assignedTo:null};if(shared&&S.household)S.household.tasks.push(nt);else S.tasks.push(nt)}
+      }else{const nt={id:gid(),name:n,category:sc,frequencyDays:freq,freqType,freqWeekday,freqMonthDay,lastDone:null,assignedTo:null};if(shared&&S.household)S.household.tasks.push(nt);else S.tasks.push(nt)}
       S.modal=null;save();R();break}
     case 'deleteTask':S.modal={type:'confirm',taskId:el.dataset.id};R();break;
     case 'confirmDelete':{const id=el.dataset.id;S.tasks=S.tasks.filter(t=>t.id!==id);if(S.household)S.household.tasks=(S.household.tasks||[]).filter(t=>t.id!==id);S.modal=null;save();R();break}
