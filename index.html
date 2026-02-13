@@ -208,6 +208,20 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .auth-provider-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 16px;border-radius:10px;border:1px solid var(--brd2);background:var(--bg-in);color:var(--t1);font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
 .auth-provider-btn:hover{background:var(--bg3);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.1)}
 
+/* Onboarding */
+.ob{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;animation:fadeIn .4s ease}
+.ob-step{max-width:360px;animation:fadeSlideIn .4s ease forwards;opacity:0}
+.ob-icon{font-size:56px;margin-bottom:20px}
+.ob-title{font-size:22px;font-weight:700;margin-bottom:10px;line-height:1.3}
+.ob-desc{font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:28px}
+.ob-demo{border-radius:12px;background:var(--bg3);border:1px solid var(--brd);padding:16px;margin-bottom:28px;text-align:left}
+.ob-dots{display:flex;gap:8px;justify-content:center;margin-bottom:24px}
+.ob-dot{width:8px;height:8px;border-radius:50%;background:var(--tm);transition:all .3s}
+.ob-dot.on{background:var(--acc);width:24px;border-radius:4px}
+.ob-next{width:100%;padding:14px;border-radius:12px;border:none;background:var(--acc);color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.ob-next:hover{box-shadow:0 4px 20px var(--acc-g)}
+.ob-skip{margin-top:12px;font-size:12px;color:var(--tm);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif}
+.ob-skip:hover{color:var(--t3)}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeSlideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
@@ -262,8 +276,6 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 firebase.initializeApp({apiKey:"AIzaSyD-n66FkaZuWkLN8r2i-iMBv-FBXklwLbM",authDomain:"puls-whack-a-do.firebaseapp.com",projectId:"puls-whack-a-do",storageBucket:"puls-whack-a-do.firebasestorage.app",messagingSenderId:"348032853742",appId:"1:348032853742:web:2a9b573470f28c5dedf5ff",measurementId:"G-Q6W3PVF0ZY"});
 const auth=firebase.auth(),db=firebase.firestore();
 const gProv=new firebase.auth.GoogleAuthProvider();
-const msProv=new firebase.auth.OAuthProvider('microsoft.com');msProv.setCustomParameters({prompt:'select_account'});
-const appleProv=new firebase.auth.OAuthProvider('apple.com');appleProv.addScope('email');appleProv.addScope('name');
 db.enablePersistence({synchronizeTabs:true}).catch(e=>console.log('P:',e.code));
 
 // ═══════════════════════════════════════════
@@ -280,15 +292,11 @@ const DEFAULT_CATS=[
 ];
 const EMOJI_POOL=['🎯','🧹','👶','🎨','📚','🏃','🎵','🐾','🌱','💊','🛒','🍳','📱','🚗','❤️','🎓'];
 const VTASK={id:'__vacation__',name:'Semester',category:'recovery',frequencyDays:90,lastDone:null,isProtected:true};
+function daysAgo(n){const d=new Date();d.setDate(d.getDate()-n);return d.toISOString()}
 const DEFAULTS=[
-  {id:'d1',name:'Publicera på TikTok',category:'content',frequencyDays:2,lastDone:null},
-  {id:'d2',name:'Publicera på Instagram',category:'content',frequencyDays:3,lastDone:null},
-  {id:'d3',name:'Ladda upp på YouTube',category:'content',frequencyDays:7,lastDone:null},
-  {id:'d4',name:'Skicka mejl för samarbeten',category:'business',frequencyDays:3,lastDone:null},
-  {id:'d5',name:'Gymma',category:'fitness',frequencyDays:2,lastDone:null},
-  {id:'d6',name:'Städa hemma',category:'hem',frequencyDays:3,lastDone:null},
-  {id:'d7',name:'Tvätta bilen',category:'hem',frequencyDays:14,lastDone:null},
-  {id:'d8',name:'Gå på dejt',category:'personligt',frequencyDays:21,lastDone:null},
+  {id:'d1',name:'Gymma',category:'fitness',frequencyDays:2,lastDone:daysAgo(5)},
+  {id:'d2',name:'Städa hemma',category:'hem',frequencyDays:7,lastDone:daysAgo(5)},
+  {id:'d3',name:'Ring en vän',category:'personligt',frequencyDays:14,lastDone:daysAgo(2)},
   {...VTASK,frequencyDays:90},
 ];
 
@@ -298,11 +306,11 @@ const DEFAULTS=[
 let S={
   tasks:[],customCats:[],theme:'dark',expandedCat:null,
   modal:null,datePicking:null,expandedTask:null,showCats:false,
-  tab:'pulser', // 'pulser' or 'todos'
-  todos:[],showDone:false,
+  tab:'pulser',todos:[],showDone:false,
   user:null,syncStatus:'offline',profileOpen:false,
   hiddenToday:{},liftedToPrio:new Set(),
   household:null,householdId:null,
+  onboarding:0, // 0=not shown, 1/2/3=step, -1=done
 };
 let _unsub=null,_hhUnsub=null;
 function getCats(){return[...DEFAULT_CATS,...S.customCats]}
@@ -313,12 +321,12 @@ function getCats(){return[...DEFAULT_CATS,...S.customCats]}
 function saveLocal(){try{localStorage.setItem('puls',JSON.stringify({tasks:S.tasks,todos:S.todos,theme:S.theme,householdId:S.householdId,customCats:S.customCats,hiddenToday:S.hiddenToday}))}catch(e){}}
 function loadLocal(){
   try{const d=JSON.parse(localStorage.getItem('puls'));
-    if(d?.tasks){S.tasks=d.tasks;ensV()}else S.tasks=DEFAULTS.map(t=>({...t}));
+    if(d?.tasks){S.tasks=d.tasks;ensV();S.onboarding=-1}else{S.tasks=DEFAULTS.map(t=>({...t}));S.onboarding=1}
     if(d?.todos)S.todos=d.todos;
     if(d?.theme)S.theme=d.theme;if(d?.householdId)S.householdId=d.householdId;
     if(d?.customCats)S.customCats=d.customCats;
     if(d?.hiddenToday){const td=today();S.hiddenToday={};for(const[id,date]of Object.entries(d.hiddenToday)){if(date===td)S.hiddenToday[id]=date}}
-  }catch(e){S.tasks=DEFAULTS.map(t=>({...t}))}
+  }catch(e){S.tasks=DEFAULTS.map(t=>({...t}));S.onboarding=1}
 }
 function ensV(){if(!S.tasks.find(t=>t.id==='__vacation__'))S.tasks.push({...VTASK});const v=S.tasks.find(t=>t.id==='__vacation__');if(v)v.isProtected=true}
 
@@ -337,7 +345,6 @@ async function mergeUp(){if(!S.user||S.user.isAnonymous)return;const s=await db.
 // AUTH
 // ═══════════════════════════════════════════
 async function authWithProvider(prov){try{await auth.signInWithPopup(prov)}catch(e){if(e.code==='auth/popup-blocked')await auth.signInWithRedirect(prov);else{S.modal={type:'authError',msg:e.message};R()}}}
-async function emailSignIn(email,pass){try{await auth.signInWithEmailAndPassword(email,pass)}catch(e){if(e.code==='auth/user-not-found'||e.code==='auth/invalid-credential'){try{await auth.createUserWithEmailAndPassword(email,pass)}catch(e2){S.modal={type:'authError',msg:e2.message};R()}}else{S.modal={type:'authError',msg:e.message};R()}}}
 async function anonSignIn(){try{await auth.signInAnonymously()}catch(e){S.modal={type:'authError',msg:e.message};R()}}
 async function doSignOut(){if(_unsub){_unsub();_unsub=null}if(_hhUnsub){_hhUnsub();_hhUnsub=null}await auth.signOut();S.user=null;S.syncStatus='offline';S.profileOpen=false;S.household=null;R()}
 auth.onAuthStateChanged(async u=>{S.user=u;if(u){if(u.isAnonymous){S.syncStatus='offline';R();return}S.syncStatus='syncing';R();await mergeUp();startSync();if(S.householdId)startHHSync()}else{S.syncStatus='offline';if(_unsub){_unsub();_unsub=null}if(_hhUnsub){_hhUnsub();_hhUnsub=null}R()}});
@@ -391,7 +398,8 @@ function R(){
   const app=document.getElementById('app');if(!app)return;
   document.documentElement.setAttribute('data-theme',S.theme);
   document.getElementById('metaTheme').content=S.theme==='dark'?'#0A0A0F':'#FFF5F7';
-  let html=rHeader()+rTabs();
+  if(S.onboarding>0){app.innerHTML=rOnboarding();bind();return}
+  let html=rHeader()+rTabs()+`<div style="padding:0 0 8px"><button class="add-btn" data-action="addTask" style="width:100%;justify-content:center;height:40px;border-radius:10px;font-size:13px"><span>+</span> Ny ${S.tab==='todos'?'att-göra':'puls'}</button></div>`;
   if(S.tab==='todos'){html+=rTodosView()}
   else{
     const all=allTasks();
@@ -424,7 +432,7 @@ function rHeader(){
       prof+=`<div class="profile-drop"><div class="p-name">${anon?'Anonym':S.user.displayName||'Inloggad'}</div>${!anon?`<div class="p-email">${S.user.email||''}</div>`:''}<div class="p-sync"><div class="sync-dot ${S.syncStatus}" style="width:6px;height:6px"></div> ${st}</div><div class="p-divider"></div>${upgradeBtn}${hhBtn}<button class="p-btn danger" data-action="signOut">Logga ut</button></div>`;
     }
   }else{prof=`<button class="signin-btn" data-action="openAuth">🔑 Logga in</button>`}
-  return`<header class="hdr"><div class="hdr-row"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1><div class="hdr-actions"><div style="position:relative">${prof}</div><button class="icon-btn" data-action="toggleTheme">${S.theme==='dark'?'☀️':'🌙'}</button><button class="add-btn" data-action="addTask"><span>+</span> Ny</button></div></div>${rVacation()}</header>`;
+  return`<header class="hdr"><div class="hdr-row"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1><div class="hdr-actions"><div style="position:relative">${prof}</div><button class="icon-btn" data-action="toggleTheme">${S.theme==='dark'?'☀️':'🌙'}</button></div></div>${rVacation()}</header>`;
 }
 function rVacation(){
   const vt=S.tasks.find(t=>t.id==='__vacation__');if(!vt)return'';
@@ -432,6 +440,15 @@ function rVacation(){
   const ds=dsince(vt.lastDone),p=Math.min(ds/vt.frequencyDays,1),dl=Math.max(0,vt.frequencyDays-ds);
   return`<div class="vac-strip" data-action="editVacation"><span style="font-size:14px">🏖️</span><span style="font-size:11px;color:var(--t3)">Semester</span><div class="vac-prog"><div class="vac-prog-fill" style="width:${p*100}%"></div></div><span class="vac-txt">${dl===0?'🎉 Dags!':dl+'d'}</span></div>`;
 }
+function rOnboarding(){
+  const step=S.onboarding;
+  const dots=`<div class="ob-dots"><div class="ob-dot${step===1?' on':''}"></div><div class="ob-dot${step===2?' on':''}"></div><div class="ob-dot${step===3?' on':''}"></div></div>`;
+  if(step===1)return`<div class="ob"><div class="ob-step"><div class="ob-icon">⚡</div><div class="ob-title">Välkommen till Puls</div><div class="ob-desc">Lägg till saker du vill göra regelbundet. Puls håller koll så du inte glömmer.</div><div class="ob-demo"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--grn);min-width:36px;text-align:center">0</div><div><div style="font-size:14px;font-weight:600">Gymma</div><div style="font-size:11px;color:var(--t3)">💪 Fitness · var 2:a dag</div></div></div><div style="font-size:12px;color:var(--t2);padding-left:46px">↑ Dagar sedan du senast gjorde det</div></div>${dots}<button class="ob-next" data-action="obNext">Nästa →</button><button class="ob-skip" data-action="obSkip">Hoppa över</button></div></div>`;
+  if(step===2)return`<div class="ob"><div class="ob-step"><div class="ob-icon">🎨</div><div class="ob-title">Färgen säger allt</div><div class="ob-desc">Ju längre sen, desto mer bråttom. Du behöver bara titta på färgen.</div><div class="ob-demo"><div style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;align-items:center;gap:10px"><div style="width:10px;height:10px;border-radius:50%;background:var(--grn);box-shadow:0 0 6px rgba(81,207,102,.4)"></div><div style="font-size:13px"><span style="color:var(--grn);font-weight:600">Grön</span> <span style="color:var(--t2)">— Lugnt, nyligen gjord</span></div></div><div style="display:flex;align-items:center;gap:10px"><div style="width:10px;height:10px;border-radius:50%;background:var(--yel);box-shadow:0 0 6px rgba(255,212,59,.4)"></div><div style="font-size:13px"><span style="color:var(--yel);font-weight:600">Gul</span> <span style="color:var(--t2)">— Börjar bli dags</span></div></div><div style="display:flex;align-items:center;gap:10px"><div style="width:10px;height:10px;border-radius:50%;background:var(--org);box-shadow:0 0 6px rgba(255,140,66,.4)"></div><div style="font-size:13px"><span style="color:var(--org);font-weight:600">Orange</span> <span style="color:var(--t2)">— Gör snart</span></div></div><div style="display:flex;align-items:center;gap:10px"><div style="width:10px;height:10px;border-radius:50%;background:var(--red);box-shadow:0 0 6px rgba(255,71,87,.4)"></div><div style="font-size:13px"><span style="color:var(--red);font-weight:600">Röd</span> <span style="color:var(--t2)">— Gör nu!</span></div></div></div></div>${dots}<button class="ob-next" data-action="obNext">Nästa →</button><button class="ob-skip" data-action="obSkip">Hoppa över</button></div></div>`;
+  if(step===3)return`<div class="ob"><div class="ob-step"><div class="ob-icon">🚀</div><div class="ob-title">Redo!</div><div class="ob-desc">Vi har lagt in 3 exempel-pulser åt dig. Redigera, ta bort eller lägg till egna — det är din puls.</div><div class="ob-demo" style="text-align:center"><div style="display:flex;justify-content:center;gap:16px;padding:6px 0"><div><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--red)">5</div><div style="font-size:10px;color:var(--t3)">Gymma</div></div><div><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--org)">5</div><div style="font-size:10px;color:var(--t3)">Städa</div></div><div><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--grn)">2</div><div style="font-size:10px;color:var(--t3)">Ring en vän</div></div></div></div>${dots}<button class="ob-next" data-action="obDone">Kör igång! ⚡</button></div></div>`;
+  return'';
+}
+
 function rStats(red,org,grn,allOk){
   if(allOk)return`<div class="stats-inline"><div class="all-clear">✨ Alla pulser i fas</div></div>`;
   let h='<div class="stats-inline">';
@@ -449,7 +466,7 @@ function rTodo(){
   const items=all.filter(t=>(urg(t)>=.75||S.liftedToPrio.has(t.id))&&!S.hiddenToday[t.id]);
   items.sort((a,b)=>urg(b)-urg(a));
   if(!items.length)return'';
-  let h=`<div style="margin-bottom:4px"><div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px">Att göra <span style="font-family:'Space Mono',monospace;color:var(--red);font-size:12px">${items.length}</span></div>`;
+  let h=`<div style="margin-bottom:4px">`;
   items.forEach((t,i)=>{h+=rCard(t,i,'prio')});
   return h+'</div>';
 }
@@ -476,7 +493,7 @@ function rCard(t,i,ctx){
   h+=`<div class="tc-info" data-action="toggleTask" data-id="${t.id}"><div class="tc-name">${t.name}${isLifted&&!isPrio?' <span class="prio-pin">📌</span>':''}${shared?' <span class="shared-tag">👥</span>':''}</div><div class="tc-meta">${cat?cat.icon+' '+cat.label:''}<span class="dot">·</span>var ${t.frequencyDays}:e dag</div></div>`;
   // Actions
   h+=`<div class="tc-actions">`;
-  if(isPrio)h+=`<button class="tc-btn" data-action="hideToday" data-id="${t.id}">Dölj</button>`;
+  if(isPrio)h+=`<span style="font-size:10px;color:var(--tm);cursor:pointer;white-space:nowrap" data-action="hideToday" data-id="${t.id}">dölj</span>`;
   else h+=`<button class="tc-btn" data-action="${isLifted?'unliftPrio':'liftPrio'}" data-id="${t.id}">${isLifted?'📌':'↑'}</button>`;
   h+=`<button class="tc-btn check" data-action="checkTask" data-id="${t.id}">✓</button></div></div>`;
   // Expanded
@@ -582,7 +599,7 @@ function rModal(){
 }
 
 function rAuthModal(){
-  return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">Logga in</h2><button class="md-close" data-action="closeModal">✕</button></div><p style="font-size:13px;color:var(--t2);margin-bottom:18px">Synka mellan enheter och dela med hushåll.</p><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"><button class="auth-provider-btn" data-action="signInGoogle"><svg viewBox="0 0 48 48" style="width:18px;height:18px;flex-shrink:0"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Google</button><button class="auth-provider-btn" data-action="signInMicrosoft"><svg viewBox="0 0 21 21" style="width:18px;height:18px;flex-shrink:0"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg> Microsoft</button><button class="auth-provider-btn" data-action="signInApple"><svg viewBox="0 0 24 24" style="width:18px;height:18px;flex-shrink:0;fill:var(--t1)"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.52-3.23 0-1.44.62-2.2.44-3.06-.4C3.79 16.17 4.36 9.02 8.7 8.76c1.26.07 2.13.72 2.87.76.83-.17 2.08-.84 3.52-.72 1.59.14 2.78.82 3.54 2.07-3.24 1.93-2.47 6.17.62 7.35-.56 1.44-1.28 2.86-2.2 4.06zM12.05 8.67c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg> Apple</button></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><div style="flex:1;height:1px;background:var(--brd)"></div><span style="font-size:11px;color:var(--tm)">ELLER</span><div style="flex:1;height:1px;background:var(--brd)"></div></div><div class="fg"><label class="fl">E-post</label><input class="fi" id="auth-email" type="email" placeholder="din@epost.se"></div><div class="fg"><label class="fl">Lösenord</label><input class="fi" id="auth-pass" type="password" placeholder="Minst 6 tecken"></div><div class="br" style="margin-bottom:14px"><button class="bp" data-action="signInEmail">Logga in / Skapa konto</button></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><div style="flex:1;height:1px;background:var(--brd)"></div><span style="font-size:11px;color:var(--tm)">ELLER</span><div style="flex:1;height:1px;background:var(--brd)"></div></div><button class="auth-provider-btn" data-action="signInAnon" style="border-style:dashed;color:var(--t3)">👻 Fortsätt utan konto</button><p style="font-size:11px;color:var(--t3);margin-top:8px;text-align:center">Anonym = ingen synk, bara lokalt.</p></div></div>`;
+  return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">Logga in</h2><button class="md-close" data-action="closeModal">✕</button></div><p style="font-size:13px;color:var(--t2);margin-bottom:18px">Synka mellan enheter och dela med hushåll.</p><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"><button class="auth-provider-btn" data-action="signInGoogle"><svg viewBox="0 0 48 48" style="width:18px;height:18px;flex-shrink:0"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Logga in med Google</button></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><div style="flex:1;height:1px;background:var(--brd)"></div><span style="font-size:11px;color:var(--tm)">ELLER</span><div style="flex:1;height:1px;background:var(--brd)"></div></div><button class="auth-provider-btn" data-action="signInAnon" style="border-style:dashed;color:var(--t3)">👻 Fortsätt utan konto</button><p style="font-size:11px;color:var(--t3);margin-top:8px;text-align:center">Utan konto = ingen synk, bara lokalt på enheten.</p></div></div>`;
 }
 
 function rHHModal(){
@@ -640,9 +657,6 @@ function H(e){
     case 'toggleProfile':e.stopPropagation();S.profileOpen=!S.profileOpen;R();break;
     case 'openAuth':S.modal={type:'auth'};S.profileOpen=false;pNav();R();break;
     case 'signInGoogle':S.modal=null;R();authWithProvider(gProv);break;
-    case 'signInMicrosoft':S.modal=null;R();authWithProvider(msProv);break;
-    case 'signInApple':S.modal=null;R();authWithProvider(appleProv);break;
-    case 'signInEmail':{const em=document.getElementById('auth-email')?.value?.trim();const pw=document.getElementById('auth-pass')?.value;if(!em||!pw)return;S.modal=null;R();emailSignIn(em,pw);break}
     case 'signInAnon':S.modal=null;R();anonSignIn();break;
     case 'signOut':doSignOut();break;
     case 'addTask':S.modal={type:S.tab==='todos'?'todo':'task'};pNav();R();break;
@@ -688,6 +702,9 @@ function H(e){
     case 'joinHousehold':{const inp=document.getElementById('hh-code-input');const err=document.getElementById('hh-error');if(inp?.value)joinHH(inp.value).then(ok=>{if(!ok&&err)err.style.display='block';else{S.modal={type:'household'};R()}});break}
     case 'leaveHousehold':leaveHH().then(()=>{S.modal=null;R()});break;
     case 'toggleSharedCat':toggleSharedCat(el.dataset.cat);break;
+    // ─── Onboarding ───
+    case 'obNext':S.onboarding++;R();break;
+    case 'obSkip':case 'obDone':S.onboarding=-1;save();R();break;
     // ─── Todo actions ───
     case 'toggleTodo':{e.stopPropagation();const t=S.todos.find(x=>x.id===el.dataset.id);if(t){t.done=!t.done;t.doneAt=t.done?new Date().toISOString():null;save();R()}break}
     case 'editTodo':{const t=S.todos.find(x=>x.id===el.dataset.id);if(t){S.modal={type:'todo',todo:{...t}};pNav();R()}break}
