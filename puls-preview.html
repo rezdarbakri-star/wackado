@@ -476,7 +476,7 @@ function rCard(t,i,ctx){
   h+=`<div class="tc-info" data-action="toggleTask" data-id="${t.id}"><div class="tc-name">${t.name}${isLifted&&!isPrio?' <span class="prio-pin">📌</span>':''}${shared?' <span class="shared-tag">👥</span>':''}</div><div class="tc-meta">${cat?cat.icon+' '+cat.label:''}<span class="dot">·</span>var ${t.frequencyDays}:e dag</div></div>`;
   // Actions
   h+=`<div class="tc-actions">`;
-  if(isPrio)h+=`<span style="font-size:11px;color:var(--t3);cursor:pointer;white-space:nowrap" data-action="hideToday" data-id="${t.id}">Dölj</span>`;
+  if(isPrio)h+=`<span style="font-size:10px;color:var(--tm);cursor:pointer;white-space:nowrap" data-action="hideToday" data-id="${t.id}">dölj</span>`;
   else h+=`<button class="tc-btn" data-action="${isLifted?'unliftPrio':'liftPrio'}" data-id="${t.id}">${isLifted?'📌':'↑'}</button>`;
   h+=`<button class="tc-btn check" data-action="checkTask" data-id="${t.id}">✓</button></div></div>`;
   // Expanded
