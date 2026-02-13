@@ -15,7 +15,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
 :root{
-  --bg:#0A0A0F;--bg2:rgba(255,255,255,0.025);--bg3:rgba(255,255,255,0.045);
+  --bg:#0A0A0F;--bg2:rgba(255,255,255,0.03);--bg3:rgba(255,255,255,0.055);
   --bg-in:rgba(255,255,255,0.04);--bg-modal:#14141F;
   --brd:rgba(255,255,255,0.06);--brd2:rgba(255,255,255,0.1);
   --t1:#E8E8ED;--t2:#888;--t3:#555;--tm:#333;
@@ -24,10 +24,9 @@
   --org:#FF8C42;--org-s:rgba(255,140,66,0.1);
   --red:#FF4757;--red-s:rgba(255,71,87,0.08);
   --yel:#FFD43B;--yel-s:rgba(255,212,59,0.1);
-  --ov:rgba(0,0,0,0.7);--sh:0 2px 12px rgba(0,0,0,0.2);
+  --ov:rgba(0,0,0,0.7);
   --c-cnt:#FF6B6B;--c-fit:#51CF66;--c-hem:#339AF0;--c-per:#DA77F2;
   --c-biz:#FFD43B;--c-rec:#74C0FC;--c-oth:#868E96;
-  --glow:rgba(81,207,102,0.3);
 }
 [data-theme="light"]{
   --bg:#FFF5F7;--bg2:rgba(255,255,255,0.85);--bg3:rgba(255,255,255,1);
@@ -39,21 +38,21 @@
   --org:#E8A87C;--org-s:rgba(232,168,124,0.15);
   --red:#D4798C;--red-s:rgba(212,121,140,0.1);
   --yel:#E8C87C;--yel-s:rgba(232,200,124,0.15);
-  --ov:rgba(255,245,247,0.85);--sh:0 2px 16px rgba(140,100,120,0.08);
+  --ov:rgba(255,245,247,0.85);
   --c-cnt:#D4798C;--c-fit:#7BC5A0;--c-hem:#7BAED4;--c-per:#B88DC4;
   --c-biz:#D4C07B;--c-rec:#7BB8D4;--c-oth:#A8A0AC;
-  --glow:rgba(123,197,160,0.3);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{height:100%;overflow-y:scroll}
 body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-serif;color:var(--t1);-webkit-font-smoothing:antialiased;transition:background .4s,color .4s}
 .app{max-width:520px;margin:0 auto;padding:0 16px 100px;position:relative}
 
+/* Header */
 .hdr{padding:env(safe-area-inset-top,8px) 0 0;position:sticky;top:0;z-index:20;background:var(--bg);transition:background .4s}
 .hdr-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0 8px}
-.hdr-left{display:flex;align-items:center;gap:10px}
 .logo{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;letter-spacing:3px;color:var(--t1)}
 .logo-z{font-size:18px}
+.hdr-actions{display:flex;align-items:center;gap:6px}
 .profile-chip{display:flex;align-items:center;gap:6px;padding:4px 8px 4px 4px;border-radius:20px;background:var(--bg2);border:1px solid var(--brd);cursor:pointer;transition:all .2s;position:relative}
 .profile-chip:hover{background:var(--bg3)}
 .profile-chip img{width:26px;height:26px;border-radius:50%;object-fit:cover}
@@ -67,136 +66,106 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .p-divider{height:1px;background:var(--brd);margin:8px 0}
 .p-btn{width:100%;padding:8px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--t2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;margin-bottom:6px;text-align:left;display:flex;align-items:center;gap:6px}
 .p-btn:hover{background:var(--bg3);color:var(--t1)}
-.p-btn.danger:hover{background:var(--red-s);color:var(--red);border-color:var(--red-s)}
+.p-btn.danger:hover{background:var(--red-s);color:var(--red)}
 .p-hh-badge{font-size:10px;padding:2px 6px;border-radius:5px;background:var(--acc-g);color:var(--acc);font-weight:600;margin-left:auto}
 .signin-btn{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:10px;border:1px solid var(--brd2);background:var(--bg2);color:var(--t1);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
 .signin-btn:hover{background:var(--bg3)}
-/* Auth provider buttons */
-.auth-provider-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 16px;border-radius:10px;border:1px solid var(--brd2);background:var(--bg-in);color:var(--t1);font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
-.auth-provider-btn:hover{background:var(--bg3);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,0.1)}
-.hdr-actions{display:flex;align-items:center;gap:6px}
 .icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--brd);background:var(--bg2);color:var(--t2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.icon-btn:hover{background:var(--bg3);transform:translateY(-1px)}
+.icon-btn:hover{background:var(--bg3)}
 .add-btn{height:38px;padding:0 14px;border-radius:10px;border:none;background:var(--acc);color:#fff;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .2s;white-space:nowrap}
-.add-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px var(--acc-g)}
+.add-btn:hover{box-shadow:0 4px 16px var(--acc-g)}
 .add-btn span{font-size:18px;line-height:1}
 
-.vac-strip{display:flex;align-items:center;gap:8px;padding:6px 0 8px;cursor:pointer;transition:opacity .2s;border-bottom:1px solid var(--brd)}
-.vac-strip:hover{opacity:.8}
-.vac-strip .vac-ico{font-size:14px;flex-shrink:0}
-.vac-strip .vac-prog{flex:1;height:3px;background:var(--bg-in);border-radius:2px;overflow:hidden;min-width:40px}
+/* Vacation */
+.vac-strip{display:flex;align-items:center;gap:8px;padding:6px 0 8px;cursor:pointer;border-bottom:1px solid var(--brd)}
+.vac-strip .vac-prog{flex:1;height:3px;background:var(--bg-in);border-radius:2px;overflow:hidden}
 .vac-strip .vac-prog-fill{height:100%;border-radius:2px;background:var(--acc);transition:width .6s ease}
-.vac-strip .vac-txt{font-size:12px;font-family:'Space Mono',monospace;font-weight:600;color:var(--acc);white-space:nowrap}
-.vac-strip .vac-lbl{font-size:11px;color:var(--t3);white-space:nowrap}
-.vac-empty-s{display:flex;align-items:center;gap:6px;padding:6px 0 8px;cursor:pointer;font-size:12px;color:var(--t3);border-bottom:1px solid var(--brd);transition:color .2s}
-.vac-empty-s:hover{color:var(--acc)}
+.vac-strip .vac-txt{font-size:12px;font-family:'Space Mono',monospace;font-weight:600;color:var(--acc)}
+.vac-empty{display:flex;align-items:center;gap:6px;padding:6px 0 8px;cursor:pointer;font-size:12px;color:var(--t3);border-bottom:1px solid var(--brd)}
+.vac-empty:hover{color:var(--acc)}
 
+/* Stats */
 .stats-inline{display:flex;align-items:center;gap:12px;padding:4px 0 10px;font-size:12px;color:var(--t3)}
 .si{display:flex;align-items:center;gap:4px}
 .si-num{font-family:'Space Mono',monospace;font-weight:700;font-size:13px}
-.si-num.red{color:var(--red)}.si-num.org{color:var(--org)}.si-num.grn{color:var(--grn)}.si-num.muted{color:var(--tm)}
+.si-num.red{color:var(--red)}.si-num.org{color:var(--org)}.si-num.grn{color:var(--grn)}
 .si-dot{width:6px;height:6px;border-radius:50%}
-.all-clear{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--grn);font-weight:500;animation:softGlow 3s ease infinite}
-@keyframes softGlow{0%,100%{text-shadow:0 0 8px var(--glow)}50%{text-shadow:0 0 16px var(--glow)}}
+.all-clear{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--grn);font-weight:500}
 
-/* Priority cards – clean: only check visible, tap to expand */
-/* Add bar above activities */
-.add-bar{padding:6px 0 10px}
-.add-bar .add-btn{width:100%;justify-content:center;height:42px;border-radius:12px;font-size:14px}
+/* ═════════════════════════════════════════════ */
+/* TASK CARD                                     */
+/* ═════════════════════════════════════════════ */
+.tc{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:var(--bg2);border:2px solid var(--brd);margin-bottom:6px;transition:all .25s;animation:fadeSlideIn .25s ease forwards;opacity:0;cursor:pointer}
+.tc:hover{background:var(--bg3)}
+/* Color shift by urgency */
+.tc.u-grn{border-color:rgba(81,207,102,.2)}
+.tc.u-yel{border-color:rgba(255,212,59,.35);background:var(--yel-s)}
+.tc.u-org{border-color:rgba(255,140,66,.4);background:var(--org-s)}
+.tc.u-red{border-color:rgba(255,71,87,.45);background:var(--red-s)}
+/* Shared */
+.tc.shared{box-shadow:inset 3px 0 0 var(--acc)}
+.shared-tag{font-size:9px;font-weight:600;padding:2px 5px;border-radius:4px;background:var(--acc-g);color:var(--acc)}
 
-.prio-section{margin-bottom:0}
-.prio-title{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.prio-title .prio-count{font-family:'Space Mono',monospace;color:var(--red);font-size:12px}
-/* ALL prio cards – one bold uniform level */
-.prio-card{display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:12px;background:var(--bg3);border:2px solid var(--brd2);margin-bottom:6px;transition:all .2s;animation:fadeSlideIn .25s ease forwards;opacity:0;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,0.12)}
-.prio-card:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,0.18)}
-/* Urgency tint via border color only */
-.prio-card.urg-over{border-color:var(--red);background:var(--red-s)}
-.prio-card.urg-soon{border-color:var(--org);background:var(--org-s)}
-.prio-card.urg-pinned{border-color:var(--acc);background:rgba(99,102,241,0.06)}
-/* Days number */
-.prio-days-box{text-align:center;min-width:44px;flex-shrink:0}
-.prio-days{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;line-height:1}
-.prio-days-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
-.prio-cat-dot{width:4px;height:32px;border-radius:2px;flex-shrink:0}
-.prio-info{flex:1;min-width:0}
-.prio-name{font-size:15px;font-weight:600;margin-bottom:2px;display:flex;align-items:center;gap:6px}
-.prio-meta{font-size:12px;color:var(--t2);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
-.prio-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;text-transform:uppercase;letter-spacing:.5px}
-.prio-check{width:42px;height:42px;border:2px solid var(--grn);background:var(--grn-s);color:var(--t1);font-size:18px;font-weight:700;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
-.prio-check:active{transform:scale(.93)}
-.prio-check.pop{animation:checkPop .5s ease}
-/* Pinned indicator */
-.prio-pin{font-size:10px;color:var(--acc);margin-left:2px}
-/* Shared task in prio */
-.prio-card.shared-task{border-left:3px solid var(--acc)}
-.shared-tag{font-size:9px;font-weight:600;padding:2px 5px;border-radius:4px;background:var(--acc-g);color:var(--acc);letter-spacing:.3px}
-.task.shared-task{border-left-color:var(--acc) !important;background:rgba(99,102,241,0.03)}
-/* Days box in task cards (category view) */
-.task-days-box{text-align:center;min-width:38px;flex-shrink:0}
-.task-days{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;line-height:1}
-.task-days-lbl{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.3px;margin-top:2px}
-/* Inline action btn (↑↓📌) next to check */
-.prio-action-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--t2);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
-.prio-action-btn:hover{background:var(--bg3);color:var(--t1);transform:scale(1.08)}
-.prio-action-btn:active{transform:scale(.93)}
-/* Expanded action row under prio card */
-.prio-expand{display:flex;align-items:center;gap:6px;padding:8px 12px 4px;animation:fadeSlideIn .15s ease forwards;opacity:0}
-.prio-expand-btn{padding:6px 12px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--t2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px;transition:all .15s}
-.prio-expand-btn:hover{background:var(--bg3);color:var(--t1)}
-.assign-av{width:22px;height:22px;border-radius:50%;object-fit:cover;border:2px solid var(--brd2);cursor:pointer;transition:all .15s}
-.assign-av:hover{transform:scale(1.1);border-color:var(--acc)}
-.assign-any{width:22px;height:22px;border-radius:50%;border:2px dashed var(--brd2);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--t3);cursor:pointer;transition:all .15s}
-.assign-any:hover{border-color:var(--acc);color:var(--acc)}
+/* Days since – THE number */
+.tc-days{text-align:center;min-width:48px;flex-shrink:0}
+.tc-days-num{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;line-height:1}
+.tc-days-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+/* In-category cards: slightly smaller number */
+.tc.cat-card .tc-days-num{font-size:18px}
+.tc.cat-card{padding:12px 14px}
 
-.divider{display:flex;align-items:center;gap:10px;padding:14px 0 10px}
-.divider-line{flex:1;height:1px;background:var(--brd)}
-.divider-text{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--tm);font-weight:600}
+/* Signal lamp */
+.tc-lamp{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:all .3s}
+.tc-lamp.grn{background:var(--grn);box-shadow:0 0 6px rgba(81,207,102,.4)}
+.tc-lamp.yel{background:var(--yel);box-shadow:0 0 8px rgba(255,212,59,.5)}
+.tc-lamp.org{background:var(--org);box-shadow:0 0 10px rgba(255,140,66,.5);animation:blink 1.8s ease infinite}
+.tc-lamp.red{background:var(--red);box-shadow:0 0 14px rgba(255,71,87,.6);animation:blink .8s ease infinite}
 
-.cats{display:flex;flex-direction:column;gap:6px}
-.cat{border-radius:12px;padding:12px 14px;background:var(--bg2);border:1px solid var(--brd);cursor:pointer;transition:all .25s;box-shadow:var(--sh);overflow:hidden}
-.cat:hover{background:var(--bg3);transform:translateY(-1px)}
-.cat-top{display:flex;justify-content:space-between;align-items:center}
-.cat-l{display:flex;align-items:center;gap:8px}
-.cat-ico{font-size:18px}.cat-nm{font-size:14px;font-weight:600}
-.cat-shared{font-size:10px;color:var(--acc);margin-left:2px}
-.cat-r{display:flex;align-items:center;gap:8px}
-.cat-stat{font-size:10px;font-weight:600;padding:3px 8px;border-radius:7px;text-transform:uppercase;letter-spacing:.5px}
-.cat-cnt{font-size:11px;color:var(--t3);font-family:'Space Mono',monospace}
-.cat-arr{color:var(--t3);font-size:11px}
-.cat-prog{height:3px;background:var(--bg-in);border-radius:2px;margin-top:8px;overflow:hidden}
-.cat-prog-fill{height:100%;border-radius:2px;transition:width .5s ease,background .3s}
-.cat-assign{display:flex;gap:3px;align-items:center}
-.cat-assign img{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--bg)}
+.tc-info{flex:1;min-width:0}
+.tc-name{font-size:15px;font-weight:600;margin-bottom:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tc-meta{font-size:11px;color:var(--t2);display:flex;align-items:center;gap:4px}
+.tc-meta .dot{color:var(--tm);font-size:8px}
+.prio-pin{font-size:10px;color:var(--acc)}
 
-/* Task view – same tap-to-expand pattern */
-.task-list{padding:8px 0 4px;display:flex;flex-direction:column;gap:6px}
-.task{border-radius:10px;padding:12px;background:var(--bg);border:1px solid var(--brd);transition:all .2s;animation:fadeSlideIn .25s ease forwards;opacity:0;cursor:pointer}
-.task:hover{border-color:var(--brd2)}
-.task-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.task-info{flex:1;min-width:0}
-.task-name{font-size:14px;font-weight:500;margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.task-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px;line-height:1.4}
-.task-meta{font-size:11px;color:var(--t2);display:flex;flex-wrap:wrap;gap:4px;align-items:center}
-.task-meta .dot{color:var(--tm);font-size:8px}
-.check-btn{width:40px;height:40px;border-radius:10px;border:2px solid var(--grn);background:var(--grn-s);color:var(--t1);font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
-.check-btn:hover{transform:scale(1.08)}.check-btn:active{transform:scale(.95)}.check-btn.pop{animation:checkPop .5s ease}
-.task-prog{height:2px;background:var(--bg-in);border-radius:2px;margin-top:8px;overflow:hidden}
-.task-prog-fill{height:100%;border-radius:2px;transition:width .5s ease}
-/* Expanded actions under task */
-.task-expand{display:flex;align-items:center;gap:6px;padding:8px 0 2px;animation:fadeSlideIn .15s ease forwards;opacity:0}
-.task-expand-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--t2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;transition:all .15s}
-.task-expand-btn:hover{background:var(--bg3);color:var(--t1)}
-.task-expand-btn.del:hover{background:var(--red-s);color:var(--red)}
-.date-pick{margin-top:6px;display:flex;align-items:center;gap:6px;animation:fadeSlideIn .2s ease forwards;opacity:0}
+/* Buttons */
+.tc-actions{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.tc-btn{height:34px;padding:0 10px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--t2);font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;font-family:'DM Sans',sans-serif}
+.tc-btn:hover{background:var(--bg3);color:var(--t1)}
+.tc-btn:active{transform:scale(.93)}
+.tc-btn.check{width:42px;height:42px;border:2px solid var(--grn);background:var(--grn-s);color:var(--t1);font-size:18px;font-weight:700;border-radius:10px;padding:0}
+.tc-btn.check.pop{animation:checkPop .5s ease}
+
+/* Expand row */
+.tc-expand{display:flex;align-items:center;gap:6px;padding:8px 16px 4px;animation:fadeSlideIn .15s ease forwards;opacity:0}
+.tc-expand-btn{padding:6px 12px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--t2);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px;transition:all .15s}
+.tc-expand-btn:hover{background:var(--bg3);color:var(--t1)}
+.tc-expand-btn.del:hover{background:var(--red-s);color:var(--red)}
+.date-pick{display:flex;align-items:center;gap:6px;padding:4px 16px 8px;animation:fadeSlideIn .2s ease forwards;opacity:0}
 .date-pick input{padding:6px 10px;border-radius:8px;border:1px solid var(--brd2);background:var(--bg-in);color:var(--t1);font-family:'DM Sans',sans-serif;font-size:13px}
 .date-pick button{padding:6px 12px;border-radius:8px;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
 
-.sort-row{display:flex;align-items:center;gap:4px;margin-bottom:4px;padding:6px 0}
+/* Divider + cat toggle */
+.divider{display:flex;align-items:center;gap:10px;padding:16px 0 10px;cursor:pointer}
+.divider:hover .divider-text{color:var(--t2)}
+.divider-line{flex:1;height:1px;background:var(--brd)}
+.divider-text{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--tm);font-weight:600;transition:color .15s;white-space:nowrap}
+
+/* Category chips */
+.cat-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;animation:fadeSlideIn .2s ease}
+.cat-chip{padding:8px 14px;border-radius:10px;background:var(--bg2);border:1px solid var(--brd);cursor:pointer;font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px;transition:all .2s}
+.cat-chip:hover{background:var(--bg3);border-color:var(--brd2)}
+.cat-chip .cc-cnt{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:2px 6px;border-radius:5px;background:var(--bg-in)}
+.cat-chip .cc-urg{color:var(--red)}
+
+/* Category expanded */
+.cat-back{display:flex;align-items:center;gap:6px;padding:8px 0;cursor:pointer;font-size:13px;color:var(--t2);margin-bottom:4px}
+.cat-back:hover{color:var(--t1)}
+.sort-row{display:flex;align-items:center;gap:4px;margin-bottom:6px}
 .sort-label{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-right:4px}
 .sort-btn{padding:5px 10px;border-radius:6px;font-size:12px;border:none;background:transparent;color:var(--t3);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
 .sort-btn:hover{background:var(--bg2)}.sort-btn.on{background:var(--bg3);color:var(--t1)}
 
+/* ═════════ MODALS ═════════ */
 .mo{position:fixed;inset:0;background:var(--ov);z-index:100;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .15s ease;backdrop-filter:blur(6px)}
 @media(min-width:500px){.mo{align-items:center}}
 .md{background:var(--bg-modal);border-radius:20px 20px 0 0;padding:24px 20px env(safe-area-inset-bottom,20px);width:100%;max-width:460px;max-height:90vh;overflow-y:auto;animation:slideUp .25s ease;border:1px solid var(--brd);box-shadow:0 -8px 40px rgba(0,0,0,.3)}
@@ -215,10 +184,14 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .fh{font-size:12px;color:var(--t3);margin-top:6px;font-style:italic}
 .br{display:flex;gap:10px;margin-top:8px}
 .bp{flex:1;padding:13px;border-radius:12px;border:none;background:var(--acc);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
-.bp:hover{box-shadow:0 4px 16px var(--acc-g)}.bp:disabled{opacity:.4;cursor:not-allowed}
+.bp:hover{box-shadow:0 4px 16px var(--acc-g)}
 .bd{padding:13px 16px;border-radius:12px;border:1px solid var(--red-s);background:var(--red-s);color:var(--red);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
 .bs{flex:1;padding:13px;border-radius:12px;border:1px solid var(--brd);background:var(--bg2);color:var(--t1);font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.add-cat-row{display:flex;gap:6px;margin-top:8px}
+.add-cat-row input{flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--brd2);background:var(--bg-in);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;outline:none}
+.add-cat-row button{padding:8px 14px;border-radius:8px;border:none;background:var(--acc);color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
 
+/* Household */
 .hh-code{font-family:'Space Mono',monospace;font-size:28px;font-weight:700;letter-spacing:6px;text-align:center;color:var(--acc);padding:16px;background:var(--acc-g);border-radius:12px;margin-bottom:16px;user-select:all}
 .hh-members{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
 .hh-member{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:var(--bg-in)}
@@ -235,37 +208,63 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .assign-opt{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:9px;border:1px solid var(--brd);background:var(--bg2);cursor:pointer;font-size:12px;color:var(--t2);transition:all .15s}
 .assign-opt:hover{background:var(--bg3)}.assign-opt.sel{border-color:var(--acc);color:var(--acc);font-weight:600}
 .assign-opt img{width:20px;height:20px;border-radius:50%}
-/* Add category input */
-.add-cat-row{display:flex;gap:6px;margin-top:8px}
-.add-cat-row input{flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--brd2);background:var(--bg-in);color:var(--t1);font-size:13px;font-family:'DM Sans',sans-serif;outline:none}
-.add-cat-row button{padding:8px 14px;border-radius:8px;border:none;background:var(--acc);color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+/* Auth */
+.auth-provider-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 16px;border-radius:10px;border:1px solid var(--brd2);background:var(--bg-in);color:var(--t1);font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.auth-provider-btn:hover{background:var(--bg3);transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.1)}
 
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeSlideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes checkPop{0%{transform:scale(1)}30%{transform:scale(1.25)}60%{transform:scale(.92)}100%{transform:scale(1)}}
+/* Tab switcher */
+.tabs{display:flex;gap:4px;padding:6px 0 10px}
+.tab{flex:1;padding:10px;border-radius:10px;border:1px solid var(--brd);background:var(--bg2);color:var(--t3);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;text-align:center;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+.tab:hover{background:var(--bg3);color:var(--t2)}
+.tab.on{background:var(--bg3);color:var(--t1);border-color:var(--brd2);font-weight:600}
+.tab .tab-count{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--bg-in)}
+.tab .tab-count.hot{color:var(--red);background:var(--red-s)}
+/* One-off todo card */
+.todo-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;background:var(--bg2);border:1px solid var(--brd);margin-bottom:5px;animation:fadeSlideIn .2s ease forwards;opacity:0;cursor:pointer;transition:all .2s}
+.todo-card:hover{background:var(--bg3)}
+.todo-card.done{opacity:.4}
+.todo-card.done .todo-name{text-decoration:line-through;color:var(--t3)}
+.todo-check{width:28px;height:28px;border-radius:8px;border:2px solid var(--brd2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;font-size:14px;color:transparent}
+.todo-check:hover{border-color:var(--grn);background:var(--grn-s)}
+.todo-check.checked{border-color:var(--grn);background:var(--grn-s);color:var(--grn)}
+.todo-info{flex:1;min-width:0}
+.todo-name{font-size:14px;font-weight:500}
+.todo-note{font-size:11px;color:var(--t3);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.todo-due{font-size:11px;color:var(--t3);margin-top:2px;display:flex;align-items:center;gap:4px}
+.todo-due.overdue{color:var(--red)}
+.todo-del{width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:var(--t3);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.todo-del:hover{background:var(--red-s);color:var(--red)}
+/* Todo empty state */
+.todo-empty{text-align:center;padding:40px 20px;color:var(--t3)}
+.todo-empty-icon{font-size:40px;margin-bottom:10px}
+.todo-empty-text{font-size:14px;margin-bottom:4px}
+.todo-empty-sub{font-size:12px;color:var(--tm)}
+/* Show done toggle */
+.todo-done-toggle{font-size:12px;color:var(--t3);cursor:pointer;padding:8px 0;transition:color .15s;text-align:center}
+.todo-done-toggle:hover{color:var(--t2)}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--brd);border-radius:4px}
-@media(max-width:380px){.add-btn .plus-label{display:none}.si-num{font-size:12px}}
 </style>
 </head>
 <body>
 <div class="app" id="app"></div>
 <script>
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 // FIREBASE
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 firebase.initializeApp({apiKey:"AIzaSyD-n66FkaZuWkLN8r2i-iMBv-FBXklwLbM",authDomain:"puls-whack-a-do.firebaseapp.com",projectId:"puls-whack-a-do",storageBucket:"puls-whack-a-do.firebasestorage.app",messagingSenderId:"348032853742",appId:"1:348032853742:web:2a9b573470f28c5dedf5ff",measurementId:"G-Q6W3PVF0ZY"});
 const auth=firebase.auth(),db=firebase.firestore();
 const gProv=new firebase.auth.GoogleAuthProvider();
-const msProv=new firebase.auth.OAuthProvider('microsoft.com');
-msProv.setCustomParameters({prompt:'select_account'});
-const appleProv=new firebase.auth.OAuthProvider('apple.com');
-appleProv.addScope('email');appleProv.addScope('name');
+const msProv=new firebase.auth.OAuthProvider('microsoft.com');msProv.setCustomParameters({prompt:'select_account'});
+const appleProv=new firebase.auth.OAuthProvider('apple.com');appleProv.addScope('email');appleProv.addScope('name');
 db.enablePersistence({synchronizeTabs:true}).catch(e=>console.log('P:',e.code));
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 // CONFIG
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 const DEFAULT_CATS=[
   {id:'content',label:'Content',icon:'🎬',v:'--c-cnt'},
   {id:'fitness',label:'Fitness',icon:'💪',v:'--c-fit'},
@@ -289,273 +288,315 @@ const DEFAULTS=[
   {...VTASK,frequencyDays:90},
 ];
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 // STATE
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 let S={
   tasks:[],customCats:[],theme:'dark',expandedCat:null,sort:'urgency',
-  modal:null,datePicking:null,expandedTask:null,
-  user:null,syncStatus:'offline',profileOpen:false,hiddenFromPrio:{},liftedToPrio:new Set(),
+  modal:null,datePicking:null,expandedTask:null,showCats:false,
+  tab:'pulser', // 'pulser' or 'todos'
+  todos:[],showDone:false,
+  user:null,syncStatus:'offline',profileOpen:false,
+  hiddenToday:{},liftedToPrio:new Set(),
   household:null,householdId:null,
 };
 let _unsub=null,_hhUnsub=null;
-
 function getCats(){return[...DEFAULT_CATS,...S.customCats]}
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 // PERSISTENCE
-// ═══════════════════════════════════════════════════════════════
-function saveLocal(){try{localStorage.setItem('puls',JSON.stringify({tasks:S.tasks,theme:S.theme,householdId:S.householdId,customCats:S.customCats,hiddenFromPrio:S.hiddenFromPrio}))}catch(e){}}
+// ═══════════════════════════════════════════
+function saveLocal(){try{localStorage.setItem('puls',JSON.stringify({tasks:S.tasks,todos:S.todos,theme:S.theme,householdId:S.householdId,customCats:S.customCats,hiddenToday:S.hiddenToday}))}catch(e){}}
 function loadLocal(){
   try{const d=JSON.parse(localStorage.getItem('puls'));
     if(d?.tasks){S.tasks=d.tasks;ensV()}else S.tasks=DEFAULTS.map(t=>({...t}));
+    if(d?.todos)S.todos=d.todos;
     if(d?.theme)S.theme=d.theme;if(d?.householdId)S.householdId=d.householdId;
     if(d?.customCats)S.customCats=d.customCats;
-    // Load hidden items, purge entries from before today
-    if(d?.hiddenFromPrio){const td=today();S.hiddenFromPrio={};for(const[id,date]of Object.entries(d.hiddenFromPrio)){if(date===td)S.hiddenFromPrio[id]=date}}
+    if(d?.hiddenToday){const td=today();S.hiddenToday={};for(const[id,date]of Object.entries(d.hiddenToday)){if(date===td)S.hiddenToday[id]=date}}
   }catch(e){S.tasks=DEFAULTS.map(t=>({...t}))}
 }
 function ensV(){if(!S.tasks.find(t=>t.id==='__vacation__'))S.tasks.push({...VTASK});const v=S.tasks.find(t=>t.id==='__vacation__');if(v)v.isProtected=true}
 
-async function saveCloud(){if(!S.user)return;S.syncStatus='syncing';R();try{await db.collection('users').doc(S.user.uid).set({tasks:S.tasks,theme:S.theme,householdId:S.householdId||null,customCats:S.customCats,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});S.syncStatus='synced'}catch(e){S.syncStatus='offline'}R()}
+async function saveCloud(){if(!S.user||S.user.isAnonymous)return;S.syncStatus='syncing';R();try{await db.collection('users').doc(S.user.uid).set({tasks:S.tasks,todos:S.todos,theme:S.theme,householdId:S.householdId||null,customCats:S.customCats,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});S.syncStatus='synced'}catch(e){S.syncStatus='offline'}R()}
 async function saveHH(){if(!S.household||!S.householdId)return;try{await db.collection('households').doc(S.householdId).set({members:S.household.members,sharedCats:S.household.sharedCats||[],tasks:S.household.tasks||[],updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.error('HH:',e)}}
 function save(){saveLocal();clearTimeout(save._t);save._t=setTimeout(()=>{saveCloud();if(S.household)saveHH()},600)}
 save._t=null;
 
-function startSync(){if(_unsub)_unsub();if(!S.user)return;
-  _unsub=db.collection('users').doc(S.user.uid).onSnapshot(s=>{if(s.exists){const d=s.data();if(d.tasks){S.tasks=d.tasks;ensV();saveLocal()}if(d.theme)S.theme=d.theme;if(d.customCats)S.customCats=d.customCats;if(d.householdId&&d.householdId!==S.householdId){S.householdId=d.householdId;startHHSync()}S.syncStatus='synced';R()}},e=>{S.syncStatus='offline';R()})}
-
+function startSync(){if(_unsub)_unsub();if(!S.user||S.user.isAnonymous)return;
+  _unsub=db.collection('users').doc(S.user.uid).onSnapshot(s=>{if(s.exists){const d=s.data();if(d.tasks){S.tasks=d.tasks;ensV();saveLocal()}if(d.todos)S.todos=d.todos;if(d.theme)S.theme=d.theme;if(d.customCats)S.customCats=d.customCats;if(d.householdId&&d.householdId!==S.householdId){S.householdId=d.householdId;startHHSync()}S.syncStatus='synced';R()}},e=>{S.syncStatus='offline';R()})}
 function startHHSync(){if(_hhUnsub)_hhUnsub();if(!S.householdId)return;
   _hhUnsub=db.collection('households').doc(S.householdId).onSnapshot(s=>{if(s.exists){S.household={code:S.householdId,...s.data()};R()}else{S.household=null;S.householdId=null;saveLocal();R()}},e=>console.error('HH:',e))}
+async function mergeUp(){if(!S.user||S.user.isAnonymous)return;const s=await db.collection('users').doc(S.user.uid).get();if(s.exists&&s.data().tasks?.length>0){if(s.data().householdId)S.householdId=s.data().householdId;return}await saveCloud()}
 
-async function mergeUp(){if(!S.user)return;const s=await db.collection('users').doc(S.user.uid).get();if(s.exists&&s.data().tasks?.length>0){if(s.data().householdId)S.householdId=s.data().householdId;return}await saveCloud()}
-
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 // AUTH
-// ═══════════════════════════════════════════════════════════════
-async function authWithProvider(prov){try{await auth.signInWithPopup(prov)}catch(e){if(e.code==='auth/popup-blocked')await auth.signInWithRedirect(prov);else if(e.code==='auth/account-exists-with-different-credential'){const methods=await auth.fetchSignInMethodsForEmail(e.email);S.modal={type:'authError',msg:`Det kontot är redan kopplat via ${methods[0]}. Logga in med den metoden istället.`};R()}else{console.error(e);S.modal={type:'authError',msg:e.message};R()}}}
-async function emailSignIn(email,pass){try{await auth.signInWithEmailAndPassword(email,pass)}catch(e){if(e.code==='auth/user-not-found'||e.code==='auth/invalid-credential'){try{await auth.createUserWithEmailAndPassword(email,pass)}catch(e2){S.modal={type:'authError',msg:e2.code==='auth/weak-password'?'Lösenordet måste vara minst 6 tecken.':e2.code==='auth/email-already-in-use'?'E-postadressen används redan med en annan inloggning.':e2.message};R()}}else{S.modal={type:'authError',msg:e.code==='auth/wrong-password'?'Fel lösenord.':e.code==='auth/invalid-email'?'Ogiltig e-postadress.':e.message};R()}}}
+// ═══════════════════════════════════════════
+async function authWithProvider(prov){try{await auth.signInWithPopup(prov)}catch(e){if(e.code==='auth/popup-blocked')await auth.signInWithRedirect(prov);else{S.modal={type:'authError',msg:e.message};R()}}}
+async function emailSignIn(email,pass){try{await auth.signInWithEmailAndPassword(email,pass)}catch(e){if(e.code==='auth/user-not-found'||e.code==='auth/invalid-credential'){try{await auth.createUserWithEmailAndPassword(email,pass)}catch(e2){S.modal={type:'authError',msg:e2.message};R()}}else{S.modal={type:'authError',msg:e.message};R()}}}
+async function anonSignIn(){try{await auth.signInAnonymously()}catch(e){S.modal={type:'authError',msg:e.message};R()}}
 async function doSignOut(){if(_unsub){_unsub();_unsub=null}if(_hhUnsub){_hhUnsub();_hhUnsub=null}await auth.signOut();S.user=null;S.syncStatus='offline';S.profileOpen=false;S.household=null;R()}
-auth.onAuthStateChanged(async u=>{S.user=u;if(u){S.syncStatus='syncing';R();await mergeUp();startSync();if(S.householdId)startHHSync()}else{S.syncStatus='offline';if(_unsub){_unsub();_unsub=null}if(_hhUnsub){_hhUnsub();_hhUnsub=null}R()}});
+auth.onAuthStateChanged(async u=>{S.user=u;if(u){if(u.isAnonymous){S.syncStatus='offline';R();return}S.syncStatus='syncing';R();await mergeUp();startSync();if(S.householdId)startHHSync()}else{S.syncStatus='offline';if(_unsub){_unsub();_unsub=null}if(_hhUnsub){_hhUnsub();_hhUnsub=null}R()}});
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 // HOUSEHOLD
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 function genHHCode(){const c='ABCDEFGHJKLMNPRSTUVWXYZ23456789';let r='';for(let i=0;i<6;i++)r+=c[Math.floor(Math.random()*c.length)];return r}
 async function createHH(){if(!S.user)return;const code=genHHCode();const me={uid:S.user.uid,name:S.user.displayName||'Du',photo:S.user.photoURL||''};await db.collection('households').doc(code).set({members:[me],sharedCats:[],tasks:[],createdAt:firebase.firestore.FieldValue.serverTimestamp()});S.householdId=code;await saveCloud();startHHSync()}
 async function joinHH(code){if(!S.user)return false;code=code.toUpperCase().trim();const snap=await db.collection('households').doc(code).get();if(!snap.exists)return false;const d=snap.data();if(d.members.length>=2||d.members.find(m=>m.uid===S.user.uid))return false;d.members.push({uid:S.user.uid,name:S.user.displayName||'Du',photo:S.user.photoURL||''});await db.collection('households').doc(code).update({members:d.members});S.householdId=code;await saveCloud();startHHSync();return true}
 async function leaveHH(){if(!S.householdId||!S.user||!S.household)return;const r=S.household.members.filter(m=>m.uid!==S.user.uid);if(r.length===0)await db.collection('households').doc(S.householdId).delete();else await db.collection('households').doc(S.householdId).update({members:r});if(_hhUnsub){_hhUnsub();_hhUnsub=null}S.householdId=null;S.household=null;await saveCloud();R()}
 function toggleSharedCat(cid){
-  if(!S.household)return;
-  const sc=S.household.sharedCats||[];const i=sc.indexOf(cid);
-  if(i>=0){
-    // Unsharing: move household tasks in this cat back to personal
-    const moving=(S.household.tasks||[]).filter(t=>t.category===cid);
-    S.household.tasks=(S.household.tasks||[]).filter(t=>t.category!==cid);
-    moving.forEach(t=>S.tasks.push(t));
-    sc.splice(i,1);
-  }else{
-    // Sharing: move personal tasks in this cat to household
-    const moving=S.tasks.filter(t=>t.category===cid&&t.id!=='__vacation__');
-    S.tasks=S.tasks.filter(t=>t.category!==cid||t.id==='__vacation__');
-    moving.forEach(t=>{t.assignedTo=t.assignedTo||null;S.household.tasks.push(t)});
-    sc.push(cid);
-  }
-  S.household.sharedCats=sc;
-  saveHH();saveLocal();saveCloud();R();
+  if(!S.household)return;const sc=S.household.sharedCats||[];const i=sc.indexOf(cid);
+  if(i>=0){const mv=(S.household.tasks||[]).filter(t=>t.category===cid);S.household.tasks=(S.household.tasks||[]).filter(t=>t.category!==cid);mv.forEach(t=>S.tasks.push(t));sc.splice(i,1)}
+  else{const mv=S.tasks.filter(t=>t.category===cid&&t.id!=='__vacation__');S.tasks=S.tasks.filter(t=>t.category!==cid||t.id==='__vacation__');mv.forEach(t=>{t.assignedTo=t.assignedTo||null;S.household.tasks.push(t)});sc.push(cid)}
+  S.household.sharedCats=sc;saveHH();saveLocal();saveCloud();R();
 }
 function isShared(cid){return S.household?.sharedCats?.includes(cid)||false}
 function getPartner(){return S.household?.members?.find(m=>m.uid!==S.user?.uid)||null}
-function getMember(uid){return S.household?.members?.find(m=>m.uid===uid)||null}
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 // TASK HELPERS
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 function allTasks(){return[...S.tasks.filter(t=>t.id!=='__vacation__'),...(S.household?.tasks||[])]}
 function ctasks(cid){if(isShared(cid))return(S.household?.tasks||[]).filter(t=>t.category===cid);return S.tasks.filter(t=>t.category===cid&&t.id!=='__vacation__')}
 function findTask(id){let t=S.tasks.find(x=>x.id===id);if(t)return{task:t,src:'p'};t=(S.household?.tasks||[]).find(x=>x.id===id);if(t)return{task:t,src:'h'};return null}
 
-// ═══════════════════════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
+// UTILS — ONE number: days since last done
+// Color = urgency signal based on ratio
+// ═══════════════════════════════════════════
 const gid=()=>Date.now().toString(36)+Math.random().toString(36).substr(2,5);
 const dsince=d=>{if(!d)return null;return Math.floor((new Date()-new Date(d))/864e5)};
 const urg=t=>{const ds=dsince(t.lastDone);return ds===null?1:ds/t.frequencyDays};
-const dleft=t=>{const ds=dsince(t.lastDone);if(ds===null)return -t.frequencyDays;return t.frequencyDays-ds}; // negative = overdue
-const ucol=u=>{const s=getComputedStyle(document.documentElement);if(u>=1)return s.getPropertyValue('--red').trim();if(u>=.75)return s.getPropertyValue('--org').trim();if(u>=.5)return s.getPropertyValue('--yel').trim();return s.getPropertyValue('--grn').trim()};
-const ulab=u=>u>=1?'Förfallen':u>=.75?'Snart':u>=.5?'På gång':'Klart';
-const ubg=u=>u>=1?'var(--red-s)':u>=.75?'var(--org-s)':u>=.5?'var(--yel-s)':'var(--grn-s)';
-const ucc=u=>u>=1?'var(--red)':u>=.75?'var(--org)':u>=.5?'var(--yel)':'var(--grn)';
-const tago=d=>{if(!d)return'Aldrig';const ds=dsince(d);return ds===0?'Idag':ds===1?'Igår':ds+' dagar sedan'};
+// <50% green, 50-75% yellow, 75-100% orange, >100% red
+const urgCls=t=>{const u=urg(t);return u>=1?'u-red':u>=.75?'u-org':u>=.5?'u-yel':'u-grn'};
+const lampCls=t=>{const u=urg(t);return u>=1?'red':u>=.75?'org':u>=.5?'yel':'grn'};
+const dayCol=t=>{const u=urg(t);return u>=1?'var(--red)':u>=.75?'var(--org)':u>=.5?'var(--yel)':'var(--grn)'};
 const ccol=id=>{const c=getCats().find(x=>x.id===id);return c?`var(${c.v})`:'var(--t3)'};
-const curg=id=>{const t=ctasks(id);return t.length?Math.max(...t.map(urg)):0};
-const cratio=id=>{const t=ctasks(id);if(!t.length)return 1;return t.filter(x=>urg(x)<.75).length/t.length};
 const today=()=>new Date().toISOString().split('T')[0];
 const ffreq=d=>{d=parseInt(d);return d===1?'dag':d===7?'vecka':d===14?'annan vecka':d===30?'månad':d+':e dag'};
 
-// ═══════════════════════════════════════════════════════════════
-// SORT: by days left (most overdue first)
-// ═══════════════════════════════════════════════════════════════
 function sortTasks(arr){
   if(S.sort==='name')return[...arr].sort((a,b)=>a.name.localeCompare(b.name,'sv'));
-  // Sort by days left ascending (most overdue / least days left first)
-  return[...arr].sort((a,b)=>dleft(a)-dleft(b));
+  return[...arr].sort((a,b)=>urg(b)-urg(a));
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 // RENDER
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 function R(){
   const app=document.getElementById('app');if(!app)return;
   document.documentElement.setAttribute('data-theme',S.theme);
   document.getElementById('metaTheme').content=S.theme==='dark'?'#0A0A0F':'#FFF5F7';
-  const all=allTasks();
-  const od=all.filter(t=>urg(t)>=1).length,sn=all.filter(t=>{const u=urg(t);return u>=.75&&u<1}).length,kl=all.filter(t=>urg(t)<.5).length,allK=od===0&&sn===0;
-  let html=rHeader()+rStats(od,sn,kl,allK);
-  if(S.expandedCat){html+=rTaskView()}
-  else{html+=rAddBar()+rPrio()+rDivider()+rCats()}
+  let html=rHeader()+rTabs();
+  if(S.tab==='todos'){html+=rTodosView()}
+  else{
+    const all=allTasks();
+    const red=all.filter(t=>urg(t)>=1).length,org=all.filter(t=>{const u=urg(t);return u>=.75&&u<1}).length,grn=all.filter(t=>urg(t)<.5).length,allOk=red===0&&org===0;
+    html+=rStats(red,org,grn,allOk);
+    if(S.expandedCat){html+=rCatView()}
+    else{html+=rTodo()+rDivider()+rCats()}
+  }
   html+=S.modal?rModal():'';
   app.innerHTML=html;bind();
+}
+
+function rTabs(){
+  const all=allTasks();
+  const urgN=all.filter(t=>urg(t)>=.75).length;
+  const todoN=S.todos.filter(t=>!t.done).length;
+  return`<div class="tabs"><button class="tab${S.tab==='pulser'?' on':''}" data-action="setTab" data-tab="pulser">⚡ Pulser${urgN?` <span class="tab-count hot">${urgN}</span>`:''}</button><button class="tab${S.tab==='todos'?' on':''}" data-action="setTab" data-tab="todos">☑ Att göra${todoN?` <span class="tab-count">${todoN}</span>`:''}</button></div>`;
 }
 
 function rHeader(){
   let prof='';
   if(S.user){
-    const hh=S.household?`<span class="p-hh-badge">🏠</span>`:'';
-    prof=`<div class="profile-chip" data-action="toggleProfile">${S.user.photoURL?`<img src="${S.user.photoURL}" referrerpolicy="no-referrer">`:'<span style="font-size:14px">👤</span>'}${hh}<div class="sync-dot ${S.syncStatus}"></div></div>`;
+    const anon=S.user.isAnonymous;
+    const hh=S.household?'<span class="p-hh-badge">🏠</span>':'';
+    prof=`<div class="profile-chip" data-action="toggleProfile">${S.user.photoURL?`<img src="${S.user.photoURL}" referrerpolicy="no-referrer">`:anon?'<span style="font-size:14px">👻</span>':'<span style="font-size:14px">👤</span>'}${hh}<div class="sync-dot ${S.syncStatus}"></div></div>`;
     if(S.profileOpen){
-      const st={synced:'Synkad',syncing:'Synkar...',offline:'Offline'}[S.syncStatus];
-      const hhBtn=S.household?`<button class="p-btn" data-action="openHousehold">🏠 Hushåll <span class="p-hh-badge">${S.householdId}</span></button>`:`<button class="p-btn" data-action="openHousehold">🏠 Skapa/gå med i hushåll</button>`;
-      prof+=`<div class="profile-drop"><div class="p-name">${S.user.displayName||'Inloggad'}</div><div class="p-email">${S.user.email||''}</div><div class="p-sync"><div class="sync-dot ${S.syncStatus}" style="width:6px;height:6px"></div> ${st}</div><div class="p-divider"></div>${hhBtn}<div class="p-divider"></div><button class="p-btn danger" data-action="signOut">Logga ut</button></div>`;
+      const st={synced:'Synkad',syncing:'Synkar...',offline:anon?'Lokal':'Offline'}[S.syncStatus];
+      const hhBtn=anon?'':(S.household?`<button class="p-btn" data-action="openHousehold">🏠 Hushåll <span class="p-hh-badge">${S.householdId}</span></button>`:`<button class="p-btn" data-action="openHousehold">🏠 Hushåll</button>`);
+      const upgradeBtn=anon?`<button class="p-btn" data-action="openAuth" style="border-color:var(--acc);color:var(--acc)">🔗 Koppla konto (synka)</button>`:'';
+      prof+=`<div class="profile-drop"><div class="p-name">${anon?'Anonym':S.user.displayName||'Inloggad'}</div>${!anon?`<div class="p-email">${S.user.email||''}</div>`:''}<div class="p-sync"><div class="sync-dot ${S.syncStatus}" style="width:6px;height:6px"></div> ${st}</div><div class="p-divider"></div>${upgradeBtn}${hhBtn}<button class="p-btn danger" data-action="signOut">Logga ut</button></div>`;
     }
   }else{prof=`<button class="signin-btn" data-action="openAuth">🔑 Logga in</button>`}
-  return`<header class="hdr"><div class="hdr-row"><div class="hdr-left"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1></div><div class="hdr-actions"><div style="position:relative">${prof}</div><button class="icon-btn" data-action="toggleTheme">${S.theme==='dark'?'☀️':'🌙'}</button></div></div>${rVacation()}</header>`;
+  return`<header class="hdr"><div class="hdr-row"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1><div class="hdr-actions"><div style="position:relative">${prof}</div><button class="icon-btn" data-action="toggleTheme">${S.theme==='dark'?'☀️':'🌙'}</button><button class="add-btn" data-action="addTask"><span>+</span> Ny</button></div></div>${rVacation()}</header>`;
 }
-
 function rVacation(){
   const vt=S.tasks.find(t=>t.id==='__vacation__');if(!vt)return'';
-  if(!vt.lastDone)return`<div class="vac-empty-s" data-action="editVacation"><span>🏖️</span> <span>Ställ in semester →</span></div>`;
-  const ds=dsince(vt.lastDone),dl=Math.max(0,vt.frequencyDays-ds),p=Math.min(ds/vt.frequencyDays,1),ov=dl===0;
-  return`<div class="vac-strip" data-action="editVacation"><span class="vac-ico">🏖️</span><span class="vac-lbl">Semester</span><div class="vac-prog"><div class="vac-prog-fill" style="width:${p*100}%"></div></div><span class="vac-txt">${ov?'🎉 Dags!':dl+'d'}</span></div>`;
+  if(!vt.lastDone)return`<div class="vac-empty" data-action="editVacation">🏖️ Ställ in semester →</div>`;
+  const ds=dsince(vt.lastDone),p=Math.min(ds/vt.frequencyDays,1),dl=Math.max(0,vt.frequencyDays-ds);
+  return`<div class="vac-strip" data-action="editVacation"><span style="font-size:14px">🏖️</span><span style="font-size:11px;color:var(--t3)">Semester</span><div class="vac-prog"><div class="vac-prog-fill" style="width:${p*100}%"></div></div><span class="vac-txt">${dl===0?'🎉 Dags!':dl+'d'}</span></div>`;
 }
-
-function rStats(od,sn,kl,allK){
-  if(allK)return`<div class="stats-inline"><div class="all-clear">✨ Alla pulser i fas – snyggt jobbat!</div></div>`;
+function rStats(red,org,grn,allOk){
+  if(allOk)return`<div class="stats-inline"><div class="all-clear">✨ Alla pulser i fas</div></div>`;
   let h='<div class="stats-inline">';
-  if(od>0)h+=`<div class="si"><div class="si-dot" style="background:var(--red)"></div><span class="si-num red">${od}</span> förfallna</div>`;
-  if(sn>0)h+=`<div class="si"><div class="si-dot" style="background:var(--org)"></div><span class="si-num org">${sn}</span> snart</div>`;
-  h+=`<div class="si"><div class="si-dot" style="background:var(--grn)"></div><span class="si-num grn">${kl}</span> klart</div>`;
+  if(red>0)h+=`<div class="si"><div class="si-dot" style="background:var(--red)"></div><span class="si-num red">${red}</span> gör nu</div>`;
+  if(org>0)h+=`<div class="si"><div class="si-dot" style="background:var(--org)"></div><span class="si-num org">${org}</span> snart</div>`;
+  h+=`<div class="si"><div class="si-dot" style="background:var(--grn)"></div><span class="si-num grn">${grn}</span> lugnt</div>`;
   return h+'</div>';
 }
 
-function rAddBar(){
-  return`<div class="add-bar"><button class="add-btn" data-action="addTask"><span>+</span> Ny uppgift</button></div>`;
-}
-
-function rPrio(){
+// ═══════════════════════════════════════════
+// TODO section – urgent + lifted
+// ═══════════════════════════════════════════
+function rTodo(){
   const all=allTasks();
-  // Include urgent + manually lifted (that aren't hidden)
-  const urgent=all.filter(t=>(urg(t)>=.75||S.liftedToPrio.has(t.id))&&!S.hiddenFromPrio[t.id]);
-  urgent.sort((a,b)=>dleft(a)-dleft(b));
-  if(!urgent.length)return'';
-  let h=`<div class="prio-section"><div class="prio-title">Att göra <span class="prio-count">${urgent.length}</span></div>`;
-  urgent.forEach((t,i)=>{
-    const u=urg(t),cat=getCats().find(c=>c.id===t.category),ds=dsince(t.lastDone),dl=ds!==null?t.frequencyDays-ds:0;
-    const shared=isShared(t.category);const isExp=S.expandedTask===t.id;const isLifted=S.liftedToPrio.has(t.id)&&urg(t)<.75;
-    // Urgency class for coloring ALL cards
-    const urgCls=isLifted?'urg-pinned':u>=1?'urg-over':'urg-soon';
-
-    // Days display on EVERY prio card
-    const daysVal=dl<=0?Math.abs(dl):dl;
-    const daysColor=dl<=0?'var(--red)':dl<=2?'var(--org)':'var(--yel)';
-    const daysLabel=ds===null?'ny':dl<=0?'över':'kvar';
-    const daysHtml=`<div class="prio-days-box"><div class="prio-days" style="color:${daysColor}">${ds===null?'–':daysVal}</div><div class="prio-days-lbl">${daysLabel}</div></div>`;
-    h+=`<div><div class="prio-card ${urgCls}${shared?' shared-task':''}" style="animation-delay:${i*.03}s${isExp?';border-radius:10px 10px '+(S.datePicking===t.id?'0 0':'10px 10px'):''}"><div class="prio-cat-dot" style="background:${ccol(t.category)}"></div><div class="prio-info" data-action="toggleTask" data-id="${t.id}"><div class="prio-name">${t.name} ${isLifted?'<span class="prio-pin">📌</span>':''}${shared?'<span class="shared-tag">👥</span>':''}<span class="prio-badge" style="background:${ubg(u)};color:${ucc(u)}">${ulab(u)}</span></div><div class="prio-meta">${cat?cat.icon+' '+cat.label:''} · ${tago(t.lastDone)}</div></div>${daysHtml}<div style="display:flex;align-items:center;gap:4px"><button class="prio-action-btn" data-action="hidePrio" data-id="${t.id}" title="Skicka ner">↓</button><button class="prio-check" data-action="checkTask" data-id="${t.id}">✓</button></div></div>`;
-    if(isExp){
-      h+=`<div class="prio-expand"><button class="prio-expand-btn" data-action="editTask" data-id="${t.id}">✏️ Redigera</button><button class="prio-expand-btn" data-action="pickDate" data-id="${t.id}">📅 Ange datum</button></div>`;
-      if(S.datePicking===t.id){
-        h+=`<div class="date-pick" style="padding:4px 12px 8px"><input type="date" id="dp-${t.id}" value="${today()}" max="${today()}"><button style="background:var(--acc);color:#fff" data-action="confirmDate" data-id="${t.id}">Spara</button><button style="background:var(--bg2);color:var(--t2);border:1px solid var(--brd)" data-action="cancelDate">Avbryt</button></div>`;
-      }
-    }
-    h+=`</div>`;
-  });
+  const items=all.filter(t=>(urg(t)>=.75||S.liftedToPrio.has(t.id))&&!S.hiddenToday[t.id]);
+  items.sort((a,b)=>urg(b)-urg(a));
+  if(!items.length)return'';
+  let h=`<div style="margin-bottom:4px"><div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px">Att göra <span style="font-family:'Space Mono',monospace;color:var(--red);font-size:12px">${items.length}</span></div>`;
+  items.forEach((t,i)=>{h+=rCard(t,i,'prio')});
   return h+'</div>';
 }
 
-function rDivider(){return`<div class="divider"><div class="divider-line"></div><div class="divider-text">Kategorier</div><div class="divider-line"></div></div>`}
+// ═══════════════════════════════════════════
+// CARD – universal, used in both views
+// ═══════════════════════════════════════════
+function rCard(t,i,ctx){
+  const ds=dsince(t.lastDone);
+  const daysNum=ds===null?'–':ds;
+  const cat=getCats().find(c=>c.id===t.category);
+  const shared=isShared(t.category);
+  const isExp=S.expandedTask===t.id;
+  const isLifted=S.liftedToPrio.has(t.id);
+  const isPrio=ctx==='prio';
+  const extra=isPrio?'':'cat-card';
 
-function rCats(){
-  let h='<div class="cats">';
-  for(const cat of getCats()){
-    const ts=ctasks(cat.id);if(!ts.length)continue;
-    const wu=curg(cat.id),rat=cratio(cat.id),ucl=ucol(wu);
-    const kc=ts.filter(t=>urg(t)<.75).length;
-    const st=kc===ts.length?'✓ Klart':`${kc}/${ts.length}`;
-    const sb=kc===ts.length?'var(--grn-s)':ubg(wu);const sc=kc===ts.length?'var(--grn)':ucc(wu);
-    const shared=isShared(cat.id);
-    let aa='';if(shared&&S.household){const av=S.household.members.map(m=>m.photo?`<img src="${m.photo}" referrerpolicy="no-referrer">`:'').filter(Boolean).join('');if(av)aa=`<div class="cat-assign">${av}</div>`}
-    h+=`<div class="cat" data-action="expandCat" data-cat="${cat.id}"><div class="cat-top"><div class="cat-l"><span class="cat-ico">${cat.icon}</span><span class="cat-nm">${cat.label}</span>${shared?'<span class="cat-shared">👥</span>':''}</div><div class="cat-r">${aa}<span class="cat-stat" style="background:${sb};color:${sc}">${st}</span><span class="cat-cnt">${ts.length}</span><span class="cat-arr">▶</span></div></div><div class="cat-prog"><div class="cat-prog-fill" style="width:${rat*100}%;background:${rat===1?'var(--grn)':ucl}"></div></div></div>`;
+  let h=`<div><div class="tc ${urgCls(t)} ${extra}${shared?' shared':''}" style="animation-delay:${i*.03}s">`;
+  // THE number: days since
+  h+=`<div class="tc-days"><div class="tc-days-num" style="color:${dayCol(t)}">${daysNum}</div><div class="tc-days-lbl">dagar</div></div>`;
+  // Signal lamp
+  h+=`<div class="tc-lamp ${lampCls(t)}"></div>`;
+  // Info
+  h+=`<div class="tc-info" data-action="toggleTask" data-id="${t.id}"><div class="tc-name">${t.name}${isLifted&&!isPrio?' <span class="prio-pin">📌</span>':''}${shared?' <span class="shared-tag">👥</span>':''}</div><div class="tc-meta">${cat?cat.icon+' '+cat.label:''}<span class="dot">·</span>var ${t.frequencyDays}:e dag</div></div>`;
+  // Actions
+  h+=`<div class="tc-actions">`;
+  if(isPrio)h+=`<button class="tc-btn" data-action="hideToday" data-id="${t.id}">Dölj</button>`;
+  else h+=`<button class="tc-btn" data-action="${isLifted?'unliftPrio':'liftPrio'}" data-id="${t.id}">${isLifted?'📌':'↑'}</button>`;
+  h+=`<button class="tc-btn check" data-action="checkTask" data-id="${t.id}">✓</button></div></div>`;
+  // Expanded
+  if(isExp){
+    h+=`<div class="tc-expand"><button class="tc-expand-btn" data-action="editTask" data-id="${t.id}">✏️ Redigera</button><button class="tc-expand-btn" data-action="pickDate" data-id="${t.id}">📅 Datum</button>${!t.isProtected?`<button class="tc-expand-btn del" data-action="deleteTask" data-id="${t.id}">🗑</button>`:''}</div>`;
+    if(S.datePicking===t.id)h+=`<div class="date-pick"><input type="date" id="dp-${t.id}" value="${today()}" max="${today()}"><button style="background:var(--acc);color:#fff" data-action="confirmDate" data-id="${t.id}">Spara</button><button style="background:var(--bg2);color:var(--t2);border:1px solid var(--brd)" data-action="cancelDate">Avbryt</button></div>`;
   }
   return h+'</div>';
 }
 
-function rTaskView(){
+// ═══════════════════════════════════════════
+// CATEGORIES – hidden by default
+// ═══════════════════════════════════════════
+function rDivider(){
+  return`<div class="divider" data-action="toggleCats"><div class="divider-line"></div><div class="divider-text">${S.showCats?'▾ Dölj kategorier':'▸ Visa kategorier'}</div><div class="divider-line"></div></div>`;
+}
+function rCats(){
+  if(!S.showCats)return'';
+  let h='<div class="cat-row">';
+  for(const cat of getCats()){
+    const ts=ctasks(cat.id);if(!ts.length)continue;
+    const urgN=ts.filter(t=>urg(t)>=.75).length;
+    h+=`<div class="cat-chip" data-action="expandCat" data-cat="${cat.id}"><span>${cat.icon}</span><span>${cat.label}</span><span class="cc-cnt${urgN?' cc-urg':''}">${urgN?'⚠ '+urgN:ts.length}</span></div>`;
+  }
+  return h+'</div>';
+}
+
+// ═══════════════════════════════════════════
+// CATEGORY VIEW
+// ═══════════════════════════════════════════
+function rCatView(){
   const cat=getCats().find(c=>c.id===S.expandedCat);if(!cat)return'';
   const ts=ctasks(cat.id),sorted=sortTasks(ts);
   const shared=isShared(cat.id);
-  let h=`<div style="margin-bottom:10px"><button class="cat" data-action="collapseCat" style="margin-bottom:4px;border-color:${ccol(cat.id)}30"><div class="cat-top"><div class="cat-l"><span style="font-size:13px;color:var(--t3);margin-right:3px">←</span><span class="cat-ico">${cat.icon}</span><span class="cat-nm">${cat.label}</span>${shared?'<span class="cat-shared">👥 Delad</span>':''}</div><div class="cat-r"><span class="cat-cnt">${ts.length} uppgifter</span></div></div></button><div class="sort-row"><span class="sort-label">Sortera:</span><button class="sort-btn ${S.sort==='urgency'?'on':''}" data-action="setSort" data-sort="urgency">Brådskande</button><button class="sort-btn ${S.sort==='name'?'on':''}" data-action="setSort" data-sort="name">Namn</button></div></div><div class="task-list">`;
-  sorted.forEach((t,i)=>{
-    const u=urg(t),ds=dsince(t.lastDone),dl=ds!==null?t.frequencyDays-ds:0,ucl=ucol(u),pct=Math.min(u*100,100);
-    const isExp=S.expandedTask===t.id;
-    const isLifted=S.liftedToPrio.has(t.id);
-    const daysVal=dl<=0?Math.abs(dl):dl;
-    const daysColor=dl<=0?'var(--red)':dl<=2?'var(--org)':u>=.5?'var(--yel)':'var(--grn)';
-    const daysLabel=ds===null?'ny':dl<=0?'över':'kvar';
-    h+=`<div class="task${shared?' shared-task':''}" style="animation-delay:${i*.04}s;border-left:3px solid ${shared?'var(--acc)':ucl}"><div class="task-top"><div class="task-info" data-action="toggleTask" data-id="${t.id}"><div class="task-name">${t.name} ${isLifted?'<span class="prio-pin">📌</span>':''}${shared?'<span class="shared-tag">👥</span>':''}<span class="task-badge" style="background:${ubg(u)};color:${ucc(u)}">${ulab(u)}</span></div><div class="task-meta"><span>Var ${t.frequencyDays}:e dag</span><span class="dot">·</span><span style="color:${ucc(u)}">${tago(t.lastDone)}</span></div></div><div class="task-days-box"><div class="task-days" style="color:${daysColor}">${ds===null?'–':daysVal}</div><div class="task-days-lbl">${daysLabel}</div></div><div style="display:flex;align-items:center;gap:4px">${isLifted?`<button class="prio-action-btn" data-action="unliftPrio" data-id="${t.id}" title="Av-pinna">📌</button>`:`<button class="prio-action-btn" data-action="liftPrio" data-id="${t.id}" title="Lyft upp">↑</button>`}<button class="check-btn" data-action="checkTask" data-id="${t.id}" style="border-color:${ucl};background:${ubg(u)}">✓</button></div></div>`;
-    if(isExp){
-      const isLiftedExp=S.liftedToPrio.has(t.id);
-      h+=`<div class="task-expand"><button class="task-expand-btn" data-action="editTask" data-id="${t.id}">✏️ Redigera</button><button class="task-expand-btn" data-action="pickDate" data-id="${t.id}">📅 Ange datum</button>${!t.isProtected?`<button class="task-expand-btn del" data-action="deleteTask" data-id="${t.id}">🗑 Ta bort</button>`:''}</div>`;
-      if(S.datePicking===t.id){
-        h+=`<div class="date-pick"><input type="date" id="dp-${t.id}" value="${today()}" max="${today()}"><button style="background:var(--acc);color:#fff" data-action="confirmDate" data-id="${t.id}">Spara</button><button style="background:var(--bg2);color:var(--t2);border:1px solid var(--brd)" data-action="cancelDate">Avbryt</button></div>`;
-      }
-    }
-    h+=`<div class="task-prog"><div class="task-prog-fill" style="width:${pct}%;background:${ucl}"></div></div></div>`;
-  });
+  let h=`<div><div class="cat-back" data-action="collapseCat">← ${cat.icon} ${cat.label}${shared?' <span class="shared-tag">👥</span>':''} <span style="color:var(--t3);margin-left:auto;font-size:11px">${ts.length}</span></div><div class="sort-row"><span class="sort-label">Sortera:</span><button class="sort-btn ${S.sort==='urgency'?'on':''}" data-action="setSort" data-sort="urgency">Brådskande</button><button class="sort-btn ${S.sort==='name'?'on':''}" data-action="setSort" data-sort="name">Namn</button></div>`;
+  sorted.forEach((t,i)=>{h+=rCard(t,i,'cat')});
   return h+'</div>';
+}
+
+// ═══════════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════
+// TODOS VIEW – one-off tasks
+// ═══════════════════════════════════════════
+function rTodosView(){
+  const pending=S.todos.filter(t=>!t.done);
+  const done=S.todos.filter(t=>t.done);
+  if(!pending.length&&!done.length)return`<div class="todo-empty"><div class="todo-empty-icon">📋</div><div class="todo-empty-text">Inga att-göra-saker ännu</div><div class="todo-empty-sub">Tryck + Ny för att lägga till</div></div>`;
+  let h='';
+  // Pending
+  pending.sort((a,b)=>{if(a.dueDate&&b.dueDate)return a.dueDate.localeCompare(b.dueDate);if(a.dueDate)return-1;if(b.dueDate)return 1;return(b.createdAt||'').localeCompare(a.createdAt||'')});
+  pending.forEach((t,i)=>{h+=rTodoCard(t,i,false)});
+  // Done section
+  if(done.length){
+    h+=`<div class="todo-done-toggle" data-action="toggleShowDone">${S.showDone?'▾':'▸'} ${done.length} klara</div>`;
+    if(S.showDone){
+      done.sort((a,b)=>(b.doneAt||'').localeCompare(a.doneAt||''));
+      done.forEach((t,i)=>{h+=rTodoCard(t,i,true)});
+    }
+  }
+  return h;
+}
+
+function rTodoCard(t,i,isDone){
+  const ds=t.dueDate?Math.floor((new Date(t.dueDate)-new Date())/864e5):null;
+  const overdue=ds!==null&&ds<0&&!isDone;
+  let due='';
+  if(t.dueDate){
+    const d=new Date(t.dueDate);
+    const label=ds===0?'Idag':ds===1?'Imorgon':ds===-1?'Igår':ds<0?Math.abs(ds)+' dagar sen':ds+' dagar';
+    due=`<div class="todo-due${overdue?' overdue':''}">📅 ${label}</div>`;
+  }
+  return`<div class="todo-card${isDone?' done':''}" style="animation-delay:${i*.03}s"><button class="todo-check${isDone?' checked':''}" data-action="toggleTodo" data-id="${t.id}">${isDone?'✓':''}</button><div class="todo-info" data-action="editTodo" data-id="${t.id}"><div class="todo-name">${t.name}</div>${t.note?`<div class="todo-note">${t.note}</div>`:''}${due}</div><button class="todo-del" data-action="deleteTodo" data-id="${t.id}">✕</button></div>`;
 }
 
 function rModal(){
   const m=S.modal;if(!m)return'';
-  if(m.type==='confirm')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><h3 style="font-size:18px;margin-bottom:8px;font-weight:600">Ta bort uppgift?</h3><p style="color:var(--t2);font-size:14px;margin-bottom:20px">Kan inte ångras.</p><div class="br"><button class="bs" data-action="closeModal">Avbryt</button><button class="bp" style="background:var(--red)" data-action="confirmDelete" data-id="${m.taskId}">Ta bort</button></div></div></div>`;
-  if(m.type==='authError')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">Inloggningsproblem</h2><button class="md-close" data-action="closeModal">✕</button></div><p style="color:var(--t2);font-size:14px;margin-bottom:16px">${m.msg||'Något gick fel.'}</p><div class="br"><button class="bp" data-action="openAuth">Försök igen</button></div></div></div>`;
-  if(m.type==='auth')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">Logga in</h2><button class="md-close" data-action="closeModal">✕</button></div><p style="font-size:13px;color:var(--t2);margin-bottom:18px">Logga in för att synka mellan enheter och dela med hushåll.</p><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px"><button class="auth-provider-btn" data-action="signInGoogle"><svg viewBox="0 0 48 48" style="width:18px;height:18px;flex-shrink:0"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Google</button><button class="auth-provider-btn ms" data-action="signInMicrosoft"><svg viewBox="0 0 21 21" style="width:18px;height:18px;flex-shrink:0"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg> Microsoft</button><button class="auth-provider-btn apple" data-action="signInApple"><svg viewBox="0 0 24 24" style="width:18px;height:18px;flex-shrink:0;fill:var(--t1)"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.52-3.23 0-1.44.62-2.2.44-3.06-.4C3.79 16.17 4.36 9.02 8.7 8.76c1.26.07 2.13.72 2.87.76.83-.17 2.08-.84 3.52-.72 1.59.14 2.78.82 3.54 2.07-3.24 1.93-2.47 6.17.62 7.35-.56 1.44-1.28 2.86-2.2 4.06zM12.05 8.67c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg> Apple</button></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><div style="flex:1;height:1px;background:var(--brd)"></div><span style="font-size:11px;color:var(--tm)">ELLER</span><div style="flex:1;height:1px;background:var(--brd)"></div></div><div class="fg"><label class="fl">E-post</label><input class="fi" id="auth-email" type="email" placeholder="din@epost.se"></div><div class="fg"><label class="fl">Lösenord</label><input class="fi" id="auth-pass" type="password" placeholder="Minst 6 tecken"></div><p id="auth-err" style="font-size:12px;color:var(--red);margin-bottom:8px;display:none"></p><div class="br"><button class="bp" data-action="signInEmail">Logga in / Skapa konto</button></div></div></div>`;
-  if(m.type==='vacation'){const vt=S.tasks.find(t=>t.id==='__vacation__');return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">🏖️ Semester</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Var X:e dag</label><input class="fi" type="number" id="vf" value="${vt?vt.frequencyDays:90}" min="1"><p class="fh" style="margin-top:6px">T.ex. 90 = var 3:e månad</p></div><div class="fg"><label class="fl">Senaste semester</label><input class="fi" type="date" id="vl" value="${vt?.lastDone?vt.lastDone.split('T')[0]:today()}" max="${today()}"></div><div class="br"><button class="bp" data-action="saveVacation">Spara</button></div></div></div>`}
-  if(m.type==='household'){
-    let c='';
-    if(S.household){
-      const mem=S.household.members.map(m=>`<div class="hh-member">${m.photo?`<img src="${m.photo}" referrerpolicy="no-referrer">`:'<span style="font-size:20px">👤</span>'}<span class="hh-member-name">${m.name}</span>${m.uid===S.user?.uid?'<span class="hh-member-you">Du</span>':''}</div>`).join('');
-      const cats=getCats().filter(x=>x.id!=='recovery').map(x=>{const on=isShared(x.id);return`<div class="hh-cat-toggle"><div class="hh-cat-l"><span>${x.icon}</span><span>${x.label}</span></div><button class="toggle ${on?'on':''}" data-action="toggleSharedCat" data-cat="${x.id}"></button></div>`}).join('');
-      c=`<div class="md-head"><h2 class="md-title">🏠 Hushåll</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Dela denna kod</label><div class="hh-code">${S.householdId}</div></div><div class="fg"><label class="fl">Medlemmar</label><div class="hh-members">${mem}</div></div><div class="fg"><label class="fl">Delade kategorier</label><p style="font-size:12px;color:var(--t3);margin-bottom:10px">Tasks i delade kategorier synkas mellan er.</p>${cats}</div><div class="br"><button class="bd" data-action="leaveHousehold">Lämna hushåll</button></div>`;
-    }else{
-      c=`<div class="md-head"><h2 class="md-title">🏠 Hushåll</h2><button class="md-close" data-action="closeModal">✕</button></div><p style="font-size:13px;color:var(--t2);margin-bottom:20px">Dela uppgifter med din partner.</p><div class="fg"><button class="bp" data-action="createHousehold" style="margin-bottom:12px">Skapa nytt hushåll</button><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="flex:1;height:1px;background:var(--brd)"></div><span style="font-size:11px;color:var(--tm)">ELLER</span><div style="flex:1;height:1px;background:var(--brd)"></div></div><label class="fl">Gå med i hushåll</label><div style="display:flex;gap:8px"><input class="fi" id="hh-code-input" placeholder="6-siffrig kod" maxlength="6" style="text-transform:uppercase;letter-spacing:3px;font-family:'Space Mono',monospace;text-align:center"><button class="bp" data-action="joinHousehold" style="flex:0 0 auto;padding:13px 20px">Gå med</button></div><p id="hh-error" style="font-size:12px;color:var(--red);margin-top:8px;display:none">Kod hittades inte eller hushållet är fullt.</p></div>`;
-    }
-    return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()">${c}</div></div>`;
+  if(m.type==='confirm')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><h3 style="font-size:18px;margin-bottom:8px;font-weight:600">Ta bort?</h3><p style="color:var(--t2);font-size:14px;margin-bottom:20px">Kan inte ångras.</p><div class="br"><button class="bs" data-action="closeModal">Avbryt</button><button class="bp" style="background:var(--red)" data-action="confirmDelete" data-id="${m.taskId}">Ta bort</button></div></div></div>`;
+  if(m.type==='authError')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">Problem</h2><button class="md-close" data-action="closeModal">✕</button></div><p style="color:var(--t2);font-size:14px;margin-bottom:16px">${m.msg}</p><div class="br"><button class="bp" data-action="openAuth">Försök igen</button></div></div></div>`;
+  if(m.type==='auth')return rAuthModal();
+  if(m.type==='vacation'){const vt=S.tasks.find(t=>t.id==='__vacation__');return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">🏖️ Semester</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Var X:e dag</label><input class="fi" type="number" id="vf" value="${vt?vt.frequencyDays:90}" min="1"><p class="fh">T.ex. 90 = var 3:e månad</p></div><div class="fg"><label class="fl">Senaste semester</label><input class="fi" type="date" id="vl" value="${vt?.lastDone?vt.lastDone.split('T')[0]:today()}" max="${today()}"></div><div class="br"><button class="bp" data-action="saveVacation">Spara</button></div></div></div>`}
+  if(m.type==='household')return rHHModal();
+  if(m.type==='todo')return rTodoModal();
+  return rTaskModal();
+}
+
+function rAuthModal(){
+  return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">Logga in</h2><button class="md-close" data-action="closeModal">✕</button></div><p style="font-size:13px;color:var(--t2);margin-bottom:18px">Synka mellan enheter och dela med hushåll.</p><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"><button class="auth-provider-btn" data-action="signInGoogle"><svg viewBox="0 0 48 48" style="width:18px;height:18px;flex-shrink:0"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Google</button><button class="auth-provider-btn" data-action="signInMicrosoft"><svg viewBox="0 0 21 21" style="width:18px;height:18px;flex-shrink:0"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg> Microsoft</button><button class="auth-provider-btn" data-action="signInApple"><svg viewBox="0 0 24 24" style="width:18px;height:18px;flex-shrink:0;fill:var(--t1)"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.52-3.23 0-1.44.62-2.2.44-3.06-.4C3.79 16.17 4.36 9.02 8.7 8.76c1.26.07 2.13.72 2.87.76.83-.17 2.08-.84 3.52-.72 1.59.14 2.78.82 3.54 2.07-3.24 1.93-2.47 6.17.62 7.35-.56 1.44-1.28 2.86-2.2 4.06zM12.05 8.67c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg> Apple</button></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><div style="flex:1;height:1px;background:var(--brd)"></div><span style="font-size:11px;color:var(--tm)">ELLER</span><div style="flex:1;height:1px;background:var(--brd)"></div></div><div class="fg"><label class="fl">E-post</label><input class="fi" id="auth-email" type="email" placeholder="din@epost.se"></div><div class="fg"><label class="fl">Lösenord</label><input class="fi" id="auth-pass" type="password" placeholder="Minst 6 tecken"></div><div class="br" style="margin-bottom:14px"><button class="bp" data-action="signInEmail">Logga in / Skapa konto</button></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><div style="flex:1;height:1px;background:var(--brd)"></div><span style="font-size:11px;color:var(--tm)">ELLER</span><div style="flex:1;height:1px;background:var(--brd)"></div></div><button class="auth-provider-btn" data-action="signInAnon" style="border-style:dashed;color:var(--t3)">👻 Fortsätt utan konto</button><p style="font-size:11px;color:var(--t3);margin-top:8px;text-align:center">Anonym = ingen synk, bara lokalt.</p></div></div>`;
+}
+
+function rHHModal(){
+  let c='';
+  if(S.household){
+    const mem=S.household.members.map(m=>`<div class="hh-member">${m.photo?`<img src="${m.photo}" referrerpolicy="no-referrer">`:'<span style="font-size:20px">👤</span>'}<span class="hh-member-name">${m.name}</span>${m.uid===S.user?.uid?'<span class="hh-member-you">Du</span>':''}</div>`).join('');
+    const cats=getCats().filter(x=>x.id!=='recovery').map(x=>{const on=isShared(x.id);return`<div class="hh-cat-toggle"><div class="hh-cat-l"><span>${x.icon}</span><span>${x.label}</span></div><button class="toggle ${on?'on':''}" data-action="toggleSharedCat" data-cat="${x.id}"></button></div>`}).join('');
+    c=`<div class="md-head"><h2 class="md-title">🏠 Hushåll</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Kod</label><div class="hh-code">${S.householdId}</div></div><div class="fg"><label class="fl">Medlemmar</label><div class="hh-members">${mem}</div></div><div class="fg"><label class="fl">Delade kategorier</label><p style="font-size:12px;color:var(--t3);margin-bottom:10px">Tasks i delade kategorier synkas.</p>${cats}</div><div class="br"><button class="bd" data-action="leaveHousehold">Lämna</button></div>`;
+  }else{
+    c=`<div class="md-head"><h2 class="md-title">🏠 Hushåll</h2><button class="md-close" data-action="closeModal">✕</button></div><p style="font-size:13px;color:var(--t2);margin-bottom:20px">Dela uppgifter med din partner.</p><div class="fg"><button class="bp" data-action="createHousehold" style="margin-bottom:12px">Skapa nytt hushåll</button><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="flex:1;height:1px;background:var(--brd)"></div><span style="font-size:11px;color:var(--tm)">ELLER</span><div style="flex:1;height:1px;background:var(--brd)"></div></div><label class="fl">Gå med</label><div style="display:flex;gap:8px"><input class="fi" id="hh-code-input" placeholder="6-siffrig kod" maxlength="6" style="text-transform:uppercase;letter-spacing:3px;font-family:'Space Mono',monospace;text-align:center"><button class="bp" data-action="joinHousehold" style="flex:0 0 auto;padding:13px 20px">Gå med</button></div><p id="hh-error" style="font-size:12px;color:var(--red);margin-top:8px;display:none">Kunde inte gå med.</p></div>`;
   }
-  // Task
-  const t=m.task||{},isE=!!t.id;
+  return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()">${c}</div></div>`;
+}
+
+function rTodoModal(){
+  const m=S.modal,t=m.todo||{},isE=!!t.id;
+  return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny att-göra'}</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Vad ska göras?</label><input class="fi" id="todo-name" value="${t.name||''}" placeholder="T.ex. Skicka CV till företaget" autofocus></div><div class="fg"><label class="fl">Anteckning (valfritt)</label><input class="fi" id="todo-note" value="${t.note||''}" placeholder="Detaljer, länk, kontaktinfo..."></div><div class="fg"><label class="fl">Deadline (valfritt)</label><input class="fi" type="date" id="todo-due" value="${t.dueDate||''}"></div><div class="br">${isE?`<button class="bd" data-action="deleteTodoConfirm" data-id="${t.id}">🗑</button>`:''}<button class="bp" data-action="saveTodo">${isE?'Spara':'Lägg till'}</button></div></div></div>`;
+}
+
+function rTaskModal(){
+  const m=S.modal,t=m.task||{},isE=!!t.id;
   const allCats=getCats();
   const shared=isShared(t.category||S.expandedCat||'content');
   let assignF='';
   if(shared&&S.household&&isE){
     const mems=[{uid:null,name:'Vem som helst',photo:null},...S.household.members];
-    assignF=`<div class="fg"><label class="fl">Tilldelad</label><div class="assign-row">${mems.map(mem=>{const sel=(t.assignedTo||null)===(mem.uid);return`<button class="assign-opt ${sel?'sel':''}" data-action="setAssign" data-uid="${mem.uid||''}">${mem.photo?`<img src="${mem.photo}" referrerpolicy="no-referrer">`:'👤'} ${mem.uid===S.user?.uid?'Jag':mem.name}</button>`}).join('')}</div></div>`;
+    assignF=`<div class="fg"><label class="fl">Tilldelad</label><div class="assign-row">${mems.map(mem=>`<button class="assign-opt ${(t.assignedTo||null)===(mem.uid)?'sel':''}" data-action="setAssign" data-uid="${mem.uid||''}">${mem.photo?`<img src="${mem.photo}" referrerpolicy="no-referrer">`:'👤'} ${mem.uid===S.user?.uid?'Jag':mem.name}</button>`).join('')}</div></div>`;
   }
-  return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny uppgift'}</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Namn</label><input class="fi" id="tn" value="${t.name||''}" placeholder="T.ex. Publicera på TikTok" autofocus></div><div class="fg"><label class="fl">Kategori</label><div class="cg" id="catGrid">${allCats.map(c=>{const sel=(t.category||S.expandedCat||'content')===c.id;const sh=isShared(c.id);return`<button class="co ${sel?'sel':''}" data-action="setCat" data-cat="${c.id}" style="${sel?`border-color:${ccol(c.id)};color:${ccol(c.id)};font-weight:600`:''}">${c.icon} ${c.label}${sh?' 👥':''}</button>`}).join('')}</div><div class="add-cat-row"><input id="new-cat-name" placeholder="Ny kategori..." maxlength="20"><button data-action="addCategory">+ Lägg till</button></div></div><div class="fg"><label class="fl">Frekvens (dagar)</label><div class="fr">${[1,2,3,7,14,21,30].map(d=>`<button class="fb ${parseInt(t.frequencyDays||7)===d?'sel':''}" data-action="setFreq" data-freq="${d}">${d}</button>`).join('')}<input class="fi" style="width:65px;text-align:center" id="tf" type="number" min="1" value="${t.frequencyDays||7}"></div><p class="fh">= var ${ffreq(t.frequencyDays||7)}</p></div>${isE?`<div class="fg"><label class="fl">Senast gjord</label><input class="fi" type="date" id="tl" value="${t.lastDone?t.lastDone.split('T')[0]:''}" max="${today()}"></div>`:''}${assignF}<div class="br">${isE&&!t.isProtected?`<button class="bd" data-action="deleteTask" data-id="${t.id}">🗑 Ta bort</button>`:''}<button class="bp" data-action="saveTask">${isE?'Spara':'Lägg till'}</button></div></div></div>`;
+  return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny uppgift'}</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Namn</label><input class="fi" id="tn" value="${t.name||''}" placeholder="T.ex. Gymma" autofocus></div><div class="fg"><label class="fl">Kategori</label><div class="cg" id="catGrid">${allCats.map(c=>{const sel=(t.category||S.expandedCat||'content')===c.id;return`<button class="co ${sel?'sel':''}" data-action="setCat" data-cat="${c.id}" style="${sel?`border-color:${ccol(c.id)};color:${ccol(c.id)};font-weight:600`:''}">${c.icon} ${c.label}</button>`}).join('')}</div><div class="add-cat-row"><input id="new-cat-name" placeholder="Ny kategori..." maxlength="20"><button data-action="addCategory">+ Lägg till</button></div></div><div class="fg"><label class="fl">Frekvens (dagar)</label><div class="fr">${[1,2,3,7,14,21,30].map(d=>`<button class="fb ${parseInt(t.frequencyDays||7)===d?'sel':''}" data-action="setFreq" data-freq="${d}">${d}</button>`).join('')}<input class="fi" style="width:65px;text-align:center" id="tf" type="number" min="1" value="${t.frequencyDays||7}"></div><p class="fh">= var ${ffreq(t.frequencyDays||7)}</p></div>${isE?`<div class="fg"><label class="fl">Senast gjord</label><input class="fi" type="date" id="tl" value="${t.lastDone?t.lastDone.split('T')[0]:''}" max="${today()}"></div>`:''}${assignF}<div class="br">${isE&&!t.isProtected?`<button class="bd" data-action="deleteTask" data-id="${t.id}">🗑</button>`:''}<button class="bp" data-action="saveTask">${isE?'Spara':'Lägg till'}</button></div></div></div>`;
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 // EVENTS
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════
 function bind(){
   document.querySelectorAll('[data-action]').forEach(el=>el.addEventListener('click',H));
   const fi=document.getElementById('tf');
@@ -569,23 +610,26 @@ function H(e){
   switch(a){
     case 'toggleTheme':S.theme=S.theme==='dark'?'light':'dark';save();R();break;
     case 'toggleProfile':e.stopPropagation();S.profileOpen=!S.profileOpen;R();break;
-    case 'openAuth':S.modal={type:'auth'};pNav();R();break;
+    case 'openAuth':S.modal={type:'auth'};S.profileOpen=false;pNav();R();break;
     case 'signInGoogle':S.modal=null;R();authWithProvider(gProv);break;
     case 'signInMicrosoft':S.modal=null;R();authWithProvider(msProv);break;
     case 'signInApple':S.modal=null;R();authWithProvider(appleProv);break;
-    case 'signInEmail':{const em=document.getElementById('auth-email')?.value?.trim();const pw=document.getElementById('auth-pass')?.value;if(!em||!pw){const err=document.getElementById('auth-err');if(err){err.textContent='Fyll i e-post och lösenord.';err.style.display='block'}return}S.modal=null;R();emailSignIn(em,pw);break}
+    case 'signInEmail':{const em=document.getElementById('auth-email')?.value?.trim();const pw=document.getElementById('auth-pass')?.value;if(!em||!pw)return;S.modal=null;R();emailSignIn(em,pw);break}
+    case 'signInAnon':S.modal=null;R();anonSignIn();break;
     case 'signOut':doSignOut();break;
-    case 'addTask':S.modal={type:'task'};pNav();R();break;
+    case 'addTask':S.modal={type:S.tab==='todos'?'todo':'task'};pNav();R();break;
+    case 'setTab':S.tab=el.dataset.tab;S.expandedCat=null;S.expandedTask=null;R();break;
+    case 'toggleCats':S.showCats=!S.showCats;R();break;
     case 'expandCat':S.expandedCat=el.dataset.cat;S.datePicking=null;S.expandedTask=null;pNav();R();break;
     case 'collapseCat':S.expandedCat=null;S.datePicking=null;S.expandedTask=null;R();break;
     case 'setSort':S.sort=el.dataset.sort;R();break;
     case 'toggleTask':S.expandedTask=S.expandedTask===el.dataset.id?null:el.dataset.id;S.datePicking=null;R();break;
-    case 'hidePrio':e.stopPropagation();S.hiddenFromPrio[el.dataset.id]=today();S.expandedTask=null;save();R();break;
-    case 'liftPrio':e.stopPropagation();S.liftedToPrio.add(el.dataset.id);delete S.hiddenFromPrio[el.dataset.id];S.expandedTask=null;R();break;
+    case 'hideToday':e.stopPropagation();S.hiddenToday[el.dataset.id]=today();S.expandedTask=null;save();R();break;
+    case 'liftPrio':e.stopPropagation();S.liftedToPrio.add(el.dataset.id);delete S.hiddenToday[el.dataset.id];S.expandedTask=null;R();break;
     case 'unliftPrio':e.stopPropagation();S.liftedToPrio.delete(el.dataset.id);S.expandedTask=null;R();break;
-    case 'checkTask':{e.stopPropagation();const f=findTask(el.dataset.id);if(f){f.task.lastDone=new Date().toISOString();delete S.hiddenFromPrio[f.task.id];S.liftedToPrio.delete(f.task.id);S.expandedTask=null;el.classList.add('pop');save();setTimeout(R,450)}break}
+    case 'checkTask':{e.stopPropagation();const f=findTask(el.dataset.id);if(f){f.task.lastDone=new Date().toISOString();delete S.hiddenToday[f.task.id];S.liftedToPrio.delete(f.task.id);S.expandedTask=null;el.classList.add('pop');save();setTimeout(R,450)}break}
     case 'pickDate':e.stopPropagation();S.datePicking=S.datePicking===el.dataset.id?null:el.dataset.id;R();break;
-    case 'confirmDate':{const inp=document.getElementById('dp-'+el.dataset.id);if(inp?.value){const f=findTask(el.dataset.id);if(f){f.task.lastDone=new Date(inp.value+'T12:00:00').toISOString();S.datePicking=null;S.expandedTask=null;delete S.hiddenFromPrio[f.task.id];save();R()}}break}
+    case 'confirmDate':{const inp=document.getElementById('dp-'+el.dataset.id);if(inp?.value){const f=findTask(el.dataset.id);if(f){f.task.lastDone=new Date(inp.value+'T12:00:00').toISOString();S.datePicking=null;S.expandedTask=null;delete S.hiddenToday[f.task.id];save();R()}}break}
     case 'cancelDate':S.datePicking=null;R();break;
     case 'editTask':{e.stopPropagation();const f=findTask(el.dataset.id);if(f){S.modal={type:'task',task:{...f.task},source:f.src};S.expandedTask=null;pNav();R()}break}
     case 'closeModal':S.modal=null;R();break;
@@ -593,20 +637,8 @@ function H(e){
     case 'saveVacation':{const f=parseInt(document.getElementById('vf').value)||90,ld=document.getElementById('vl').value;let vt=S.tasks.find(t=>t.id==='__vacation__');if(!vt){vt={...VTASK};S.tasks.push(vt)}vt.frequencyDays=f;vt.lastDone=ld?new Date(ld+'T12:00:00').toISOString():new Date().toISOString();S.modal=null;save();R();break}
     case 'setCat':{document.querySelectorAll('.co').forEach(b=>{b.classList.remove('sel');b.removeAttribute('style')});el.classList.add('sel');el.style.cssText=`border-color:${ccol(el.dataset.cat)};color:${ccol(el.dataset.cat)};font-weight:600`;document.getElementById('catGrid').dataset.selected=el.dataset.cat;break}
     case 'setFreq':{const f=el.dataset.freq;document.getElementById('tf').value=f;document.querySelectorAll('.fb').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');const h=el.closest('.fg').querySelector('.fh');if(h)h.textContent='= var '+ffreq(f);break}
-    case 'setAssign':{const uid=el.dataset.uid||null;if(S.modal?.task)S.modal.task.assignedTo=uid||null;document.querySelectorAll('.assign-opt').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');break}
-    case 'cycleAssign':{e.stopPropagation();const f=findTask(el.dataset.id);if(f&&S.household){const m=[null,...S.household.members.map(x=>x.uid)];const c=f.task.assignedTo||null;f.task.assignedTo=m[(m.indexOf(c)+1)%m.length]||null;save();R()}break}
-    case 'addCategory':{
-      const inp=document.getElementById('new-cat-name');
-      const name=inp?.value?.trim();if(!name)return;
-      const id=name.toLowerCase().replace(/[^a-zåäö0-9]/g,'_');
-      if(getCats().find(c=>c.id===id))return;
-      const emoji=EMOJI_POOL[S.customCats.length%EMOJI_POOL.length];
-      S.customCats.push({id,label:name,icon:emoji,v:'--c-oth'});
-      save();
-      // Select the new category
-      setTimeout(()=>{const btn=document.querySelector(`.co[data-cat="${id}"]`);if(btn)btn.click()},50);
-      R();break;
-    }
+    case 'setAssign':{if(S.modal?.task)S.modal.task.assignedTo=el.dataset.uid||null;document.querySelectorAll('.assign-opt').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');break}
+    case 'addCategory':{const inp=document.getElementById('new-cat-name');const name=inp?.value?.trim();if(!name)return;const id=name.toLowerCase().replace(/[^a-zåäö0-9]/g,'_');if(getCats().find(c=>c.id===id))return;const emoji=EMOJI_POOL[S.customCats.length%EMOJI_POOL.length];S.customCats.push({id,label:name,icon:emoji,v:'--c-oth'});save();R();break}
     case 'saveTask':{
       const ne=document.getElementById('tn'),fe=document.getElementById('tf');
       const sc=document.getElementById('catGrid')?.dataset.selected||document.querySelector('.co.sel')?.dataset.cat||S.expandedCat||'content';
@@ -620,12 +652,8 @@ function H(e){
           if(!was&&now&&S.household){S.tasks=S.tasks.filter(x=>x.id!==t.id);S.household.tasks.push(t)}
           else if(was&&!now&&S.household){S.household.tasks=S.household.tasks.filter(x=>x.id!==t.id);S.tasks.push(t)}
         }
-      }else{
-        const nt={id:gid(),name:n,category:sc,frequencyDays:freq,lastDone:null,assignedTo:null};
-        if(shared&&S.household)S.household.tasks.push(nt);else S.tasks.push(nt);
-      }
-      S.modal=null;save();R();break;
-    }
+      }else{const nt={id:gid(),name:n,category:sc,frequencyDays:freq,lastDone:null,assignedTo:null};if(shared&&S.household)S.household.tasks.push(nt);else S.tasks.push(nt)}
+      S.modal=null;save();R();break}
     case 'deleteTask':S.modal={type:'confirm',taskId:el.dataset.id};R();break;
     case 'confirmDelete':{const id=el.dataset.id;S.tasks=S.tasks.filter(t=>t.id!==id);if(S.household)S.household.tasks=(S.household.tasks||[]).filter(t=>t.id!==id);S.modal=null;save();R();break}
     case 'openHousehold':S.profileOpen=false;S.modal={type:'household'};pNav();R();break;
@@ -633,6 +661,19 @@ function H(e){
     case 'joinHousehold':{const inp=document.getElementById('hh-code-input');const err=document.getElementById('hh-error');if(inp?.value)joinHH(inp.value).then(ok=>{if(!ok&&err)err.style.display='block';else{S.modal={type:'household'};R()}});break}
     case 'leaveHousehold':leaveHH().then(()=>{S.modal=null;R()});break;
     case 'toggleSharedCat':toggleSharedCat(el.dataset.cat);break;
+    // ─── Todo actions ───
+    case 'toggleTodo':{e.stopPropagation();const t=S.todos.find(x=>x.id===el.dataset.id);if(t){t.done=!t.done;t.doneAt=t.done?new Date().toISOString():null;save();R()}break}
+    case 'editTodo':{const t=S.todos.find(x=>x.id===el.dataset.id);if(t){S.modal={type:'todo',todo:{...t}};pNav();R()}break}
+    case 'deleteTodo':{e.stopPropagation();S.todos=S.todos.filter(x=>x.id!==el.dataset.id);save();R();break}
+    case 'deleteTodoConfirm':{S.todos=S.todos.filter(x=>x.id!==el.dataset.id);S.modal=null;save();R();break}
+    case 'saveTodo':{
+      const n=document.getElementById('todo-name')?.value?.trim();if(!n)return;
+      const note=document.getElementById('todo-note')?.value?.trim()||'';
+      const due=document.getElementById('todo-due')?.value||'';
+      if(S.modal.todo?.id){const t=S.todos.find(x=>x.id===S.modal.todo.id);if(t){t.name=n;t.note=note;t.dueDate=due||null}}
+      else{S.todos.push({id:gid(),name:n,note,dueDate:due||null,done:false,doneAt:null,createdAt:new Date().toISOString()})}
+      S.modal=null;save();R();break}
+    case 'toggleShowDone':S.showDone=!S.showDone;R();break;
   }
 }
 
