@@ -770,7 +770,25 @@ function rModal(){
 }
 
 function rAuthModal(){
-  return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">Logga in</h2><button class="md-close" data-action="closeModal">✕</button></div><p style="font-size:13px;color:var(--t2);margin-bottom:18px">Synka mellan enheter och dela med hushåll.</p><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"><button class="auth-provider-btn" data-action="signInGoogle"><svg viewBox="0 0 48 48" style="width:18px;height:18px;flex-shrink:0"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Logga in med Google</button></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><div style="flex:1;height:1px;background:var(--brd)"></div><span style="font-size:11px;color:var(--tm)">ELLER</span><div style="flex:1;height:1px;background:var(--brd)"></div></div><button class="auth-provider-btn" data-action="signInAnon" style="border-style:dashed;color:var(--t3)">👻 Fortsätt utan konto</button><p style="font-size:11px;color:var(--t3);margin-top:8px;text-align:center">Utan konto = ingen synk, bara lokalt på enheten.</p></div></div>`;
+  let h='<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()">';
+  h+='<div class="md-head"><h2 class="md-title">Logga in</h2><button class="md-close" data-action="closeModal">✕</button></div>';
+  h+='<p style="font-size:13px;color:var(--t2);margin-bottom:18px">Synka mellan enheter och dela med hushåll.</p>';
+  h+='<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">';
+  h+='<button class="auth-provider-btn" data-action="signInGoogle">';
+  h+='<svg viewBox="0 0 48 48" style="width:18px;height:18px;flex-shrink:0">';
+  h+='<path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>';
+  h+='<path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>';
+  h+='<path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>';
+  h+='<path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>';
+  h+='</svg> Logga in med Google</button></div>';
+  h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">';
+  h+='<div style="flex:1;height:1px;background:var(--brd)"></div>';
+  h+='<span style="font-size:11px;color:var(--tm)">ELLER</span>';
+  h+='<div style="flex:1;height:1px;background:var(--brd)"></div></div>';
+  h+='<button class="auth-provider-btn" data-action="signInAnon" style="border-style:dashed;color:var(--t3)">👻 Fortsätt utan konto</button>';
+  h+='<p style="font-size:11px;color:var(--t3);margin-top:8px;text-align:center">Utan konto = ingen synk, bara lokalt på enheten.</p>';
+  h+='</div></div>';
+  return h;
 }
 
 function rHHModal(){
@@ -778,9 +796,22 @@ function rHHModal(){
   if(S.household){
     const mem=S.household.members.map(m=>`<div class="hh-member">${m.photo?`<img src="${m.photo}" referrerpolicy="no-referrer">`:'<span style="font-size:20px">👤</span>'}<span class="hh-member-name">${m.name}</span>${m.uid===S.user?.uid?'<span class="hh-member-you">Du</span>':''}</div>`).join('');
     const cats=getCats().filter(x=>x.id!=='recovery').map(x=>{const on=isShared(x.id);return`<div class="hh-cat-toggle"><div class="hh-cat-l"><span>${x.icon}</span><span>${x.label}</span></div><button class="toggle ${on?'on':''}" data-action="toggleSharedCat" data-cat="${x.id}"></button></div>`}).join('');
-    c=`<div class="md-head"><h2 class="md-title">🏠 Hushåll</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Kod</label><div class="hh-code">${S.householdId}</div></div><div class="fg"><label class="fl">Medlemmar</label><div class="hh-members">${mem}</div></div><div class="fg"><label class="fl">Delade kategorier</label><p style="font-size:12px;color:var(--t3);margin-bottom:10px">Tasks i delade kategorier synkas.</p>${cats}</div><div class="br"><button class="bd" data-action="leaveHousehold">Lämna</button></div>`;
+    c='<div class="md-head"><h2 class="md-title">🏠 Hushåll</h2><button class="md-close" data-action="closeModal">✕</button></div>';
+    c+=`<div class="fg"><label class="fl">Kod</label><div class="hh-code">${S.householdId}</div></div>`;
+    c+=`<div class="fg"><label class="fl">Medlemmar</label><div class="hh-members">${mem}</div></div>`;
+    c+=`<div class="fg"><label class="fl">Delade kategorier</label><p style="font-size:12px;color:var(--t3);margin-bottom:10px">Tasks i delade kategorier synkas.</p>${cats}</div>`;
+    c+='<div class="br"><button class="bd" data-action="leaveHousehold">Lämna</button></div>';
   }else{
-    c=`<div class="md-head"><h2 class="md-title">🏠 Hushåll</h2><button class="md-close" data-action="closeModal">✕</button></div><p style="font-size:13px;color:var(--t2);margin-bottom:20px">Dela uppgifter med din partner.</p><div class="fg"><button class="bp" data-action="createHousehold" style="margin-bottom:12px">Skapa nytt hushåll</button><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="flex:1;height:1px;background:var(--brd)"></div><span style="font-size:11px;color:var(--tm)">ELLER</span><div style="flex:1;height:1px;background:var(--brd)"></div></div><label class="fl">Gå med</label><div style="display:flex;gap:8px"><input class="fi" id="hh-code-input" placeholder="6-siffrig kod" maxlength="6" style="text-transform:uppercase;letter-spacing:3px;font-family:'Space Mono',monospace;text-align:center"><button class="bp" data-action="joinHousehold" style="flex:0 0 auto;padding:13px 20px">Gå med</button></div><p id="hh-error" style="font-size:12px;color:var(--red);margin-top:8px;display:none">Kunde inte gå med.</p></div>`;
+    c='<div class="md-head"><h2 class="md-title">🏠 Hushåll</h2><button class="md-close" data-action="closeModal">✕</button></div>';
+    c+='<p style="font-size:13px;color:var(--t2);margin-bottom:20px">Dela uppgifter med din partner.</p>';
+    c+='<div class="fg"><button class="bp" data-action="createHousehold" style="margin-bottom:12px">Skapa nytt hushåll</button>';
+    c+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">';
+    c+='<div style="flex:1;height:1px;background:var(--brd)"></div><span style="font-size:11px;color:var(--tm)">ELLER</span>';
+    c+='<div style="flex:1;height:1px;background:var(--brd)"></div></div>';
+    c+='<label class="fl">Gå med</label><div style="display:flex;gap:8px">';
+    c+='<input class="fi" id="hh-code-input" placeholder="6-siffrig kod" maxlength="6" style="text-transform:uppercase;letter-spacing:3px;font-family:\'Space Mono\',monospace;text-align:center">';
+    c+='<button class="bp" data-action="joinHousehold" style="flex:0 0 auto;padding:13px 20px">Gå med</button></div>';
+    c+='<p id="hh-error" style="font-size:12px;color:var(--red);margin-top:8px;display:none">Kunde inte gå med.</p></div>';
   }
   return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()">${c}</div></div>`;
 }
@@ -797,7 +828,17 @@ function rTodoModal(){
   }
   let calBtn='';
   if(isE&&t.dueDate){calBtn=`<button class="bs" data-action="pushCal" data-id="${t.id}" style="font-size:12px;display:flex;align-items:center;gap:5px;justify-content:center">📅 Google Kalender</button>`}
-  return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny att-göra'}</h2><button class="md-close" data-action="closeModal">✕</button></div>${groupPicker}<div class="fg"><label class="fl">Vad ska göras?</label><input class="fi" id="todo-name" value="${t.name||''}" placeholder="T.ex. Skicka CV till företaget" autofocus></div><div class="fg"><label class="fl">Anteckning (valfritt)</label><input class="fi" id="todo-note" value="${t.note||''}" placeholder="Detaljer, länk, kontaktinfo..."></div><div class="fg"><label class="fl">Deadline (valfritt)</label><input class="fi" type="date" id="todo-due" value="${t.dueDate||''}"></div>${calBtn?`<div class="fg">${calBtn}</div>`:''}<div class="br">${isE?`<button class="bd" data-action="deleteTodoConfirm" data-id="${t.id}">🗑</button>`:''}<button class="bp" data-action="saveTodo">${isE?'Spara':'Lägg till'}</button></div></div></div>`;
+  let h='<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()">';
+  h+=`<div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny att-göra'}</h2><button class="md-close" data-action="closeModal">✕</button></div>`;
+  h+=groupPicker;
+  h+=`<div class="fg"><label class="fl">Vad ska göras?</label><input class="fi" id="todo-name" value="${t.name||''}" placeholder="T.ex. Skicka CV till företaget" autofocus></div>`;
+  h+=`<div class="fg"><label class="fl">Anteckning (valfritt)</label><input class="fi" id="todo-note" value="${t.note||''}" placeholder="Detaljer, länk, kontaktinfo..."></div>`;
+  h+=`<div class="fg"><label class="fl">Deadline (valfritt)</label><input class="fi" type="date" id="todo-due" value="${t.dueDate||''}"></div>`;
+  if(calBtn)h+=`<div class="fg">${calBtn}</div>`;
+  h+='<div class="br">';
+  if(isE)h+=`<button class="bd" data-action="deleteTodoConfirm" data-id="${t.id}">🗑</button>`;
+  h+=`<button class="bp" data-action="saveTodo">${isE?'Spara':'Lägg till'}</button></div></div></div>`;
+  return h;
 }
 
 function rTaskModal(){
@@ -822,7 +863,20 @@ function rTaskModal(){
     freqHTML+=`<div class="md-grid">${[1,5,10,15,20,25].map(d=>`<button class="md-btn${md===d?' sel':''}" data-action="setMonthDay" data-md="${d}">${d}</button>`).join('')}<button class="md-btn${md===99?' sel':''}" data-action="setMonthDay" data-md="99">Sista</button></div>`;
   }
   freqHTML+=`</div>`;
-  return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny uppgift'}</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Namn</label><input class="fi" id="tn" value="${t.name||''}" placeholder="T.ex. Gymma" autofocus></div><div class="fg"><label class="fl">Kategori</label><div class="cg" id="catGrid">${allCats.map(c=>{const sel=(t.category||S.expandedCat||'content')===c.id;return`<button class="co ${sel?'sel':''}" data-action="setCat" data-cat="${c.id}" style="${sel?`border-color:${ccol(c.id)};color:${ccol(c.id)};font-weight:600`:''}">${c.icon} ${c.label}</button>`}).join('')}</div><div class="add-cat-row"><input id="new-cat-name" placeholder="Ny kategori..." maxlength="20"><button data-action="addCategory">+ Lägg till</button></div></div>${freqHTML}${isE?`<div class="fg"><label class="fl">Senast gjord</label><input class="fi" type="date" id="tl" value="${t.lastDone?t.lastDone.split('T')[0]:''}" max="${today()}"></div>`:''}${assignF}<div class="br">${isE&&!t.isProtected?`<button class="bd" data-action="deleteTask" data-id="${t.id}">🗑</button>`:''}<button class="bp" data-action="saveTask">${isE?'Spara':'Lägg till'}</button></div></div></div>`;
+  let h='<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()">';
+  h+=`<div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny uppgift'}</h2><button class="md-close" data-action="closeModal">✕</button></div>`;
+  h+=`<div class="fg"><label class="fl">Namn</label><input class="fi" id="tn" value="${t.name||''}" placeholder="T.ex. Gymma" autofocus></div>`;
+  h+='<div class="fg"><label class="fl">Kategori</label><div class="cg" id="catGrid">';
+  h+=allCats.map(c=>{const sel=(t.category||S.expandedCat||'content')===c.id;return`<button class="co ${sel?'sel':''}" data-action="setCat" data-cat="${c.id}" style="${sel?`border-color:${ccol(c.id)};color:${ccol(c.id)};font-weight:600`:''}">${c.icon} ${c.label}</button>`}).join('');
+  h+='</div><div class="add-cat-row"><input id="new-cat-name" placeholder="Ny kategori..." maxlength="20">';
+  h+='<button data-action="addCategory">+ Lägg till</button></div></div>';
+  h+=freqHTML;
+  if(isE)h+=`<div class="fg"><label class="fl">Senast gjord</label><input class="fi" type="date" id="tl" value="${t.lastDone?t.lastDone.split('T')[0]:''}" max="${today()}"></div>`;
+  h+=assignF;
+  h+='<div class="br">';
+  if(isE&&!t.isProtected)h+=`<button class="bd" data-action="deleteTask" data-id="${t.id}">🗑</button>`;
+  h+=`<button class="bp" data-action="saveTask">${isE?'Spara':'Lägg till'}</button></div></div></div>`;
+  return h;
 }
 
 // ═══════════════════════════════════════════
