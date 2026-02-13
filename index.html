@@ -436,7 +436,7 @@ function R(){
   const app=document.getElementById('app');if(!app)return;
   document.documentElement.setAttribute('data-theme',S.theme);
   document.getElementById('metaTheme').content=S.theme==='dark'?'#0A0A0F':'#FFF5F7';
-  if(S.onboarding>0||(S.onboarding===0&&!localStorage.getItem('puls'))){if(S.onboarding===0)S.onboarding=1;app.innerHTML=rOnboarding();bind();return}
+  if(S.onboarding>0||(S.onboarding===0&&!localStorage.getItem('puls'))){if(S.onboarding===0)S.onboarding=1;stopObAnim();app.innerHTML=rOnboarding();bind();if(S.onboarding===2)initObAnim();return}
   let html=rHeader()+rTabs();
   if(S.tab==='todos'){html+=rTodosView()}
   else{
@@ -482,9 +482,83 @@ function rOnboarding(){
   const step=S.onboarding;
   const dots=`<div class="ob-dots"><div class="ob-dot${step===1?' on':''}"></div><div class="ob-dot${step===2?' on':''}"></div><div class="ob-dot${step===3?' on':''}"></div></div>`;
   if(step===1)return`<div class="ob"><div class="ob-step"><div class="ob-icon">⚡</div><div class="ob-title">Håll koll på allt<br>som behöver göras</div><div class="ob-desc">Puls räknar dagar sedan du senast gjorde något. Siffran tickar upp — färgen hjälper dig prioritera.</div><div class="ob-demo" style="padding:0;border:none;background:none"><div class="tc u-red" style="animation:none;opacity:1"><div class="tc-days"><div class="tc-days-num" style="color:var(--red)">5</div><div class="tc-days-lbl">dagar sen</div></div><div class="tc-lamp red"></div><div class="tc-info"><div class="tc-name">Gymma</div><div class="tc-meta">💪 Fitness<span class="dot">·</span>var 2:e dag</div></div><div class="tc-actions"><button class="tc-btn check" style="pointer-events:none">✓</button></div></div></div>${dots}<button class="ob-next" data-action="obNext">Nästa →</button><button class="ob-skip" data-action="obSkip">Hoppa över</button></div></div>`;
-  if(step===2)return`<div class="ob"><div class="ob-step"><div class="ob-icon">🔄</div><div class="ob-title">Sätt frekvens,<br>sen glöm det</div><div class="ob-desc">Puls håller koll åt dig och lyfter upp det när det börjar bli dags igen.</div><div class="ob-demo" style="padding:0;border:none;background:none;display:flex;flex-direction:column;gap:6px"><div class="tc u-red" style="animation:none;opacity:1"><div class="tc-days"><div class="tc-days-num" style="color:var(--red)">5</div><div class="tc-days-lbl">dagar sen</div></div><div class="tc-lamp red"></div><div class="tc-info"><div class="tc-name">Gymma</div><div class="tc-meta">💪 Fitness<span class="dot">·</span>var 2:a dag</div></div><div class="tc-actions"><button class="tc-btn check" style="pointer-events:none">✓</button></div></div><div class="tc u-org" style="animation:none;opacity:1"><div class="tc-days"><div class="tc-days-num" style="color:var(--org)">6</div><div class="tc-days-lbl">dagar sen</div></div><div class="tc-lamp org"></div><div class="tc-info"><div class="tc-name">Städa hemma</div><div class="tc-meta">🏠 Hem<span class="dot">·</span>var 7:e dag</div></div><div class="tc-actions"><button class="tc-btn check" style="pointer-events:none">✓</button></div></div><div class="tc u-grn" style="animation:none;opacity:1"><div class="tc-days"><div class="tc-days-num" style="color:var(--grn)">2</div><div class="tc-days-lbl">dagar sen</div></div><div class="tc-lamp grn"></div><div class="tc-info"><div class="tc-name">Handla mat</div><div class="tc-meta">🛒 Hem<span class="dot">·</span>var 5:e dag</div></div><div class="tc-actions"><button class="tc-btn check" style="pointer-events:none">✓</button></div></div></div>${dots}<button class="ob-next" data-action="obNext">Nästa →</button><button class="ob-skip" data-action="obSkip">Hoppa över</button></div></div>`;
+  if(step===2)return`<div class="ob"><div class="ob-step"><div class="ob-icon">🔄</div><div class="ob-title">Sätt frekvens,<br>sen glöm det</div><div class="ob-desc">Puls håller koll åt dig och lyfter upp det när det börjar bli dags igen.</div><div id="ob-anim" style="padding:0;border:none;background:none;display:flex;flex-direction:column;gap:6px;position:relative"></div>${dots}<button class="ob-next" data-action="obNext">Nästa →</button><button class="ob-skip" data-action="obSkip">Hoppa över</button></div></div>`;
   if(step===3)return`<div class="ob"><div class="ob-step"><div class="ob-icon">🚀</div><div class="ob-title">Redo!</div><div class="ob-desc">Vi har lagt in 3 exempel-pulser åt dig. Redigera, ta bort eller lägg till egna — det är din puls.</div><div class="ob-demo" style="text-align:center"><div style="display:flex;justify-content:center;gap:16px;padding:6px 0"><div><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--red)">5</div><div style="font-size:10px;color:var(--t3)">Gymma</div></div><div><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--org)">6</div><div style="font-size:10px;color:var(--t3)">Städa</div></div><div><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--grn)">2</div><div style="font-size:10px;color:var(--t3)">Handla mat</div></div></div></div>${dots}<button class="ob-next" data-action="obDone">Kör igång! ⚡</button></div></div>`;
   return'';
+}
+
+// ═══════════════════════════════════════════
+// ONBOARDING STEP 2 ANIMATION
+// ═══════════════════════════════════════════
+let _obAnimTimer=null;
+function stopObAnim(){if(_obAnimTimer){clearInterval(_obAnimTimer);_obAnimTimer=null}}
+function initObAnim(){
+  stopObAnim();
+  const box=document.getElementById('ob-anim');if(!box)return;
+  const items=[
+    {id:'gym',name:'Gymma',cat:'💪 Fitness',freq:2,days:0},
+    {id:'stad',name:'Städa hemma',cat:'🏠 Hem',freq:7,days:0},
+    {id:'mat',name:'Handla mat',cat:'🛒 Hem',freq:5,days:0}
+  ];
+  function col(d,f){const u=d/f;return u>=1?'var(--red)':u>=.75?'var(--org)':u>=.5?'var(--yel)':'var(--grn)'}
+  function cls(d,f){const u=d/f;return u>=1?'u-red':u>=.75?'u-org':u>=.5?'u-yel':'u-grn'}
+  function lamp(d,f){const u=d/f;return u>=1?'red':u>=.75?'org':u>=.5?'yel':'grn'}
+  function renderCards(){
+    // Sort by urgency desc (FLIP animation)
+    const sorted=[...items].sort((a,b)=>(b.days/b.freq)-(a.days/a.freq));
+    // Get old positions
+    const oldPos={};box.querySelectorAll('.tc[data-ob]').forEach(el=>{
+      oldPos[el.dataset.ob]=el.getBoundingClientRect();
+    });
+    // Render new order
+    box.innerHTML=sorted.map(it=>{
+      const c=col(it.days,it.freq),l=lamp(it.days,it.freq),u=cls(it.days,it.freq);
+      return`<div class="tc ${u}" data-ob="${it.id}" style="animation:none;opacity:1;transition:transform .45s cubic-bezier(.4,0,.2,1)"><div class="tc-days"><div class="tc-days-num" style="color:${c};transition:color .3s">${it.days}</div><div class="tc-days-lbl">dagar sen</div></div><div class="tc-lamp ${l}"></div><div class="tc-info"><div class="tc-name">${it.name}</div><div class="tc-meta">${it.cat}<span class="dot">·</span>var ${it.freq===1?'dag':it.freq+':e dag'}</div></div><div class="tc-actions"><button class="tc-btn check" style="pointer-events:none">✓</button></div></div>`;
+    }).join('');
+    // FLIP: animate from old position to new
+    if(Object.keys(oldPos).length){
+      box.querySelectorAll('.tc[data-ob]').forEach(el=>{
+        const id=el.dataset.ob;
+        if(oldPos[id]){
+          const newPos=el.getBoundingClientRect();
+          const dy=oldPos[id].top-newPos.top;
+          if(Math.abs(dy)>2){
+            el.style.transform=`translateY(${dy}px)`;
+            el.style.transition='none';
+            requestAnimationFrame(()=>{requestAnimationFrame(()=>{
+              el.style.transition='transform .45s cubic-bezier(.4,0,.2,1)';
+              el.style.transform='';
+            })});
+          }
+        }
+      });
+    }
+  }
+  renderCards();
+  let tick=0;
+  _obAnimTimer=setInterval(()=>{
+    tick++;
+    // Check if we should "do" a task (reset it)
+    let checked=null;
+    items.forEach(it=>{
+      if(it.days/it.freq>=1.3&&!checked){checked=it.id;it.days=0}
+      else it.days++;
+    });
+    // Flash check animation
+    if(checked){
+      const card=box.querySelector(`[data-ob="${checked}"]`);
+      if(card){
+        const btn=card.querySelector('.tc-btn.check');
+        if(btn){btn.style.background='var(--grn)';btn.style.color='#fff';btn.style.transform='scale(1.3)'}
+        card.style.boxShadow='0 0 20px rgba(81,207,102,.5)';
+        setTimeout(()=>{renderCards()},350);
+        return;
+      }
+    }
+    renderCards();
+    // Reset all after a while to keep looping
+    if(tick>25){tick=0;items.forEach(it=>it.days=0);renderCards()}
+  },900);
 }
 
 function rStats(red,org,grn,allOk){
@@ -851,8 +925,8 @@ function H(e){
     case 'leaveHousehold':leaveHH().then(()=>{S.modal=null;R()});break;
     case 'toggleSharedCat':toggleSharedCat(el.dataset.cat);break;
     // ─── Onboarding ───
-    case 'obNext':S.onboarding++;R();break;
-    case 'obSkip':case 'obDone':S.onboarding=-1;save();R();break;
+    case 'obNext':stopObAnim();S.onboarding++;R();break;
+    case 'obSkip':case 'obDone':stopObAnim();S.onboarding=-1;save();R();break;
     // ─── Todo actions ───
     case 'toggleTodo':{e.stopPropagation();const t=S.todos.find(x=>x.id===el.dataset.id);if(t){t.done=!t.done;t.doneAt=t.done?new Date().toISOString():null;save();R()}break}
     case 'editTodo':{const t=S.todos.find(x=>x.id===el.dataset.id);if(t){S.modal={type:'todo',todo:{...t}};pNav();R()}break}
