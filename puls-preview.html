@@ -256,6 +256,14 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 /* Show done toggle */
 .todo-done-toggle{font-size:12px;color:var(--t3);cursor:pointer;padding:8px 0;transition:color .15s;text-align:center}
 .todo-done-toggle:hover{color:var(--t2)}
+/* Drag handle */
+.todo-grip{display:flex;align-items:center;justify-content:center;width:20px;flex-shrink:0;color:var(--tm);font-size:14px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;letter-spacing:-1px}
+.todo-grip:active{cursor:grabbing}
+/* Dragging states */
+.todo-card.dragging{opacity:.3;pointer-events:none}
+.todo-card.drag-over-above{box-shadow:0 -2px 0 var(--acc)}
+.todo-card.drag-over-below{box-shadow:0 2px 0 var(--acc)}
+.drag-ghost{position:fixed;z-index:500;pointer-events:none;opacity:.85;transform:rotate(1.5deg);box-shadow:0 8px 30px rgba(0,0,0,.4);border-radius:10px;transition:none}
 /* Todo groups */
 .todo-group{margin-bottom:14px}
 .todo-group-hdr{display:flex;align-items:center;gap:8px;padding:6px 0;margin-bottom:4px;cursor:pointer}
@@ -264,6 +272,10 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .todo-group-count{font-family:'Space Mono',monospace;font-size:10px;color:var(--t3);padding:1px 5px;border-radius:4px;background:var(--bg-in)}
 .todo-group-prog{flex:1;height:2px;background:var(--brd);border-radius:1px;overflow:hidden;margin-left:4px}
 .todo-group-prog-fill{height:100%;background:var(--grn);border-radius:1px;transition:width .4s ease}
+.todo-quick-add{padding:2px 0 4px}
+.todo-quick-input{width:100%;padding:8px 12px;border-radius:8px;border:1px dashed var(--brd);background:transparent;color:var(--t2);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:all .2s}
+.todo-quick-input:focus{border-style:solid;border-color:var(--acc);background:var(--bg2)}
+.todo-quick-input::placeholder{color:var(--tm)}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--brd);border-radius:4px}
 </style>
 </head>
@@ -330,15 +342,17 @@ function loadLocal(){
 }
 function ensV(){if(!S.tasks.find(t=>t.id==='__vacation__'))S.tasks.push({...VTASK});const v=S.tasks.find(t=>t.id==='__vacation__');if(v)v.isProtected=true}
 
-async function saveCloud(){if(!S.user||S.user.isAnonymous)return;S.syncStatus='syncing';R();try{await db.collection('users').doc(S.user.uid).set({tasks:S.tasks,todos:S.todos,theme:S.theme,householdId:S.householdId||null,customCats:S.customCats,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});S.syncStatus='synced'}catch(e){S.syncStatus='offline'}R()}
+async function saveCloud(){if(!S.user||S.user.isAnonymous)return;S.syncStatus='syncing';try{await db.collection('users').doc(S.user.uid).set({tasks:S.tasks,todos:S.todos,theme:S.theme,householdId:S.householdId||null,customCats:S.customCats,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});S.syncStatus='synced'}catch(e){S.syncStatus='offline'}}
 async function saveHH(){if(!S.household||!S.householdId)return;try{await db.collection('households').doc(S.householdId).set({members:S.household.members,sharedCats:S.household.sharedCats||[],tasks:S.household.tasks||[],updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.error('HH:',e)}}
 function save(){saveLocal();clearTimeout(save._t);save._t=setTimeout(()=>{saveCloud();if(S.household)saveHH()},600)}
 save._t=null;
 
 function startSync(){if(_unsub)_unsub();if(!S.user||S.user.isAnonymous)return;
-  _unsub=db.collection('users').doc(S.user.uid).onSnapshot(s=>{if(s.exists){const d=s.data();if(d.tasks){S.tasks=d.tasks;ensV();saveLocal()}if(d.todos)S.todos=d.todos;if(d.theme)S.theme=d.theme;if(d.customCats)S.customCats=d.customCats;if(d.householdId&&d.householdId!==S.householdId){S.householdId=d.householdId;startHHSync()}S.syncStatus='synced';R()}},e=>{S.syncStatus='offline';R()})}
+  _unsub=db.collection('users').doc(S.user.uid).onSnapshot(s=>{if(s.exists){const d=s.data();if(d.tasks){S.tasks=d.tasks;ensV();saveLocal()}if(d.todos)S.todos=d.todos;if(d.theme)S.theme=d.theme;if(d.customCats)S.customCats=d.customCats;if(d.householdId&&d.householdId!==S.householdId){S.householdId=d.householdId;startHHSync()}S.syncStatus='synced';_qR()}},e=>{S.syncStatus='offline';_qR()})}
 function startHHSync(){if(_hhUnsub)_hhUnsub();if(!S.householdId)return;
-  _hhUnsub=db.collection('households').doc(S.householdId).onSnapshot(s=>{if(s.exists){S.household={code:S.householdId,...s.data()};R()}else{S.household=null;S.householdId=null;saveLocal();R()}},e=>console.error('HH:',e))}
+  _hhUnsub=db.collection('households').doc(S.householdId).onSnapshot(s=>{if(s.exists){S.household={code:S.householdId,...s.data()};_qR()}else{S.household=null;S.householdId=null;saveLocal();_qR()}},e=>console.error('HH:',e))}
+// Queued render – debounce snapshot re-renders, skip if modal open
+let _qT=null;function _qR(){clearTimeout(_qT);_qT=setTimeout(()=>{if(!S.modal)R()},300)}
 async function mergeUp(){if(!S.user||S.user.isAnonymous)return;const s=await db.collection('users').doc(S.user.uid).get();if(s.exists&&s.data().tasks?.length>0){if(s.data().householdId)S.householdId=s.data().householdId;return}await saveCloud()}
 
 // ═══════════════════════════════════════════
@@ -399,7 +413,7 @@ function R(){
   document.documentElement.setAttribute('data-theme',S.theme);
   document.getElementById('metaTheme').content=S.theme==='dark'?'#0A0A0F':'#FFF5F7';
   if(S.onboarding>0){app.innerHTML=rOnboarding();bind();return}
-  let html=rHeader()+rTabs()+`<div style="padding:0 0 8px"><button class="add-btn" data-action="addTask" style="width:100%;justify-content:center;height:40px;border-radius:10px;font-size:13px"><span>+</span> Ny ${S.tab==='todos'?'att-göra':'puls'}</button></div>`;
+  let html=rHeader()+rTabs();
   if(S.tab==='todos'){html+=rTodosView()}
   else{
     const all=allTasks();
@@ -416,7 +430,7 @@ function rTabs(){
   const all=allTasks();
   const urgN=all.filter(t=>urg(t)>=.75).length;
   const todoN=S.todos.filter(t=>!t.done).length;
-  return`<div class="tabs"><button class="tab${S.tab==='pulser'?' on':''}" data-action="setTab" data-tab="pulser">⚡ Pulser${urgN?` <span class="tab-count hot">${urgN}</span>`:''}</button><button class="tab${S.tab==='todos'?' on':''}" data-action="setTab" data-tab="todos">☑ Att göra${todoN?` <span class="tab-count">${todoN}</span>`:''}</button></div>`;
+  return`<div class="tabs"><button class="tab${S.tab==='pulser'?' on':''}" data-action="setTab" data-tab="pulser">⚡ Pulser${urgN?` <span class="tab-count hot">${urgN}</span>`:''}</button><button class="tab${S.tab==='todos'?' on':''}" data-action="setTab" data-tab="todos">☑ Att göra${todoN?` <span class="tab-count">${todoN}</span>`:''}</button><button class="add-btn" data-action="addTask" style="height:36px;padding:0 12px;font-size:12px;flex:0 0 auto"><span>+</span></button></div>`;
 }
 
 function rHeader(){
@@ -541,36 +555,33 @@ function rCatView(){
 // ═══════════════════════════════════════════
 function rTodosView(){
   const all=S.todos;
-  const pending=all.filter(t=>!t.done);
-  const done=all.filter(t=>t.done);
-  if(!pending.length&&!done.length)return`<div class="todo-empty"><div class="todo-empty-icon">📋</div><div class="todo-empty-text">Inga att-göra-saker ännu</div><div class="todo-empty-sub">Tryck + Ny för att lägga till</div></div>`;
+  if(!all.length)return`<div class="todo-empty"><div class="todo-empty-icon">📋</div><div class="todo-empty-text">Inga att-göra-saker ännu</div><div class="todo-empty-sub">Tryck + Ny för att lägga till</div></div>`;
   let h='';
-  // Group pending todos
-  const ungrouped=pending.filter(t=>!t.group);
-  const groups={};
-  pending.filter(t=>t.group).forEach(t=>{if(!groups[t.group])groups[t.group]=[];groups[t.group].push(t)});
-  // Render grouped
-  const sortTodos=arr=>{arr.sort((a,b)=>{if(a.dueDate&&b.dueDate)return a.dueDate.localeCompare(b.dueDate);if(a.dueDate)return-1;if(b.dueDate)return 1;return(b.createdAt||'').localeCompare(a.createdAt||'')});return arr};
+  const allGroups=[...new Set(all.map(x=>x.group).filter(Boolean))];
+  const ungroupedPending=all.filter(t=>!t.group&&!t.done);
+  const ungroupedDone=all.filter(t=>!t.group&&t.done);
   let idx=0;
-  for(const[gname,items]of Object.entries(groups)){
-    const doneInGroup=done.filter(t=>t.group===gname).length;
-    const total=items.length+doneInGroup;
-    const pct=total>0?Math.round(doneInGroup/total*100):0;
-    h+=`<div class="todo-group"><div class="todo-group-hdr"><div class="todo-group-name">${gname}</div><span class="todo-group-count">${doneInGroup}/${total}</span><div class="todo-group-prog"><div class="todo-group-prog-fill" style="width:${pct}%"></div></div></div>`;
-    sortTodos(items).forEach(t=>{h+=rTodoCard(t,idx++,false)});
+  for(const gname of allGroups){
+    const gAll=all.filter(t=>t.group===gname);
+    const gPending=gAll.filter(t=>!t.done);
+    const gDone=gAll.filter(t=>t.done);
+    const total=gAll.length,doneN=gDone.length;
+    const pct=total>0?Math.round(doneN/total*100):0;
+    const allComplete=doneN===total;
+    h+=`<div class="todo-group"><div class="todo-group-hdr"><div class="todo-group-name"${allComplete?' style="color:var(--grn)"':''}>${allComplete?'✓ ':''}${gname}</div><span class="todo-group-count">${doneN}/${total}</span><div class="todo-group-prog"><div class="todo-group-prog-fill" style="width:${pct}%${allComplete?';background:var(--grn)':''}"></div></div></div>`;
+    gPending.forEach(t=>{h+=rTodoCard(t,idx++,false)});
+    if(allComplete&&gDone.length){h+=`<div style="font-size:11px;color:var(--t3);padding:4px 0 2px;text-align:center">🎉 Klart!</div>`}
+    if(gDone.length){gDone.forEach(t=>{h+=rTodoCard(t,idx++,true)})}
+    h+=`<div class="todo-quick-add"><input class="todo-quick-input" data-group="${gname}" placeholder="+ Lägg till..." data-action-enter="quickAddTodo"></div>`;
     h+=`</div>`;
   }
-  // Ungrouped
-  if(ungrouped.length){
-    sortTodos(ungrouped).forEach(t=>{h+=rTodoCard(t,idx++,false)});
+  if(ungroupedPending.length){
+    if(allGroups.length)h+=`<div style="font-size:11px;color:var(--tm);text-transform:uppercase;letter-spacing:1px;padding:10px 0 6px;font-weight:600">Övrigt</div>`;
+    ungroupedPending.forEach(t=>{h+=rTodoCard(t,idx++,false)});
   }
-  // Done section
-  if(done.length){
-    h+=`<div class="todo-done-toggle" data-action="toggleShowDone">${S.showDone?'▾':'▸'} ${done.length} klara</div>`;
-    if(S.showDone){
-      done.sort((a,b)=>(b.doneAt||'').localeCompare(a.doneAt||''));
-      done.forEach((t,i)=>{h+=rTodoCard(t,i,true)});
-    }
+  if(ungroupedDone.length){
+    h+=`<div class="todo-done-toggle" data-action="toggleShowDone">${S.showDone?'▾':'▸'} ${ungroupedDone.length} klara utan projekt</div>`;
+    if(S.showDone){ungroupedDone.forEach((t,i)=>{h+=rTodoCard(t,i,true)})}
   }
   return h;
 }
@@ -580,11 +591,12 @@ function rTodoCard(t,i,isDone){
   const overdue=ds!==null&&ds<0&&!isDone;
   let due='';
   if(t.dueDate){
-    const d=new Date(t.dueDate);
     const label=ds===0?'Idag':ds===1?'Imorgon':ds===-1?'Igår':ds<0?Math.abs(ds)+' dagar sen':ds+' dagar';
     due=`<div class="todo-due${overdue?' overdue':''}">📅 ${label}</div>`;
   }
-  return`<div class="todo-card${isDone?' done':''}" style="animation-delay:${i*.03}s"><button class="todo-check${isDone?' checked':''}" data-action="toggleTodo" data-id="${t.id}">${isDone?'✓':''}</button><div class="todo-info" data-action="editTodo" data-id="${t.id}"><div class="todo-name">${t.name}</div>${t.note?`<div class="todo-note">${t.note}</div>`:''}${due}</div><button class="todo-del" data-action="deleteTodo" data-id="${t.id}">✕</button></div>`;
+  const calBtn=t.dueDate&&!isDone?`<button class="todo-del" data-action="pushCal" data-id="${t.id}" title="Google Kalender" style="color:var(--t3);font-size:11px">📅</button>`:'';
+  const grip=!isDone?`<div class="todo-grip" data-drag-handle>⠿</div>`:'';
+  return`<div class="todo-card${isDone?' done':''}" data-todo-id="${t.id}" style="animation-delay:${i*.03}s">${grip}<button class="todo-check${isDone?' checked':''}" data-action="toggleTodo" data-id="${t.id}">${isDone?'✓':''}</button><div class="todo-info" data-action="editTodo" data-id="${t.id}"><div class="todo-name">${t.name}</div>${t.note?`<div class="todo-note">${t.note}</div>`:''}${due}</div>${calBtn}<button class="todo-del" data-action="deleteTodo" data-id="${t.id}">✕</button></div>`;
 }
 
 function rModal(){
@@ -616,15 +628,17 @@ function rHHModal(){
 
 function rTodoModal(){
   const m=S.modal,t=m.todo||{},isE=!!t.id;
-  // Collect existing group names
+  // Collect ALL group names (pending + done)
   const existingGroups=[...new Set(S.todos.map(x=>x.group).filter(Boolean))];
   let groupPicker='';
   if(existingGroups.length){
-    groupPicker=`<div class="fg"><label class="fl">Projekt / grupp (valfritt)</label><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">${existingGroups.map(g=>`<button class="co todo-group-opt ${(t.group||'')===g?'sel':''}" data-action="setTodoGroup" data-group="${g}" style="${(t.group||'')===g?'border-color:var(--acc);color:var(--acc);font-weight:600':''}">${g}</button>`).join('')}<button class="co todo-group-opt ${!t.group?'sel':''}" data-action="setTodoGroup" data-group="" style="${!t.group?'border-color:var(--acc);color:var(--acc);font-weight:600':''}">Ingen</button></div><input class="fi" id="todo-group-new" placeholder="Eller skriv nytt projektnamn..." style="font-size:13px"></div>`;
+    groupPicker=`<div class="fg"><label class="fl">Projekt</label><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">${existingGroups.map(g=>`<button class="co todo-group-opt ${(t.group||'')===g?'sel':''}" data-action="setTodoGroup" data-group="${g}" style="${(t.group||'')===g?'border-color:var(--acc);color:var(--acc);font-weight:600':''}">${g}</button>`).join('')}<button class="co todo-group-opt ${!t.group?'sel':''}" data-action="setTodoGroup" data-group="" style="${!t.group?'border-color:var(--acc);color:var(--acc);font-weight:600':''}">Inget</button></div><input class="fi" id="todo-group-new" placeholder="Eller nytt projekt..." style="font-size:13px"></div>`;
   }else{
-    groupPicker=`<div class="fg"><label class="fl">Projekt / grupp (valfritt)</label><input class="fi" id="todo-group-new" value="${t.group||''}" placeholder="T.ex. Skriva en bok, Bokföring..."></div>`;
+    groupPicker=`<div class="fg"><label class="fl">Projekt (valfritt)</label><input class="fi" id="todo-group-new" value="${t.group||''}" placeholder="T.ex. Skriva en bok, Bokföring..."></div>`;
   }
-  return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny att-göra'}</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Vad ska göras?</label><input class="fi" id="todo-name" value="${t.name||''}" placeholder="T.ex. Skicka CV till företaget" autofocus></div>${groupPicker}<div class="fg"><label class="fl">Anteckning (valfritt)</label><input class="fi" id="todo-note" value="${t.note||''}" placeholder="Detaljer, länk, kontaktinfo..."></div><div class="fg"><label class="fl">Deadline (valfritt)</label><input class="fi" type="date" id="todo-due" value="${t.dueDate||''}"></div><div class="br">${isE?`<button class="bd" data-action="deleteTodoConfirm" data-id="${t.id}">🗑</button>`:''}<button class="bp" data-action="saveTodo">${isE?'Spara':'Lägg till'}</button></div></div></div>`;
+  let calBtn='';
+  if(isE&&t.dueDate){calBtn=`<button class="bs" data-action="pushCal" data-id="${t.id}" style="font-size:12px;display:flex;align-items:center;gap:5px;justify-content:center">📅 Google Kalender</button>`}
+  return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny att-göra'}</h2><button class="md-close" data-action="closeModal">✕</button></div>${groupPicker}<div class="fg"><label class="fl">Vad ska göras?</label><input class="fi" id="todo-name" value="${t.name||''}" placeholder="T.ex. Skicka CV till företaget" autofocus></div><div class="fg"><label class="fl">Anteckning (valfritt)</label><input class="fi" id="todo-note" value="${t.note||''}" placeholder="Detaljer, länk, kontaktinfo..."></div><div class="fg"><label class="fl">Deadline (valfritt)</label><input class="fi" type="date" id="todo-due" value="${t.dueDate||''}"></div>${calBtn?`<div class="fg">${calBtn}</div>`:''}<div class="br">${isE?`<button class="bd" data-action="deleteTodoConfirm" data-id="${t.id}">🗑</button>`:''}<button class="bp" data-action="saveTodo">${isE?'Spara':'Lägg till'}</button></div></div></div>`;
 }
 
 function rTaskModal(){
@@ -642,12 +656,101 @@ function rTaskModal(){
 // ═══════════════════════════════════════════
 // EVENTS
 // ═══════════════════════════════════════════
+// ═══════════════════════════════════════════
+// DRAG & DROP (todos only, touch + mouse)
+// ═══════════════════════════════════════════
+let _drag=null;
+function initDrag(){
+  document.querySelectorAll('[data-drag-handle]').forEach(grip=>{
+    grip.addEventListener('pointerdown',dragStart);
+  });
+}
+function dragStart(e){
+  const card=e.target.closest('.todo-card');if(!card)return;
+  const id=card.dataset.todoId;if(!id)return;
+  e.preventDefault();
+  const rect=card.getBoundingClientRect();
+  // Create ghost
+  const ghost=card.cloneNode(true);
+  ghost.classList.add('drag-ghost');
+  ghost.style.width=rect.width+'px';
+  ghost.style.left=rect.left+'px';
+  ghost.style.top=rect.top+'px';
+  document.body.appendChild(ghost);
+  card.classList.add('dragging');
+  _drag={id,ghost,startY:e.clientY,offsetY:e.clientY-rect.top,srcCard:card};
+  document.addEventListener('pointermove',dragMove);
+  document.addEventListener('pointerup',dragEnd);
+  document.addEventListener('pointercancel',dragEnd);
+}
+function dragMove(e){
+  if(!_drag)return;
+  e.preventDefault();
+  _drag.ghost.style.top=(e.clientY-_drag.offsetY)+'px';
+  // Find drop target
+  document.querySelectorAll('.todo-card.drag-over-above,.todo-card.drag-over-below').forEach(c=>c.classList.remove('drag-over-above','drag-over-below'));
+  const cards=[...document.querySelectorAll('.todo-card:not(.dragging):not(.done)')];
+  let closest=null,closestDist=Infinity,above=true;
+  for(const c of cards){
+    const r=c.getBoundingClientRect();
+    const mid=r.top+r.height/2;
+    const dist=Math.abs(e.clientY-mid);
+    if(dist<closestDist){closestDist=dist;closest=c;above=e.clientY<mid}
+  }
+  if(closest){closest.classList.add(above?'drag-over-above':'drag-over-below');_drag.target=closest;_drag.above=above}
+}
+function dragEnd(e){
+  if(!_drag)return;
+  document.removeEventListener('pointermove',dragMove);
+  document.removeEventListener('pointerup',dragEnd);
+  document.removeEventListener('pointercancel',dragEnd);
+  document.querySelectorAll('.drag-over-above,.drag-over-below').forEach(c=>c.classList.remove('drag-over-above','drag-over-below'));
+  _drag.srcCard.classList.remove('dragging');
+  _drag.ghost.remove();
+  // Apply reorder
+  if(_drag.target){
+    const fromId=_drag.id;
+    const toId=_drag.target.dataset.todoId;
+    if(fromId&&toId&&fromId!==toId){
+      const fi=S.todos.findIndex(t=>t.id===fromId);
+      if(fi>=0){
+        const item=S.todos.splice(fi,1)[0];
+        // Also adopt target's group
+        const targetTodo=S.todos.find(t=>t.id===toId);
+        if(targetTodo)item.group=targetTodo.group||null;
+        let ti=S.todos.findIndex(t=>t.id===toId);
+        if(ti>=0){
+          if(!_drag.above)ti++;
+          S.todos.splice(ti,0,item);
+        }else{S.todos.push(item)}
+        save();R();
+      }
+    }
+  }
+  _drag=null;
+}
+
 function bind(){
   document.querySelectorAll('[data-action]').forEach(el=>el.addEventListener('click',H));
   const fi=document.getElementById('tf');
   if(fi)fi.addEventListener('input',()=>{const h=fi.closest('.fg')?.querySelector('.fh');if(h)h.textContent='= var '+ffreq(fi.value||'7');document.querySelectorAll('.fb').forEach(b=>b.classList.toggle('sel',b.dataset.freq===fi.value))});
   const af=document.querySelector('[autofocus]');if(af)setTimeout(()=>af.focus(),50);
   document.addEventListener('click',e=>{if(S.profileOpen&&!e.target.closest('.profile-chip')&&!e.target.closest('.profile-drop')){S.profileOpen=false;R()}},{once:true});
+  if(S.tab==='todos'){
+    initDrag();
+    document.querySelectorAll('.todo-quick-input').forEach(inp=>{
+      inp.addEventListener('keydown',e=>{
+        if(e.key==='Enter'){
+          const name=inp.value.trim();if(!name)return;
+          const group=inp.dataset.group||null;
+          S.todos.push({id:gid(),name,group,note:'',dueDate:null,done:false,doneAt:null,createdAt:new Date().toISOString()});
+          save();R();
+          // Re-focus the same group's input after render
+          setTimeout(()=>{const ni=document.querySelector(`.todo-quick-input[data-group="${group}"]`);if(ni)ni.focus()},60);
+        }
+      });
+    });
+  }
 }
 
 function H(e){
@@ -722,6 +825,7 @@ function H(e){
       S.modal=null;save();R();break}
     case 'setTodoGroup':{document.querySelectorAll('.todo-group-opt').forEach(b=>{b.classList.remove('sel');b.style.cssText=''});el.classList.add('sel');el.style.cssText='border-color:var(--acc);color:var(--acc);font-weight:600';const inp=document.getElementById('todo-group-new');if(inp)inp.value='';break}
     case 'toggleShowDone':S.showDone=!S.showDone;R();break;
+    case 'pushCal':{e.stopPropagation();const t=S.todos.find(x=>x.id===el.dataset.id);if(t&&t.dueDate){const d=t.dueDate.replace(/-/g,'');const next=new Date(t.dueDate);next.setDate(next.getDate()+1);const d2=next.toISOString().split('T')[0].replace(/-/g,'');const title=encodeURIComponent((t.group?t.group+': ':'')+t.name);const details=encodeURIComponent(t.note||'');const url=`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${d}/${d2}&details=${details}`;window.open(url,'_blank')}break}
   }
 }
 
@@ -731,7 +835,7 @@ window.addEventListener('popstate',()=>{if(S.modal){S.modal=null;R()}else if(S.e
 document.addEventListener('DOMContentLoaded',()=>{
   loadLocal();
   if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
-  R();setInterval(R,60000);
+  R();
 });
 </script>
 </body>
