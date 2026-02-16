@@ -277,9 +277,11 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .todo-group{margin-bottom:14px}
 .todo-group-hdr{display:flex;align-items:center;gap:8px;padding:6px 0;margin-bottom:4px;cursor:pointer}
 .todo-group-hdr:hover .todo-group-name{color:var(--t1)}
-.grp-arrows{display:flex;flex-direction:column;line-height:1;margin-left:4px;opacity:.3;transition:opacity .2s}
-.todo-group-hdr:hover .grp-arrows{opacity:.7}
-.grp-arrows span:hover{color:var(--acc)!important;opacity:1}
+.todo-group-hdr.sel{outline:2px solid var(--acc);outline-offset:-2px;border-radius:8px}
+.grp-grip{color:var(--tm);font-size:12px;touch-action:none;cursor:grab;padding:4px;opacity:.3;user-select:none}
+.todo-group-hdr:hover .grp-grip{opacity:.7}
+.todo-group.grp-dragging{opacity:.4}
+.todo-group.grp-drag-over{border-top:2px solid var(--acc)}
 .todo-group-name{font-size:13px;font-weight:600;color:var(--t2);transition:color .15s}
 .todo-group-count{font-family:'Space Mono',monospace;font-size:10px;color:var(--t3);padding:1px 5px;border-radius:4px;background:var(--bg-in)}
 .todo-group-prog{flex:1;height:2px;background:var(--brd);border-radius:1px;overflow:hidden;margin-left:4px}
@@ -314,7 +316,7 @@ const DEFAULT_CATS=[
   {id:'recovery',label:'Återhämtning',icon:'🌿',v:'--c-rec'},
   {id:'other',label:'Övrigt',icon:'📌',v:'--c-oth'},
 ];
-const EMOJI_POOL=['🎯','🧹','👶','🎨','📚','🏃','🎵','🐾','🌱','💊','🛒','🍳','📱','🚗','❤️','🎓'];
+const EMOJI_POOL=['🎯','🧹','👶','🎨','📚','🏃','🎵','🐾','🌱','💊','🛒','🍳','📱','🚗','❤','🎓'];
 const VTASK={id:'__vacation__',name:'Semester',category:'recovery',frequencyDays:90,lastDone:null,isProtected:true};
 function daysAgo(n){const d=new Date();d.setDate(d.getDate()-n);return d.toISOString()}
 const DEFAULTS=[
@@ -330,7 +332,7 @@ const DEFAULTS=[
 let S={
   tasks:[],customCats:[],theme:'light',expandedCat:null,
   modal:null,datePicking:null,expandedTask:null,showCats:false,
-  tab:'pulser',todos:[],todoGroups:[],todoHistory:[],collapsedGroups:{},showDone:false,showHistory:false,
+  tab:'pulser',todos:[],todoGroups:[],todoHistory:[],collapsedGroups:{},selectedGroup:null,showDone:false,showHistory:false,
   user:null,syncStatus:'offline',profileOpen:false,
   hiddenToday:{},liftedToPrio:new Set(),
   household:null,householdId:null,
@@ -493,13 +495,13 @@ function rHeader(){
       prof+=`<div class="profile-drop"><div class="p-name">${anon?'Anonym':S.user.displayName||'Inloggad'}</div>${!anon?`<div class="p-email">${S.user.email||''}</div>`:''}<div class="p-sync"><div class="sync-dot ${S.syncStatus}" style="width:6px;height:6px"></div> ${st}</div><div class="p-divider"></div>${upgradeBtn}${hhBtn}<button class="p-btn danger" data-action="signOut">Logga ut</button></div>`;
     }
   }else{prof=`<button class="signin-btn" data-action="openAuth">🔑 Logga in</button>`}
-  return`<header class="hdr"><div class="hdr-row"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1><div class="hdr-actions"><div style="position:relative">${prof}</div><button class="icon-btn" data-action="toggleTheme">${S.theme==='dark'?'☀️':'🌙'}</button></div></div>${rVacation()}</header>`;
+  return`<header class="hdr"><div class="hdr-row"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1><div class="hdr-actions"><div style="position:relative">${prof}</div><button class="icon-btn" data-action="toggleTheme">${S.theme==='dark'?'☀':'🌙'}</button></div></div>${rVacation()}</header>`;
 }
 function rVacation(){
   const vt=S.tasks.find(t=>t.id==='__vacation__');if(!vt)return'';
-  if(!vt.lastDone)return`<div class="vac-empty" data-action="editVacation">🏖️ Ställ in semester →</div>`;
+  if(!vt.lastDone)return`<div class="vac-empty" data-action="editVacation">🏖 Ställ in semester →</div>`;
   const ds=dsince(vt.lastDone),p=Math.min(ds/vt.frequencyDays,1),dl=Math.max(0,vt.frequencyDays-ds);
-  return`<div class="vac-strip" data-action="editVacation"><span style="font-size:14px">🏖️</span><span style="font-size:11px;color:var(--t3)">Semester</span><div class="vac-prog"><div class="vac-prog-fill" style="width:${p*100}%"></div></div><span class="vac-txt">${dl===0?'🎉 Dags!':dl+'d'}</span></div>`;
+  return`<div class="vac-strip" data-action="editVacation"><span style="font-size:14px">🏖</span><span style="font-size:11px;color:var(--t3)">Semester</span><div class="vac-prog"><div class="vac-prog-fill" style="width:${p*100}%"></div></div><span class="vac-txt">${dl===0?'🎉 Dags!':dl+'d'}</span></div>`;
 }
 function rOnboarding(){
   const step=S.onboarding;
@@ -654,7 +656,7 @@ function rCard(t,i,ctx){
   h+=`<button class="tc-btn check" data-action="checkTask" data-id="${t.id}">✓</button></div></div>`;
   // Expanded
   if(isExp){
-    h+=`<div class="tc-expand"><button class="tc-expand-btn" data-action="editTask" data-id="${t.id}">✏️ Redigera</button><button class="tc-expand-btn" data-action="pickDate" data-id="${t.id}">📅 Datum</button>${!t.isProtected?`<button class="tc-expand-btn del" data-action="deleteTask" data-id="${t.id}">🗑</button>`:''}</div>`;
+    h+=`<div class="tc-expand"><button class="tc-expand-btn" data-action="editTask" data-id="${t.id}">✏ Redigera</button><button class="tc-expand-btn" data-action="pickDate" data-id="${t.id}">📅 Datum</button>${!t.isProtected?`<button class="tc-expand-btn del" data-action="deleteTask" data-id="${t.id}">🗑</button>`:''}</div>`;
     if(S.datePicking===t.id)h+=`<div class="date-pick"><input type="date" id="dp-${t.id}" value="${today()}" max="${today()}"><button style="background:var(--acc);color:#fff" data-action="confirmDate" data-id="${t.id}">Spara</button><button style="background:var(--bg2);color:var(--t2);border:1px solid var(--brd)" data-action="cancelDate">Avbryt</button></div>`;
   }
   return h+'</div>';
@@ -707,17 +709,36 @@ function rTodosView(){
     const allCollapsed=allGroups.every(g=>S.collapsedGroups[g]);
     h+=`<div style="text-align:right;margin-bottom:4px"><span data-action="toggleAllGroups" style="font-size:10px;color:var(--tm);cursor:pointer;text-transform:lowercase">${allCollapsed?'visa alla':'dölj alla'}</span></div>`;
   }
+  // Deadline priority section
+  const deadlineTodos=all.filter(t=>t.dueDate&&!t.done).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
+  if(deadlineTodos.length){
+    h+=`<div style="margin-bottom:12px">`;
+    h+=`<div style="font-size:11px;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;padding:0 0 6px;font-weight:600;display:flex;align-items:center;gap:4px">📅 Deadline</div>`;
+    deadlineTodos.forEach(t=>{h+=rTodoCard(t,idx++,false)});
+    h+=`</div>`;
+  }
   // Groups
   for(const gname of allGroups){
     const gAll=all.filter(t=>t.group===gname);
-    const gPending=gAll.filter(t=>!t.done);
+    const gPendingAll=gAll.filter(t=>!t.done);
+    const gPending=gPendingAll.filter(t=>!t.dueDate); // deadline ones shown above
     const gDone=gAll.filter(t=>t.done);
     const total=gAll.length,doneN=gDone.length;
     const pct=total>0?Math.round(doneN/total*100):0;
     const allComplete=total>0&&doneN===total;
     const collapsed=!!S.collapsedGroups[gname];
     const pendingN=gPending.length;
-    h+=`<div class="todo-group"><div class="todo-group-hdr" data-action="toggleGroup" data-gname="${gname}"><span style="font-size:10px;color:var(--tm);margin-right:2px">${collapsed?'▸':'▾'}</span><div class="todo-group-name"${allComplete?' style="color:var(--grn)"':''}>${allComplete?'✓ ':''}${gname}</div>${total>0?`<span class="todo-group-count">${collapsed&&pendingN>0?pendingN+' kvar · ':''}${doneN}/${total}</span><div class="todo-group-prog"><div class="todo-group-prog-fill" style="width:${pct}%${allComplete?';background:var(--grn)':''}"></div></div>`:''}<div class="grp-arrows" onclick="event.stopPropagation()"><span data-action="moveGroup" data-gname="${gname}" data-dir="up" style="font-size:10px;color:var(--tm);cursor:pointer;padding:2px 4px">▲</span><span data-action="moveGroup" data-gname="${gname}" data-dir="down" style="font-size:10px;color:var(--tm);cursor:pointer;padding:2px 4px">▼</span></div></div>`;
+    const isSel=S.selectedGroup===gname;
+    h+=`<div class="todo-group" data-grp="${gname}">`;
+    h+=`<div class="todo-group-hdr${isSel?' sel':''}" data-action="selectGroup" data-gname="${gname}" tabindex="0">`;
+    h+=`<span class="grp-grip" data-grp-drag="${gname}">⠿</span>`;
+    h+=`<span style="font-size:10px;color:var(--tm);margin-right:2px">${collapsed?'▸':'▾'}</span>`;
+    h+=`<div class="todo-group-name"${allComplete?' style="color:var(--grn)"':''}>${allComplete?'✓ ':''}${gname}</div>`;
+    if(total>0){
+      h+=`<span class="todo-group-count">${collapsed&&pendingN>0?pendingN+' kvar · ':''}${doneN}/${total}</span>`;
+      h+=`<div class="todo-group-prog"><div class="todo-group-prog-fill" style="width:${pct}%${allComplete?';background:var(--grn)':''}"></div></div>`;
+    }
+    h+=`</div>`;
     if(!collapsed){
       gPending.forEach(t=>{h+=rTodoCard(t,idx++,false)});
       if(allComplete&&gDone.length){h+=`<div style="font-size:11px;color:var(--t3);padding:4px 0 2px;text-align:center">🎉 Klart!</div>`}
@@ -763,7 +784,7 @@ function rModal(){
   if(m.type==='confirm')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><h3 style="font-size:18px;margin-bottom:8px;font-weight:600">Ta bort?</h3><p style="color:var(--t2);font-size:14px;margin-bottom:20px">Kan inte ångras.</p><div class="br"><button class="bs" data-action="closeModal">Avbryt</button><button class="bp" style="background:var(--red)" data-action="confirmDelete" data-id="${m.taskId}">Ta bort</button></div></div></div>`;
   if(m.type==='authError')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">Problem</h2><button class="md-close" data-action="closeModal">✕</button></div><p style="color:var(--t2);font-size:14px;margin-bottom:16px">${m.msg}</p><div class="br"><button class="bp" data-action="openAuth">Försök igen</button></div></div></div>`;
   if(m.type==='auth')return rAuthModal();
-  if(m.type==='vacation'){const vt=S.tasks.find(t=>t.id==='__vacation__');return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">🏖️ Semester</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Var X:e dag</label><input class="fi" type="number" id="vf" value="${vt?vt.frequencyDays:90}" min="1"><p class="fh">T.ex. 90 = var 3:e månad</p></div><div class="fg"><label class="fl">Senaste semester</label><input class="fi" type="date" id="vl" value="${vt?.lastDone?vt.lastDone.split('T')[0]:today()}" max="${today()}"></div><div class="br"><button class="bp" data-action="saveVacation">Spara</button></div></div></div>`}
+  if(m.type==='vacation'){const vt=S.tasks.find(t=>t.id==='__vacation__');return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">🏖 Semester</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Var X:e dag</label><input class="fi" type="number" id="vf" value="${vt?vt.frequencyDays:90}" min="1"><p class="fh">T.ex. 90 = var 3:e månad</p></div><div class="fg"><label class="fl">Senaste semester</label><input class="fi" type="date" id="vl" value="${vt?.lastDone?vt.lastDone.split('T')[0]:today()}" max="${today()}"></div><div class="br"><button class="bp" data-action="saveVacation">Spara</button></div></div></div>`}
   if(m.type==='household')return rHHModal();
   if(m.type==='todo')return rTodoModal();
   return rTaskModal();
@@ -890,6 +911,71 @@ function initDrag(){
   document.querySelectorAll('[data-drag-handle]').forEach(grip=>{
     grip.addEventListener('pointerdown',dragStart);
   });
+  // Group drag
+  document.querySelectorAll('[data-grp-drag]').forEach(grip=>{
+    grip.addEventListener('pointerdown',grpDragStart);
+  });
+}
+
+let _grpDrag=null;
+function grpDragStart(e){
+  const grp=e.target.closest('.todo-group');if(!grp)return;
+  const gname=e.target.dataset.grpDrag;if(!gname)return;
+  e.preventDefault();e.stopPropagation();
+  const rect=grp.getBoundingClientRect();
+  const ghost=grp.cloneNode(true);
+  ghost.classList.add('drag-ghost');
+  ghost.style.width=rect.width+'px';
+  ghost.style.left=rect.left+'px';
+  ghost.style.top=rect.top+'px';
+  ghost.style.opacity='0.8';
+  document.body.appendChild(ghost);
+  grp.classList.add('grp-dragging');
+  _grpDrag={gname,ghost,offsetY:e.clientY-rect.top,srcEl:grp};
+  document.addEventListener('pointermove',grpDragMove);
+  document.addEventListener('pointerup',grpDragEnd);
+  document.addEventListener('pointercancel',grpDragEnd);
+}
+function grpDragMove(e){
+  if(!_grpDrag)return;
+  e.preventDefault();
+  _grpDrag.ghost.style.top=(e.clientY-_grpDrag.offsetY)+'px';
+  document.querySelectorAll('.todo-group.grp-drag-over').forEach(c=>c.classList.remove('grp-drag-over'));
+  const groups=[...document.querySelectorAll('.todo-group:not(.grp-dragging)')];
+  let closest=null,closestDist=Infinity,above=true;
+  for(const g of groups){
+    const r=g.getBoundingClientRect();
+    const mid=r.top+r.height/2;
+    const dist=Math.abs(e.clientY-mid);
+    if(dist<closestDist){closestDist=dist;closest=g;above=e.clientY<mid}
+  }
+  if(closest){closest.classList.add('grp-drag-over');_grpDrag.target=closest;_grpDrag.above=above}
+}
+function grpDragEnd(e){
+  if(!_grpDrag)return;
+  document.removeEventListener('pointermove',grpDragMove);
+  document.removeEventListener('pointerup',grpDragEnd);
+  document.removeEventListener('pointercancel',grpDragEnd);
+  document.querySelectorAll('.grp-drag-over').forEach(c=>c.classList.remove('grp-drag-over'));
+  _grpDrag.srcEl.classList.remove('grp-dragging');
+  _grpDrag.ghost.remove();
+  if(_grpDrag.target){
+    const fromName=_grpDrag.gname;
+    const toName=_grpDrag.target.dataset.grp;
+    if(fromName&&toName&&fromName!==toName){
+      const current=[...new Set([...(S.todoGroups||[]),...S.todos.map(x=>x.group).filter(Boolean)])];
+      S.todoGroups=current;
+      const fi=S.todoGroups.indexOf(fromName);
+      if(fi>=0){
+        S.todoGroups.splice(fi,1);
+        let ti=S.todoGroups.indexOf(toName);
+        if(ti>=0){if(!_grpDrag.above)ti++;S.todoGroups.splice(ti,0,fromName)}
+        else S.todoGroups.push(fromName);
+        save();R();
+      }
+    }
+  }
+  _grpDrag=null;
 }
 function dragStart(e){
   const card=e.target.closest('.todo-card');if(!card)return;
@@ -961,7 +1047,16 @@ function bind(){
   const fi=document.getElementById('tf');
   if(fi)fi.addEventListener('input',()=>{const h=fi.closest('.fg')?.querySelector('.fh');if(h)h.textContent='= var '+ffreq(fi.value||'7');document.querySelectorAll('.fb').forEach(b=>b.classList.toggle('sel',b.dataset.freq===fi.value))});
   const af=document.querySelector('[autofocus]');if(af)setTimeout(()=>af.focus(),50);
-  document.addEventListener('click',e=>{if(S.profileOpen&&!e.target.closest('.profile-chip')&&!e.target.closest('.profile-drop')){S.profileOpen=false;R()}},{once:true});
+  document.addEventListener('click',e=>{
+    if(S.profileOpen&&!e.target.closest('.profile-chip')&&!e.target.closest('.profile-drop')){S.profileOpen=false;R()}
+  },{once:true});
+  if(S.selectedGroup){
+    const _deselectGrp=e=>{
+      if(!e.target.closest('.todo-group-hdr')&&!e.target.closest('.grp-grip')){S.selectedGroup=null;R()}
+      document.removeEventListener('click',_deselectGrp);
+    };
+    document.addEventListener('click',_deselectGrp);
+  }
   if(S.tab==='todos'){
     initDrag();
     document.querySelectorAll('.todo-quick-input').forEach(inp=>{
@@ -983,6 +1078,31 @@ function bind(){
             setTimeout(()=>{const ni=document.querySelector(`.todo-quick-input[data-group="${group||''}"]`);if(ni)ni.focus()},60);
           }
         }
+      });
+    });
+    // Keyboard nav for selected group
+    document.querySelectorAll('.todo-group-hdr[tabindex]').forEach(hdr=>{
+      hdr.addEventListener('keydown',e=>{
+        const g=hdr.dataset.gname;if(!g||S.selectedGroup!==g)return;
+        if(e.key==='ArrowUp'||e.key==='ArrowDown'){
+          e.preventDefault();
+          const dir=e.key==='ArrowUp'?'up':'down';
+          const current=[...new Set([...(S.todoGroups||[]),...S.todos.map(x=>x.group).filter(Boolean)])];
+          S.todoGroups=current;
+          const i=S.todoGroups.indexOf(g);if(i<0)return;
+          const ni=dir==='up'?i-1:i+1;
+          if(ni<0||ni>=S.todoGroups.length)return;
+          [S.todoGroups[i],S.todoGroups[ni]]=[S.todoGroups[ni],S.todoGroups[i]];
+          save();R();
+          setTimeout(()=>{const h=document.querySelector('.todo-group-hdr.sel');if(h)h.focus()},30);
+        }
+        if(e.key==='Enter'||e.key===' '){
+          e.preventDefault();
+          if(S.collapsedGroups[g])delete S.collapsedGroups[g];else S.collapsedGroups[g]=true;
+          saveLocal();R();
+          setTimeout(()=>{const h=document.querySelector(`.todo-group-hdr[data-gname="${g}"]`);if(h)h.focus()},30);
+        }
+        if(e.key==='Escape'){S.selectedGroup=null;R()}
       });
     });
   }
@@ -1068,6 +1188,18 @@ function H(e){
       S.modal=null;save();R();break}
     case 'setTodoGroup':{document.querySelectorAll('.todo-group-opt').forEach(b=>{b.classList.remove('sel');b.style.cssText=''});el.classList.add('sel');el.style.cssText='border-color:var(--acc);color:var(--acc);font-weight:600';const inp=document.getElementById('todo-group-new');if(inp)inp.value='';break}
     case 'toggleShowDone':S.showDone=!S.showDone;R();break;
+    case 'selectGroup':{
+      const g=el.dataset.gname;
+      if(S.selectedGroup===g){
+        // Already selected — toggle collapse
+        if(S.collapsedGroups[g])delete S.collapsedGroups[g];else S.collapsedGroups[g]=true;
+        S.selectedGroup=null;saveLocal();R();
+      }else{
+        S.selectedGroup=g;R();
+        // Focus so keyboard works
+        setTimeout(()=>{const hdr=document.querySelector('.todo-group-hdr.sel');if(hdr)hdr.focus()},30);
+      }
+      break}
     case 'toggleGroup':{const g=el.dataset.gname;if(S.collapsedGroups[g])delete S.collapsedGroups[g];else S.collapsedGroups[g]=true;saveLocal();R();break}
     case 'toggleAllGroups':{const allGroups=[...new Set([...(S.todoGroups||[]),...S.todos.map(x=>x.group).filter(Boolean)])];const allCollapsed=allGroups.every(g=>S.collapsedGroups[g]);if(allCollapsed){S.collapsedGroups={}}else{allGroups.forEach(g=>S.collapsedGroups[g]=true)}saveLocal();R();break}
     case 'toggleHistory':S.showHistory=!S.showHistory;R();break;
