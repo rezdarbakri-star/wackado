@@ -280,8 +280,6 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .grp-grip{color:var(--tm);font-size:14px;touch-action:none;cursor:grab;padding:4px 6px;opacity:.5;user-select:none;transition:opacity .15s}
 .todo-group-hdr:hover .grp-grip,.grp-grip:hover{opacity:1;color:var(--acc)}
 .todo-group.grp-dragging{opacity:.3}
-.todo-group.grp-drag-above{border-top:2px solid var(--acc)}
-.todo-group.grp-drag-below{border-bottom:2px solid var(--acc)}
 .todo-group-name{font-size:13px;font-weight:600;color:var(--t2);transition:color .15s}
 .todo-group-count{font-family:'Space Mono',monospace;font-size:10px;color:var(--t3);padding:1px 5px;border-radius:4px;background:var(--bg-in)}
 .todo-group-prog{flex:1;height:2px;background:var(--brd);border-radius:1px;overflow:hidden;margin-left:4px}
@@ -941,60 +939,64 @@ function grpDragStart(e){
   ghost.style.opacity='0.8';
   document.body.appendChild(ghost);
   grp.classList.add('grp-dragging');
-  _grpDrag={gname,ghost,offsetY:e.clientY-rect.top,srcEl:grp};
+  // Pre-calculate slot positions (gaps between groups)
+  const others=[...document.querySelectorAll('.todo-group:not(.grp-dragging)')];
+  const slots=[];
+  for(let i=0;i<=others.length;i++){
+    let y;
+    if(i===0){y=others[0]?others[0].getBoundingClientRect().top:rect.top}
+    else if(i===others.length){const r=others[i-1].getBoundingClientRect();y=r.bottom}
+    else{const prev=others[i-1].getBoundingClientRect().bottom;const next=others[i].getBoundingClientRect().top;y=(prev+next)/2}
+    slots.push(y);
+  }
+  _grpDrag={gname,ghost,offsetY:e.clientY-rect.top,srcEl:grp,others,slots,dropIdx:0};
   document.addEventListener('pointermove',grpDragMove);
   document.addEventListener('pointerup',grpDragEnd);
   document.addEventListener('pointercancel',grpDragEnd);
+}
+function _grpLine(){
+  let line=document.getElementById('grp-drop-line');
+  if(!line){
+    line=document.createElement('div');line.id='grp-drop-line';
+    line.style.cssText='position:fixed;left:16px;right:16px;height:3px;background:var(--acc);border-radius:2px;z-index:501;pointer-events:none;transition:top .1s';
+    document.body.appendChild(line);
+  }
+  return line;
 }
 function grpDragMove(e){
   if(!_grpDrag)return;
   e.preventDefault();
   _grpDrag.ghost.style.top=(e.clientY-_grpDrag.offsetY)+'px';
-  document.querySelectorAll('.todo-group.grp-drag-above,.todo-group.grp-drag-below').forEach(c=>{
-    c.classList.remove('grp-drag-above','grp-drag-below');
-  });
-  const groups=[...document.querySelectorAll('.todo-group:not(.grp-dragging)')];
-  let closest=null,closestDist=Infinity,above=true;
-  for(const g of groups){
-    const r=g.getBoundingClientRect();
-    const mid=r.top+r.height/2;
-    const dist=Math.abs(e.clientY-mid);
-    if(dist<closestDist){closestDist=dist;closest=g;above=e.clientY<mid}
+  // Find closest slot
+  const y=e.clientY;
+  let best=0,bestDist=Infinity;
+  for(let i=0;i<_grpDrag.slots.length;i++){
+    const d=Math.abs(y-_grpDrag.slots[i]);
+    if(d<bestDist){bestDist=d;best=i}
   }
-  if(closest){
-    closest.classList.add(above?'grp-drag-above':'grp-drag-below');
-    _grpDrag.target=closest;_grpDrag.above=above;
-  }
+  _grpDrag.dropIdx=best;
+  // Show line
+  const line=_grpLine();
+  line.style.display='block';
+  line.style.top=_grpDrag.slots[best]+'px';
 }
 function grpDragEnd(e){
   if(!_grpDrag)return;
   document.removeEventListener('pointermove',grpDragMove);
   document.removeEventListener('pointerup',grpDragEnd);
   document.removeEventListener('pointercancel',grpDragEnd);
-  document.querySelectorAll('.grp-drag-above,.grp-drag-below').forEach(c=>{
-    c.classList.remove('grp-drag-above','grp-drag-below');
-  });
   _grpDrag.srcEl.classList.remove('grp-dragging');
   _grpDrag.ghost.remove();
-  if(_grpDrag.target){
-    const fromName=_grpDrag.gname;
-    const toName=_grpDrag.target.dataset.grp;
-    if(fromName&&toName&&fromName!==toName){
-      // Build order from current DOM (visual order)
-      const domOrder=[...document.querySelectorAll('.todo-group[data-grp]')].map(el=>el.dataset.grp);
-      // Remove dragged item
-      const filtered=domOrder.filter(g=>g!==fromName);
-      // Find target position
-      let ti=filtered.indexOf(toName);
-      if(ti>=0){
-        if(!_grpDrag.above)ti++;
-        filtered.splice(ti,0,fromName);
-      }else{
-        filtered.push(fromName);
-      }
-      S.todoGroups=filtered;
-      save();R();
-    }
+  const line=document.getElementById('grp-drop-line');
+  if(line)line.style.display='none';
+  // Build new order
+  const fromName=_grpDrag.gname;
+  const otherNames=_grpDrag.others.map(el=>el.dataset.grp);
+  const idx=_grpDrag.dropIdx;
+  otherNames.splice(idx,0,fromName);
+  if(JSON.stringify(otherNames)!==JSON.stringify([...document.querySelectorAll('.todo-group[data-grp]')].map(el=>el.dataset.grp))){
+    S.todoGroups=otherNames;
+    save();R();
   }
   _grpDrag=null;
 }
