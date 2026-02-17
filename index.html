@@ -279,8 +279,9 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .todo-group-hdr:hover .todo-group-name{color:var(--t1)}
 .grp-grip{color:var(--tm);font-size:14px;touch-action:none;cursor:grab;padding:4px 6px;opacity:.5;user-select:none;transition:opacity .15s}
 .todo-group-hdr:hover .grp-grip,.grp-grip:hover{opacity:1;color:var(--acc)}
-.todo-group.grp-dragging{opacity:.4}
-.todo-group.grp-drag-over{border-top:2px solid var(--acc)}
+.todo-group.grp-dragging{opacity:.3}
+.todo-group.grp-drag-above{border-top:2px solid var(--acc)}
+.todo-group.grp-drag-below{border-bottom:2px solid var(--acc)}
 .todo-group-name{font-size:13px;font-weight:600;color:var(--t2);transition:color .15s}
 .todo-group-count{font-family:'Space Mono',monospace;font-size:10px;color:var(--t3);padding:1px 5px;border-radius:4px;background:var(--bg-in)}
 .todo-group-prog{flex:1;height:2px;background:var(--brd);border-radius:1px;overflow:hidden;margin-left:4px}
@@ -700,15 +701,15 @@ function rTodosView(){
   const all=S.todos;
   let h='';
   const allGroups=[...new Set([...(S.todoGroups||[]),...all.map(x=>x.group).filter(Boolean)])];
-  // Sort: completed groups sink to bottom
+  // Preserve todoGroups order, sink completed to bottom
+  const grpIdx=g=>{const i=(S.todoGroups||[]).indexOf(g);return i>=0?i:999};
   allGroups.sort((a,b)=>{
     const aAll=all.filter(t=>t.group===a);
     const bAll=all.filter(t=>t.group===b);
     const aDone=aAll.length>0&&aAll.every(t=>t.done);
     const bDone=bAll.length>0&&bAll.every(t=>t.done);
-    if(aDone&&!bDone)return 1;
-    if(!aDone&&bDone)return -1;
-    return 0; // preserve drag order
+    if(aDone!==bDone)return aDone?1:-1;
+    return grpIdx(a)-grpIdx(b);
   });
   let idx=0;
   // New project input at top
@@ -949,7 +950,9 @@ function grpDragMove(e){
   if(!_grpDrag)return;
   e.preventDefault();
   _grpDrag.ghost.style.top=(e.clientY-_grpDrag.offsetY)+'px';
-  document.querySelectorAll('.todo-group.grp-drag-over').forEach(c=>c.classList.remove('grp-drag-over'));
+  document.querySelectorAll('.todo-group.grp-drag-above,.todo-group.grp-drag-below').forEach(c=>{
+    c.classList.remove('grp-drag-above','grp-drag-below');
+  });
   const groups=[...document.querySelectorAll('.todo-group:not(.grp-dragging)')];
   let closest=null,closestDist=Infinity,above=true;
   for(const g of groups){
@@ -958,30 +961,39 @@ function grpDragMove(e){
     const dist=Math.abs(e.clientY-mid);
     if(dist<closestDist){closestDist=dist;closest=g;above=e.clientY<mid}
   }
-  if(closest){closest.classList.add('grp-drag-over');_grpDrag.target=closest;_grpDrag.above=above}
+  if(closest){
+    closest.classList.add(above?'grp-drag-above':'grp-drag-below');
+    _grpDrag.target=closest;_grpDrag.above=above;
+  }
 }
 function grpDragEnd(e){
   if(!_grpDrag)return;
   document.removeEventListener('pointermove',grpDragMove);
   document.removeEventListener('pointerup',grpDragEnd);
   document.removeEventListener('pointercancel',grpDragEnd);
-  document.querySelectorAll('.grp-drag-over').forEach(c=>c.classList.remove('grp-drag-over'));
+  document.querySelectorAll('.grp-drag-above,.grp-drag-below').forEach(c=>{
+    c.classList.remove('grp-drag-above','grp-drag-below');
+  });
   _grpDrag.srcEl.classList.remove('grp-dragging');
   _grpDrag.ghost.remove();
   if(_grpDrag.target){
     const fromName=_grpDrag.gname;
     const toName=_grpDrag.target.dataset.grp;
     if(fromName&&toName&&fromName!==toName){
-      const current=[...new Set([...(S.todoGroups||[]),...S.todos.map(x=>x.group).filter(Boolean)])];
-      S.todoGroups=current;
-      const fi=S.todoGroups.indexOf(fromName);
-      if(fi>=0){
-        S.todoGroups.splice(fi,1);
-        let ti=S.todoGroups.indexOf(toName);
-        if(ti>=0){if(!_grpDrag.above)ti++;S.todoGroups.splice(ti,0,fromName)}
-        else S.todoGroups.push(fromName);
-        save();R();
+      // Build order from current DOM (visual order)
+      const domOrder=[...document.querySelectorAll('.todo-group[data-grp]')].map(el=>el.dataset.grp);
+      // Remove dragged item
+      const filtered=domOrder.filter(g=>g!==fromName);
+      // Find target position
+      let ti=filtered.indexOf(toName);
+      if(ti>=0){
+        if(!_grpDrag.above)ti++;
+        filtered.splice(ti,0,fromName);
+      }else{
+        filtered.push(fromName);
       }
+      S.todoGroups=filtered;
+      save();R();
     }
   }
   _grpDrag=null;
