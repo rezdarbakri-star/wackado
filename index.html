@@ -277,9 +277,8 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .todo-group{margin-bottom:14px}
 .todo-group-hdr{display:flex;align-items:center;gap:8px;padding:6px 0;margin-bottom:4px;cursor:pointer}
 .todo-group-hdr:hover .todo-group-name{color:var(--t1)}
-.todo-group-hdr.sel{outline:2px solid var(--acc);outline-offset:-2px;border-radius:8px}
-.grp-grip{color:var(--tm);font-size:12px;touch-action:none;cursor:grab;padding:4px;opacity:.3;user-select:none}
-.todo-group-hdr:hover .grp-grip{opacity:.7}
+.grp-grip{color:var(--tm);font-size:14px;touch-action:none;cursor:grab;padding:4px 6px;opacity:.5;user-select:none;transition:opacity .15s}
+.todo-group-hdr:hover .grp-grip,.grp-grip:hover{opacity:1;color:var(--acc)}
 .todo-group.grp-dragging{opacity:.4}
 .todo-group.grp-drag-over{border-top:2px solid var(--acc)}
 .todo-group-name{font-size:13px;font-weight:600;color:var(--t2);transition:color .15s}
@@ -332,7 +331,7 @@ const DEFAULTS=[
 let S={
   tasks:[],customCats:[],theme:'light',expandedCat:null,
   modal:null,datePicking:null,expandedTask:null,showCats:false,
-  tab:'pulser',todos:[],todoGroups:[],todoHistory:[],collapsedGroups:{},selectedGroup:null,showDone:false,showHistory:false,
+  tab:'pulser',todos:[],todoGroups:[],todoHistory:[],collapsedGroups:{},showDone:false,showHistory:false,
   user:null,syncStatus:'offline',profileOpen:false,
   hiddenToday:{},liftedToPrio:new Set(),
   household:null,householdId:null,
@@ -701,6 +700,16 @@ function rTodosView(){
   const all=S.todos;
   let h='';
   const allGroups=[...new Set([...(S.todoGroups||[]),...all.map(x=>x.group).filter(Boolean)])];
+  // Sort: completed groups sink to bottom
+  allGroups.sort((a,b)=>{
+    const aAll=all.filter(t=>t.group===a);
+    const bAll=all.filter(t=>t.group===b);
+    const aDone=aAll.length>0&&aAll.every(t=>t.done);
+    const bDone=bAll.length>0&&bAll.every(t=>t.done);
+    if(aDone&&!bDone)return 1;
+    if(!aDone&&bDone)return -1;
+    return 0; // preserve drag order
+  });
   let idx=0;
   // New project input at top
   h+=`<div class="todo-quick-add" style="margin-bottom:10px"><input class="todo-quick-input" id="new-project-input" placeholder="+ Nytt ämne..." style="border-style:dashed" data-action-enter="quickAddProject"></div>`;
@@ -728,9 +737,8 @@ function rTodosView(){
     const allComplete=total>0&&doneN===total;
     const collapsed=!!S.collapsedGroups[gname];
     const pendingN=gPending.length;
-    const isSel=S.selectedGroup===gname;
     h+=`<div class="todo-group" data-grp="${gname}">`;
-    h+=`<div class="todo-group-hdr${isSel?' sel':''}" data-action="selectGroup" data-gname="${gname}" tabindex="0">`;
+    h+=`<div class="todo-group-hdr" data-action="toggleGroup" data-gname="${gname}">`;
     h+=`<span class="grp-grip" data-grp-drag="${gname}">⠿</span>`;
     h+=`<span style="font-size:10px;color:var(--tm);margin-right:2px">${collapsed?'▸':'▾'}</span>`;
     h+=`<div class="todo-group-name"${allComplete?' style="color:var(--grn)"':''}>${allComplete?'✓ ':''}${gname}</div>`;
@@ -914,6 +922,7 @@ function initDrag(){
   // Group drag
   document.querySelectorAll('[data-grp-drag]').forEach(grip=>{
     grip.addEventListener('pointerdown',grpDragStart);
+    grip.addEventListener('click',e=>e.stopPropagation());
   });
 }
 
@@ -1050,13 +1059,6 @@ function bind(){
   document.addEventListener('click',e=>{
     if(S.profileOpen&&!e.target.closest('.profile-chip')&&!e.target.closest('.profile-drop')){S.profileOpen=false;R()}
   },{once:true});
-  if(S.selectedGroup){
-    const _deselectGrp=e=>{
-      if(!e.target.closest('.todo-group-hdr')&&!e.target.closest('.grp-grip')){S.selectedGroup=null;R()}
-      document.removeEventListener('click',_deselectGrp);
-    };
-    document.addEventListener('click',_deselectGrp);
-  }
   if(S.tab==='todos'){
     initDrag();
     document.querySelectorAll('.todo-quick-input').forEach(inp=>{
@@ -1078,31 +1080,6 @@ function bind(){
             setTimeout(()=>{const ni=document.querySelector(`.todo-quick-input[data-group="${group||''}"]`);if(ni)ni.focus()},60);
           }
         }
-      });
-    });
-    // Keyboard nav for selected group
-    document.querySelectorAll('.todo-group-hdr[tabindex]').forEach(hdr=>{
-      hdr.addEventListener('keydown',e=>{
-        const g=hdr.dataset.gname;if(!g||S.selectedGroup!==g)return;
-        if(e.key==='ArrowUp'||e.key==='ArrowDown'){
-          e.preventDefault();
-          const dir=e.key==='ArrowUp'?'up':'down';
-          const current=[...new Set([...(S.todoGroups||[]),...S.todos.map(x=>x.group).filter(Boolean)])];
-          S.todoGroups=current;
-          const i=S.todoGroups.indexOf(g);if(i<0)return;
-          const ni=dir==='up'?i-1:i+1;
-          if(ni<0||ni>=S.todoGroups.length)return;
-          [S.todoGroups[i],S.todoGroups[ni]]=[S.todoGroups[ni],S.todoGroups[i]];
-          save();R();
-          setTimeout(()=>{const h=document.querySelector('.todo-group-hdr.sel');if(h)h.focus()},30);
-        }
-        if(e.key==='Enter'||e.key===' '){
-          e.preventDefault();
-          if(S.collapsedGroups[g])delete S.collapsedGroups[g];else S.collapsedGroups[g]=true;
-          saveLocal();R();
-          setTimeout(()=>{const h=document.querySelector(`.todo-group-hdr[data-gname="${g}"]`);if(h)h.focus()},30);
-        }
-        if(e.key==='Escape'){S.selectedGroup=null;R()}
       });
     });
   }
@@ -1172,7 +1149,19 @@ function H(e){
     case 'obNext':stopObAnim();S.onboarding++;R();break;
     case 'obSkip':case 'obDone':stopObAnim();S.onboarding=-1;save();R();break;
     // ─── Todo actions ───
-    case 'toggleTodo':{e.stopPropagation();const t=S.todos.find(x=>x.id===el.dataset.id);if(t){t.done=!t.done;t.doneAt=t.done?new Date().toISOString():null;save();R()}break}
+    case 'toggleTodo':{
+      e.stopPropagation();
+      const t=S.todos.find(x=>x.id===el.dataset.id);if(!t)break;
+      t.done=!t.done;t.doneAt=t.done?new Date().toISOString():null;
+      // Animate the card sliding down
+      const card=el.closest('.todo-card');
+      if(card&&t.done){
+        card.style.transition='opacity .3s, transform .3s';
+        card.style.opacity='0.4';
+        card.style.transform='translateX(20px)';
+        setTimeout(()=>{save();R()},300);
+      }else{save();R()}
+      break}
     case 'editTodo':{const t=S.todos.find(x=>x.id===el.dataset.id);if(t){S.modal={type:'todo',todo:{...t}};pNav();R()}break}
     case 'deleteTodo':{e.stopPropagation();S.todos=S.todos.filter(x=>x.id!==el.dataset.id);save();R();break}
     case 'deleteTodoConfirm':{S.todos=S.todos.filter(x=>x.id!==el.dataset.id);S.modal=null;save();R();break}
@@ -1188,31 +1177,9 @@ function H(e){
       S.modal=null;save();R();break}
     case 'setTodoGroup':{document.querySelectorAll('.todo-group-opt').forEach(b=>{b.classList.remove('sel');b.style.cssText=''});el.classList.add('sel');el.style.cssText='border-color:var(--acc);color:var(--acc);font-weight:600';const inp=document.getElementById('todo-group-new');if(inp)inp.value='';break}
     case 'toggleShowDone':S.showDone=!S.showDone;R();break;
-    case 'selectGroup':{
-      const g=el.dataset.gname;
-      if(S.selectedGroup===g){
-        // Already selected — toggle collapse
-        if(S.collapsedGroups[g])delete S.collapsedGroups[g];else S.collapsedGroups[g]=true;
-        S.selectedGroup=null;saveLocal();R();
-      }else{
-        S.selectedGroup=g;R();
-        // Focus so keyboard works
-        setTimeout(()=>{const hdr=document.querySelector('.todo-group-hdr.sel');if(hdr)hdr.focus()},30);
-      }
-      break}
     case 'toggleGroup':{const g=el.dataset.gname;if(S.collapsedGroups[g])delete S.collapsedGroups[g];else S.collapsedGroups[g]=true;saveLocal();R();break}
     case 'toggleAllGroups':{const allGroups=[...new Set([...(S.todoGroups||[]),...S.todos.map(x=>x.group).filter(Boolean)])];const allCollapsed=allGroups.every(g=>S.collapsedGroups[g]);if(allCollapsed){S.collapsedGroups={}}else{allGroups.forEach(g=>S.collapsedGroups[g]=true)}saveLocal();R();break}
     case 'toggleHistory':S.showHistory=!S.showHistory;R();break;
-    case 'moveGroup':{
-      const g=el.dataset.gname,dir=el.dataset.dir;
-      // Ensure todoGroups has all groups in current order
-      const current=[...new Set([...(S.todoGroups||[]),...S.todos.map(x=>x.group).filter(Boolean)])];
-      S.todoGroups=current;
-      const i=S.todoGroups.indexOf(g);if(i<0)break;
-      const ni=dir==='up'?i-1:i+1;
-      if(ni<0||ni>=S.todoGroups.length)break;
-      [S.todoGroups[i],S.todoGroups[ni]]=[S.todoGroups[ni],S.todoGroups[i]];
-      save();R();break}
     case 'pushCal':{e.stopPropagation();const t=S.todos.find(x=>x.id===el.dataset.id);if(t&&t.dueDate){const d=t.dueDate.replace(/-/g,'');const next=new Date(t.dueDate);next.setDate(next.getDate()+1);const d2=next.toISOString().split('T')[0].replace(/-/g,'');const title=encodeURIComponent((t.group?t.group+': ':'')+t.name);const details=encodeURIComponent(t.note||'');const url=`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${d}/${d2}&details=${details}`;window.open(url,'_blank')}break}
   }
 }
