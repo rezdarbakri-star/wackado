@@ -280,6 +280,9 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .grp-grip{color:var(--tm);font-size:14px;touch-action:none;cursor:grab;padding:4px 6px;opacity:.5;user-select:none;transition:opacity .15s}
 .todo-group-hdr:hover .grp-grip,.grp-grip:hover{opacity:1;color:var(--acc)}
 .todo-group.grp-dragging{opacity:.3}
+.grp-del{font-size:10px;color:var(--t3);cursor:pointer;padding:4px 6px;opacity:0;transition:opacity .15s;margin-left:auto}
+.todo-group-hdr:hover .grp-del{opacity:.5}
+.grp-del:hover{opacity:1!important;color:var(--red)!important}
 .todo-group-name{font-size:13px;font-weight:600;color:var(--t2);transition:color .15s}
 .todo-group-count{font-family:'Space Mono',monospace;font-size:10px;color:var(--t3);padding:1px 5px;border-radius:4px;background:var(--bg-in)}
 .todo-group-prog{flex:1;height:2px;background:var(--brd);border-radius:1px;overflow:hidden;margin-left:4px}
@@ -330,7 +333,7 @@ const DEFAULTS=[
 let S={
   tasks:[],customCats:[],theme:'light',expandedCat:null,
   modal:null,datePicking:null,expandedTask:null,showCats:false,
-  tab:'pulser',todos:[],todoGroups:[],todoHistory:[],collapsedGroups:{},showDone:false,showHistory:false,
+  tab:'pulser',todos:[],todoGroups:[],todoHistory:[],collapsedGroups:{},showDone:false,showHistory:false,historyPage:0,
   user:null,syncStatus:'offline',profileOpen:false,
   hiddenToday:{},liftedToPrio:new Set(),
   household:null,householdId:null,
@@ -745,6 +748,7 @@ function rTodosView(){
       h+=`<span class="todo-group-count">${collapsed&&pendingN>0?pendingN+' kvar · ':''}${doneN}/${total}</span>`;
       h+=`<div class="todo-group-prog"><div class="todo-group-prog-fill" style="width:${pct}%${allComplete?';background:var(--grn)':''}"></div></div>`;
     }
+    h+=`<span class="grp-del" data-action="deleteGroup" data-gname="${gname}" onclick="event.stopPropagation()">✕</span>`;
     h+=`</div>`;
     if(!collapsed){
       gPending.forEach(t=>{h+=rTodoCard(t,idx++,false)});
@@ -757,15 +761,34 @@ function rTodosView(){
   if(!allGroups.length){h+=`<div style="text-align:center;padding:30px 0;color:var(--tm);font-size:13px">Skapa ditt första ämne ovan</div>`}
   // History
   if(S.todoHistory.length){
-    h+=`<div style="margin-top:16px;border-top:1px solid var(--brd);padding-top:10px"><span data-action="toggleHistory" style="font-size:10px;color:var(--tm);cursor:pointer;text-transform:lowercase">${S.showHistory?'▾':'▸'} historik (${S.todoHistory.reduce((s,w)=>s+w.items.length,0)} klara)</span></div>`;
+    const total=S.todoHistory.reduce((s,w)=>s+w.items.length,0);
+    h+=`<div style="margin-top:16px;border-top:1px solid var(--brd);padding-top:10px">`;
+    h+=`<span data-action="toggleHistory" style="font-size:11px;color:var(--tm);cursor:pointer">${S.showHistory?'▾':'▸'} Historik (${total} klara)</span></div>`;
     if(S.showHistory){
-      for(const week of S.todoHistory){
-        h+=`<div style="margin-top:10px"><div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:6px">📊 ${week.label} <span style="font-weight:400;color:var(--tm)">— ${week.items.length} klara</span></div>`;
+      const weeks=S.todoHistory;
+      const pg=Math.min(S.historyPage||0,weeks.length-1);
+      const week=weeks[pg];
+      if(week){
+        h+=`<div style="margin-top:8px">`;
+        // Nav
+        h+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">`;
+        h+=pg<weeks.length-1?`<span data-action="historyPrev" style="cursor:pointer;padding:6px 12px;font-size:13px;color:var(--acc)">&larr; Äldre</span>`:`<span style="padding:6px 12px"></span>`;
+        h+=`<span style="font-size:13px;font-weight:600;color:var(--t1)">${week.label}</span>`;
+        h+=pg>0?`<span data-action="historyNext" style="cursor:pointer;padding:6px 12px;font-size:13px;color:var(--acc)">Nyare &rarr;</span>`:`<span style="padding:6px 12px"></span>`;
+        h+=`</div>`;
+        // Items by group
         const byGroup={};week.items.forEach(it=>{const g=it.group||'Övrigt';if(!byGroup[g])byGroup[g]=[];byGroup[g].push(it)});
         for(const[g,items]of Object.entries(byGroup)){
-          h+=`<div style="font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;padding:4px 0 2px">${g}</div>`;
-          items.forEach(it=>{h+=`<div style="font-size:12px;color:var(--t3);padding:2px 0 2px 12px;text-decoration:line-through">✓ ${it.name}</div>`});
+          h+=`<div style="font-size:11px;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;padding:6px 0 3px;font-weight:600">${g} <span style="font-weight:400">(${items.length})</span></div>`;
+          items.forEach(it=>{
+            const d=it.doneAt?new Date(it.doneAt).toLocaleDateString('sv-SE',{weekday:'short',day:'numeric',month:'short'}):'';
+            h+=`<div style="font-size:13px;color:var(--t2);padding:4px 0 4px 12px;display:flex;justify-content:space-between;border-bottom:1px solid var(--brd)">`;
+            h+=`<span style="text-decoration:line-through;opacity:.7">✓ ${it.name}</span>`;
+            if(d)h+=`<span style="font-size:10px;color:var(--t3);white-space:nowrap">${d}</span>`;
+            h+=`</div>`;
+          });
         }
+        h+=`<div style="text-align:center;padding:10px 0;font-size:12px;color:var(--t3)">${week.items.length} avklarade denna vecka</div>`;
         h+=`</div>`;
       }
     }
@@ -846,14 +869,15 @@ function rHHModal(){
 
 function rTodoModal(){
   const m=S.modal,t=m.todo||{},isE=!!t.id;
-  // Collect ALL group names (pending + done)
   const existingGroups=[...new Set(S.todos.map(x=>x.group).filter(Boolean))];
-  let groupPicker='';
-  if(existingGroups.length){
-    groupPicker=`<div class="fg"><label class="fl">Projekt</label><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">${existingGroups.map(g=>`<button class="co todo-group-opt ${(t.group||'')===g?'sel':''}" data-action="setTodoGroup" data-group="${g}" style="${(t.group||'')===g?'border-color:var(--acc);color:var(--acc);font-weight:600':''}">${g}</button>`).join('')}<button class="co todo-group-opt ${!t.group?'sel':''}" data-action="setTodoGroup" data-group="" style="${!t.group?'border-color:var(--acc);color:var(--acc);font-weight:600':''}">Inget</button></div><input class="fi" id="todo-group-new" placeholder="Eller nytt projekt..." style="font-size:13px"></div>`;
-  }else{
-    groupPicker=`<div class="fg"><label class="fl">Projekt (valfritt)</label><input class="fi" id="todo-group-new" value="${t.group||''}" placeholder="T.ex. Skriva en bok, Bokföring..."></div>`;
-  }
+  let groupPicker='<div class="fg"><label class="fl">Projekt</label>';
+  groupPicker+=`<select class="fi" id="todo-group-sel" style="appearance:auto">`;
+  groupPicker+=`<option value=""${!t.group?' selected':''}>Inget projekt</option>`;
+  existingGroups.forEach(g=>{
+    groupPicker+=`<option value="${g}"${t.group===g?' selected':''}>${g}</option>`;
+  });
+  groupPicker+=`<option value="__new__">+ Nytt projekt...</option></select>`;
+  groupPicker+=`<input class="fi" id="todo-group-new" placeholder="Projektnamn..." style="font-size:13px;margin-top:6px;display:${t.group&&!existingGroups.includes(t.group)?'block':'none'}"></div>`;
   let calBtn='';
   if(isE&&t.dueDate){calBtn=`<button class="bs" data-action="pushCal" data-id="${t.id}" style="font-size:12px;display:flex;align-items:center;gap:5px;justify-content:center">📅 Google Kalender</button>`}
   let h='<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()">';
@@ -1005,7 +1029,6 @@ function dragStart(e){
   const id=card.dataset.todoId;if(!id)return;
   e.preventDefault();
   const rect=card.getBoundingClientRect();
-  // Create ghost
   const ghost=card.cloneNode(true);
   ghost.classList.add('drag-ghost');
   ghost.style.width=rect.width+'px';
@@ -1013,55 +1036,75 @@ function dragStart(e){
   ghost.style.top=rect.top+'px';
   document.body.appendChild(ghost);
   card.classList.add('dragging');
-  _drag={id,ghost,startY:e.clientY,offsetY:e.clientY-rect.top,srcCard:card};
+  // Pre-calc slots between other cards in same group
+  const grpEl=card.closest('.todo-group');
+  const others=[...document.querySelectorAll('.todo-card:not(.dragging):not(.done)')];
+  const sameGrp=grpEl?others.filter(c=>c.closest('.todo-group')===grpEl):others;
+  const slots=[];
+  for(let i=0;i<=sameGrp.length;i++){
+    let y;
+    if(i===0){y=sameGrp[0]?sameGrp[0].getBoundingClientRect().top:rect.top}
+    else if(i===sameGrp.length){y=sameGrp[i-1].getBoundingClientRect().bottom}
+    else{y=(sameGrp[i-1].getBoundingClientRect().bottom+sameGrp[i].getBoundingClientRect().top)/2}
+    slots.push(y);
+  }
+  _drag={id,ghost,offsetY:e.clientY-rect.top,srcCard:card,sameGrp,slots,dropIdx:0};
   document.addEventListener('pointermove',dragMove);
   document.addEventListener('pointerup',dragEnd);
   document.addEventListener('pointercancel',dragEnd);
+}
+function _todoLine(){
+  let line=document.getElementById('todo-drop-line');
+  if(!line){
+    line=document.createElement('div');line.id='todo-drop-line';
+    line.style.cssText='position:fixed;left:32px;right:32px;height:2px;background:var(--acc);border-radius:2px;z-index:501;pointer-events:none;transition:top .08s';
+    document.body.appendChild(line);
+  }
+  return line;
 }
 function dragMove(e){
   if(!_drag)return;
   e.preventDefault();
   _drag.ghost.style.top=(e.clientY-_drag.offsetY)+'px';
-  // Find drop target
-  document.querySelectorAll('.todo-card.drag-over-above,.todo-card.drag-over-below').forEach(c=>c.classList.remove('drag-over-above','drag-over-below'));
-  const cards=[...document.querySelectorAll('.todo-card:not(.dragging):not(.done)')];
-  let closest=null,closestDist=Infinity,above=true;
-  for(const c of cards){
-    const r=c.getBoundingClientRect();
-    const mid=r.top+r.height/2;
-    const dist=Math.abs(e.clientY-mid);
-    if(dist<closestDist){closestDist=dist;closest=c;above=e.clientY<mid}
+  const y=e.clientY;
+  let best=0,bestDist=Infinity;
+  for(let i=0;i<_drag.slots.length;i++){
+    const d=Math.abs(y-_drag.slots[i]);
+    if(d<bestDist){bestDist=d;best=i}
   }
-  if(closest){closest.classList.add(above?'drag-over-above':'drag-over-below');_drag.target=closest;_drag.above=above}
+  _drag.dropIdx=best;
+  const line=_todoLine();
+  line.style.display='block';
+  line.style.top=_drag.slots[best]+'px';
 }
 function dragEnd(e){
   if(!_drag)return;
   document.removeEventListener('pointermove',dragMove);
   document.removeEventListener('pointerup',dragEnd);
   document.removeEventListener('pointercancel',dragEnd);
-  document.querySelectorAll('.drag-over-above,.drag-over-below').forEach(c=>c.classList.remove('drag-over-above','drag-over-below'));
   _drag.srcCard.classList.remove('dragging');
   _drag.ghost.remove();
-  // Apply reorder
-  if(_drag.target){
-    const fromId=_drag.id;
-    const toId=_drag.target.dataset.todoId;
-    if(fromId&&toId&&fromId!==toId){
-      const fi=S.todos.findIndex(t=>t.id===fromId);
-      if(fi>=0){
-        const item=S.todos.splice(fi,1)[0];
-        // Also adopt target's group
-        const targetTodo=S.todos.find(t=>t.id===toId);
-        if(targetTodo)item.group=targetTodo.group||null;
-        let ti=S.todos.findIndex(t=>t.id===toId);
-        if(ti>=0){
-          if(!_drag.above)ti++;
-          S.todos.splice(ti,0,item);
-        }else{S.todos.push(item)}
-        save();R();
-      }
-    }
-  }
+  const line=document.getElementById('todo-drop-line');
+  if(line)line.style.display='none';
+  // Build new order from slot position
+  const fromId=_drag.id;
+  const otherIds=_drag.sameGrp.map(c=>c.dataset.todoId);
+  const idx=_drag.dropIdx;
+  otherIds.splice(idx,0,fromId);
+  // Also adopt target group
+  const firstOther=_drag.sameGrp[0];
+  const targetGrp=firstOther?firstOther.closest('.todo-group')?.dataset.grp:null;
+  const item=S.todos.find(t=>t.id===fromId);
+  if(item&&targetGrp!==undefined)item.group=targetGrp||null;
+  // Reorder in S.todos: remove all these ids, then re-insert in order
+  const idSet=new Set(otherIds);
+  const rest=S.todos.filter(t=>!idSet.has(t.id));
+  const reordered=otherIds.map(id=>S.todos.find(t=>t.id===id)).filter(Boolean);
+  // Find insertion point: where the first of these was
+  const firstIdx=S.todos.findIndex(t=>idSet.has(t.id));
+  rest.splice(firstIdx>=0?firstIdx:rest.length,0,...reordered);
+  S.todos=rest;
+  save();R();
   _drag=null;
 }
 
@@ -1070,6 +1113,13 @@ function bind(){
   const fi=document.getElementById('tf');
   if(fi)fi.addEventListener('input',()=>{const h=fi.closest('.fg')?.querySelector('.fh');if(h)h.textContent='= var '+ffreq(fi.value||'7');document.querySelectorAll('.fb').forEach(b=>b.classList.toggle('sel',b.dataset.freq===fi.value))});
   const af=document.querySelector('[autofocus]');if(af)setTimeout(()=>af.focus(),50);
+  // Group dropdown toggle new-input
+  const gsel=document.getElementById('todo-group-sel');
+  if(gsel){gsel.addEventListener('change',()=>{
+    const ni=document.getElementById('todo-group-new');
+    if(ni)ni.style.display=gsel.value==='__new__'?'block':'none';
+    if(gsel.value==='__new__'&&ni)ni.focus();
+  })}
   document.addEventListener('click',e=>{
     if(S.profileOpen&&!e.target.closest('.profile-chip')&&!e.target.closest('.profile-drop')){S.profileOpen=false;R()}
   },{once:true});
@@ -1183,17 +1233,33 @@ function H(e){
       const n=document.getElementById('todo-name')?.value?.trim();if(!n)return;
       const note=document.getElementById('todo-note')?.value?.trim()||'';
       const due=document.getElementById('todo-due')?.value||'';
+      const sel=document.getElementById('todo-group-sel');
       const newGroup=document.getElementById('todo-group-new')?.value?.trim()||'';
-      const selGroup=document.querySelector('.todo-group-opt.sel')?.dataset.group;
-      const group=newGroup||selGroup||null;
+      const selVal=sel?sel.value:'';
+      const group=selVal==='__new__'?newGroup:(selVal||newGroup||null);
+      if(group&&!S.todoGroups.includes(group)){S.todoGroups.push(group)}
       if(S.modal.todo?.id){const t=S.todos.find(x=>x.id===S.modal.todo.id);if(t){t.name=n;t.note=note;t.dueDate=due||null;t.group=group}}
       else{S.todos.push({id:gid(),name:n,note,group,dueDate:due||null,done:false,doneAt:null,createdAt:new Date().toISOString()})}
       S.modal=null;save();R();break}
-    case 'setTodoGroup':{document.querySelectorAll('.todo-group-opt').forEach(b=>{b.classList.remove('sel');b.style.cssText=''});el.classList.add('sel');el.style.cssText='border-color:var(--acc);color:var(--acc);font-weight:600';const inp=document.getElementById('todo-group-new');if(inp)inp.value='';break}
+    case 'deleteGroup':{
+      e.stopPropagation();
+      const g=el.dataset.gname;if(!g)break;
+      const hasPending=S.todos.some(t=>t.group===g&&!t.done);
+      if(hasPending){if(!confirm('Radera "'+g+'" och alla dess uppgifter?'))break;
+        S.todos=S.todos.filter(t=>t.group!==g);
+      }else{
+        // All done or empty — just remove
+        S.todos=S.todos.filter(t=>t.group!==g);
+      }
+      S.todoGroups=S.todoGroups.filter(x=>x!==g);
+      delete S.collapsedGroups[g];
+      save();R();break}
     case 'toggleShowDone':S.showDone=!S.showDone;R();break;
     case 'toggleGroup':{const g=el.dataset.gname;if(S.collapsedGroups[g])delete S.collapsedGroups[g];else S.collapsedGroups[g]=true;saveLocal();R();break}
     case 'toggleAllGroups':{const allGroups=[...new Set([...(S.todoGroups||[]),...S.todos.map(x=>x.group).filter(Boolean)])];const allCollapsed=allGroups.every(g=>S.collapsedGroups[g]);if(allCollapsed){S.collapsedGroups={}}else{allGroups.forEach(g=>S.collapsedGroups[g]=true)}saveLocal();R();break}
-    case 'toggleHistory':S.showHistory=!S.showHistory;R();break;
+    case 'toggleHistory':S.showHistory=!S.showHistory;S.historyPage=0;R();break;
+    case 'historyPrev':S.historyPage=Math.min((S.historyPage||0)+1,S.todoHistory.length-1);R();break;
+    case 'historyNext':S.historyPage=Math.max((S.historyPage||0)-1,0);R();break;
     case 'pushCal':{e.stopPropagation();const t=S.todos.find(x=>x.id===el.dataset.id);if(t&&t.dueDate){const d=t.dueDate.replace(/-/g,'');const next=new Date(t.dueDate);next.setDate(next.getDate()+1);const d2=next.toISOString().split('T')[0].replace(/-/g,'');const title=encodeURIComponent((t.group?t.group+': ':'')+t.name);const details=encodeURIComponent(t.note||'');const url=`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${d}/${d2}&details=${details}`;window.open(url,'_blank')}break}
   }
 }
