@@ -57,7 +57,39 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .profile-chip:hover{background:var(--bg3)}
 .profile-chip img{width:26px;height:26px;border-radius:50%;object-fit:cover}
 .sync-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.sync-dot.synced{background:var(--grn)}.sync-dot.syncing{background:var(--yel);animation:blink 1.2s ease infinite}.sync-dot.offline{background:var(--t3)}
+.sync-dot.synced{background:var(--grn)}.sync-dot.syncing{background:var(--yel);animation:blink 1.2s ease infinite}.sync-dot.offline{background:var(--t3)}.sync-dot.error{background:var(--red);animation:blink 1s ease infinite}
+.p-syncerr{font-size:10px;line-height:1.45;color:var(--red);background:rgba(255,80,80,.09);border:1px solid rgba(255,80,80,.25);border-radius:7px;padding:7px 9px;margin:6px 0 2px}
+.cc-lock{font-size:9px;opacity:.6;margin-left:2px}
+.lvl-hdr{display:flex;align-items:center;gap:8px;padding:12px 2px 7px;margin-top:4px}
+.lvl-hdr.lvl-locked{cursor:pointer;user-select:none}
+.lvl-hdr.lvl-locked:hover .lvl-name{color:var(--t2)}
+.lvl-tag{font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:3px 7px;border-radius:5px;background:var(--bg2);color:var(--t3);border:1px solid var(--brd);white-space:nowrap}
+.lvl-tag.open{background:rgba(80,200,120,.12);color:var(--grn);border-color:rgba(80,200,120,.3)}
+.lvl-tag.locked{opacity:.75}
+.lvl-name{font-size:12px;font-weight:600;color:var(--t2)}
+.lvl-note{font-size:10px;color:var(--tm);margin-left:auto;white-space:nowrap}
+.lvl-empty{font-size:12px;color:var(--tm);padding:8px 2px 4px;font-style:italic}
+.lvl-block{font-size:11px;color:var(--t3);background:var(--bg2);border:1px dashed var(--brd);border-radius:9px;padding:9px 11px;margin:2px 0 8px}
+.lvl-block-item{display:flex;align-items:center;gap:7px;padding:5px 0 0;color:var(--t2);font-size:12px}
+.lvl-block-dot{width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;animation:blink 1.4s ease infinite}
+.lvl-block-days{margin-left:auto;font-size:10px;color:var(--red);white-space:nowrap}
+.tc.lvl-ghost{opacity:.4;filter:grayscale(1);pointer-events:none;border-left-color:var(--brd)}
+.unlock-bar{display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:11px;margin:8px 0 2px;cursor:pointer;border:1px solid var(--brd);background:var(--bg2);transition:all .15s}
+.unlock-bar:hover{transform:translateY(-1px)}
+.unlock-bar.open{border-color:rgba(80,200,120,.35);background:rgba(80,200,120,.08)}
+.unlock-bar.shut{opacity:.72}
+.ub-ico{font-size:17px;flex-shrink:0}
+.ub-txt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ub-txt b{font-size:12.5px;font-weight:600;color:var(--t1)}
+.unlock-bar.open .ub-txt b{color:var(--grn)}
+.ub-txt span{font-size:10.5px;color:var(--tm);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ub-go{margin-left:auto;font-size:14px;color:var(--t3);flex-shrink:0}
+.lvl-pick{display:flex;flex-direction:column;gap:6px}
+.lvl-opt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:9px 12px;border:1px solid var(--brd);border-radius:9px;background:var(--bg2);cursor:pointer;transition:all .15s}
+.lvl-opt b{font-size:12px;font-weight:700;color:var(--t2)}
+.lvl-opt span{font-size:10px;color:var(--tm)}
+.lvl-opt.sel{border-color:var(--acc);background:var(--bg)}
+.lvl-opt.sel b{color:var(--acc)}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 .profile-drop{position:absolute;top:calc(100% + 6px);right:0;background:var(--bg-modal);border:1px solid var(--brd2);border-radius:12px;padding:12px;min-width:220px;box-shadow:0 8px 30px rgba(0,0,0,.4);z-index:30;animation:fadeIn .15s ease}
 .profile-drop .p-name{font-size:13px;font-weight:600;margin-bottom:2px}
@@ -331,10 +363,10 @@ const DEFAULTS=[
 // STATE
 // ═══════════════════════════════════════════
 let S={
-  tasks:[],customCats:[],theme:'light',expandedCat:null,
+  tasks:[],customCats:[],theme:'light',expandedCat:null,peekLvl:{},
   modal:null,datePicking:null,expandedTask:null,showCats:false,
   tab:'pulser',todos:[],todoGroups:[],todoHistory:[],collapsedGroups:{},showDone:false,showHistory:false,historyPage:0,
-  user:null,syncStatus:'offline',profileOpen:false,
+  user:null,syncStatus:'offline',syncErr:null,profileOpen:false,
   hiddenToday:{},liftedToPrio:new Set(),
   household:null,householdId:null,
   onboarding:0, // 0=not shown, 1/2/3=step, -1=done
@@ -360,13 +392,21 @@ function loadLocal(){
 }
 function ensV(){if(!S.tasks.find(t=>t.id==='__vacation__'))S.tasks.push({...VTASK});const v=S.tasks.find(t=>t.id==='__vacation__');if(v)v.isProtected=true}
 
-async function saveCloud(){if(!S.user||S.user.isAnonymous)return;S.syncStatus='syncing';try{await db.collection('users').doc(S.user.uid).set({tasks:S.tasks,todos:S.todos,todoGroups:S.todoGroups,todoHistory:S.todoHistory,theme:S.theme,householdId:S.householdId||null,customCats:S.customCats,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});S.syncStatus='synced'}catch(e){S.syncStatus='offline'}}
+function syncErrMsg(code){
+  if(code==='permission-denied')return'Firestore-reglerna blockerar skrivning. Troligen har test-reglerna gått ut (de gäller 30 dagar). Uppdatera reglerna i Firebase Console.';
+  if(code==='unauthenticated')return'Inte inloggad mot Firebase. Logga ut och in igen.';
+  if(code==='resource-exhausted')return'Firestore-kvoten är slut för idag.';
+  if(code==='unavailable')return'Ingen kontakt med Firestore — troligen offline.';
+  if(code==='failed-precondition')return'Firestore-databasen saknas eller är inte aktiverad i projektet.';
+  return code||'Okänt fel';
+}
+async function saveCloud(){if(!S.user||S.user.isAnonymous)return;S.syncStatus='syncing';try{await db.collection('users').doc(S.user.uid).set({tasks:S.tasks,todos:S.todos,todoGroups:S.todoGroups,todoHistory:S.todoHistory,theme:S.theme,householdId:S.householdId||null,customCats:S.customCats,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});S.syncStatus='synced';S.syncErr=null;_qR()}catch(e){console.error('Firestore write:',e.code,e.message);S.syncErr={code:e.code,msg:syncErrMsg(e.code)};S.syncStatus=e.code==='unavailable'?'offline':'error';_qR()}}
 async function saveHH(){if(!S.household||!S.householdId)return;try{await db.collection('households').doc(S.householdId).set({members:S.household.members,sharedCats:S.household.sharedCats||[],tasks:S.household.tasks||[],updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.error('HH:',e)}}
 function save(){saveLocal();clearTimeout(save._t);save._t=setTimeout(()=>{saveCloud();if(S.household)saveHH()},600)}
 save._t=null;
 
 function startSync(){if(_unsub)_unsub();if(!S.user||S.user.isAnonymous)return;
-  _unsub=db.collection('users').doc(S.user.uid).onSnapshot(s=>{if(s.exists){const d=s.data();if(d.tasks){S.tasks=d.tasks;ensV();saveLocal()}if(d.todos)S.todos=d.todos;if(d.todoGroups)S.todoGroups=d.todoGroups;if(d.todoHistory)S.todoHistory=d.todoHistory;if(d.theme)S.theme=d.theme;if(d.customCats)S.customCats=d.customCats;if(d.householdId&&d.householdId!==S.householdId){S.householdId=d.householdId;startHHSync()}S.syncStatus='synced';_qR()}},e=>{S.syncStatus='offline';_qR()})}
+  _unsub=db.collection('users').doc(S.user.uid).onSnapshot(s=>{if(s.exists){const d=s.data();if(d.tasks){S.tasks=d.tasks;ensV();saveLocal()}if(d.todos)S.todos=d.todos;if(d.todoGroups)S.todoGroups=d.todoGroups;if(d.todoHistory)S.todoHistory=d.todoHistory;if(d.theme)S.theme=d.theme;if(d.customCats)S.customCats=d.customCats;if(d.householdId&&d.householdId!==S.householdId){S.householdId=d.householdId;startHHSync()}S.syncStatus='synced';S.syncErr=null;_qR()}},e=>{console.error('Firestore listen:',e.code,e.message);S.syncErr={code:e.code,msg:syncErrMsg(e.code)};S.syncStatus=e.code==='unavailable'?'offline':'error';_qR()})}
 function startHHSync(){if(_hhUnsub)_hhUnsub();if(!S.householdId)return;
   _hhUnsub=db.collection('households').doc(S.householdId).onSnapshot(s=>{if(s.exists){S.household={code:S.householdId,...s.data()};_qR()}else{S.household=null;S.householdId=null;saveLocal();_qR()}},e=>console.error('HH:',e))}
 // Queued render – debounce snapshot re-renders, skip if modal open
@@ -420,6 +460,18 @@ function effFreq(t){
   return t.frequencyDays||7;
 }
 const urg=t=>{const ds=dsince(t.lastDone);return ds===null?1:ds/effFreq(t)};
+// ── LEVEL GATING ──────────────────────────────
+// Only active in these categories for now. Level 1 = foundation (always visible).
+// Level 2+ only exists once nothing below it is overdue (red).
+const LEVEL_CATS=['content'];
+const tlvl=t=>t.level||1;
+const maxLvl=catId=>Math.max(1,...ctasks(catId).map(tlvl));
+function blockers(catId,lvl){
+  if(!LEVEL_CATS.includes(catId)||lvl<=1)return[];
+  return ctasks(catId).filter(t=>tlvl(t)<lvl&&urg(t)>=1).sort((a,b)=>urg(b)-urg(a));
+}
+const lvlOpen=(catId,lvl)=>blockers(catId,lvl).length===0;
+const taskOpen=t=>lvlOpen(t.category,tlvl(t));
 const urgCls=t=>{const u=urg(t);return u>=1?'u-red':u>=.75?'u-org':u>=.5?'u-yel':'u-grn'};
 const lampCls=t=>{const u=urg(t);return u>=1?'red':u>=.75?'org':u>=.5?'yel':'grn'};
 const dayCol=t=>{const u=urg(t);return u>=1?'var(--red)':u>=.75?'var(--org)':u>=.5?'var(--yel)':'var(--grn)'};
@@ -466,18 +518,18 @@ function R(){
   let html=rHeader()+rTabs();
   if(S.tab==='todos'){html+=rTodosView()}
   else{
-    const all=allTasks();
+    const all=allTasks().filter(taskOpen);
     const red=all.filter(t=>urg(t)>=1).length,org=all.filter(t=>{const u=urg(t);return u>=.75&&u<1}).length,grn=all.filter(t=>urg(t)<.5).length,allOk=red===0&&org===0;
     html+=rStats(red,org,grn,allOk);
     if(S.expandedCat){html+=rCatView()}
-    else{html+=rTodo()+rDivider()+rCats()}
+    else{html+=rTodo()+rUnlock()+rDivider()+rCats()}
   }
   html+=S.modal?rModal():'';
   app.innerHTML=html;bind();
 }
 
 function rTabs(){
-  const all=allTasks();
+  const all=allTasks().filter(taskOpen);
   const urgN=all.filter(t=>urg(t)>=.75).length;
   const todoN=S.todos.filter(t=>!t.done).length;
   return`<div class="tabs"><button class="tab${S.tab==='pulser'?' on':''}" data-action="setTab" data-tab="pulser">⚡ Pulser${urgN?` <span class="tab-count hot">${urgN}</span>`:''}</button><button class="tab${S.tab==='todos'?' on':''}" data-action="setTab" data-tab="todos">☑ Att göra${todoN?` <span class="tab-count">${todoN}</span>`:''}</button><button class="add-btn" data-action="addTask" style="height:36px;padding:0 12px;font-size:12px;flex:0 0 auto"><span>+</span></button></div>`;
@@ -490,10 +542,12 @@ function rHeader(){
     const hh=S.household?'<span class="p-hh-badge">🏠</span>':'';
     prof=`<div class="profile-chip" data-action="toggleProfile">${S.user.photoURL?`<img src="${S.user.photoURL}" referrerpolicy="no-referrer">`:anon?'<span style="font-size:14px">👻</span>':'<span style="font-size:14px">👤</span>'}${hh}<div class="sync-dot ${S.syncStatus}"></div></div>`;
     if(S.profileOpen){
-      const st={synced:'Synkad',syncing:'Synkar...',offline:anon?'Lokal':'Offline'}[S.syncStatus];
+      const st={synced:'Synkad',syncing:'Synkar...',error:'Synkfel',offline:anon?'Lokal':'Offline'}[S.syncStatus]||'Offline';
       const hhBtn=anon?'':(S.household?`<button class="p-btn" data-action="openHousehold">🏠 Hushåll <span class="p-hh-badge">${S.householdId}</span></button>`:`<button class="p-btn" data-action="openHousehold">🏠 Hushåll</button>`);
       const upgradeBtn=anon?`<button class="p-btn" data-action="openAuth" style="border-color:var(--acc);color:var(--acc)">🔗 Koppla konto (synka)</button>`:'';
-      prof+=`<div class="profile-drop"><div class="p-name">${anon?'Anonym':S.user.displayName||'Inloggad'}</div>${!anon?`<div class="p-email">${S.user.email||''}</div>`:''}<div class="p-sync"><div class="sync-dot ${S.syncStatus}" style="width:6px;height:6px"></div> ${st}</div><div class="p-divider"></div>${upgradeBtn}${hhBtn}<button class="p-btn danger" data-action="signOut">Logga ut</button></div>`;
+      const errBox=S.syncErr?`<div class="p-syncerr"><b>${S.syncErr.code||'fel'}</b><br>${S.syncErr.msg}</div>`:'';
+      const retryBtn=S.syncErr?`<button class="p-btn" data-action="retrySync" style="border-color:var(--acc);color:var(--acc)">↻ Försök synka igen</button>`:'';
+      prof+=`<div class="profile-drop"><div class="p-name">${anon?'Anonym':S.user.displayName||'Inloggad'}</div>${!anon?`<div class="p-email">${S.user.email||''}</div>`:''}<div class="p-sync"><div class="sync-dot ${S.syncStatus}" style="width:6px;height:6px"></div> ${st}</div>${errBox}<div class="p-divider"></div>${retryBtn}${upgradeBtn}${hhBtn}<button class="p-btn danger" data-action="signOut">Logga ut</button></div>`;
     }
   }else{prof=`<button class="signin-btn" data-action="openAuth">🔑 Logga in</button>`}
   return`<header class="hdr"><div class="hdr-row"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1><div class="hdr-actions"><div style="position:relative">${prof}</div><button class="icon-btn" data-action="toggleTheme">${S.theme==='dark'?'☀':'🌙'}</button></div></div>${rVacation()}</header>`;
@@ -622,7 +676,7 @@ function rStats(red,org,grn,allOk){
 // ═══════════════════════════════════════════
 function rTodo(){
   const all=allTasks();
-  const items=all.filter(t=>(urg(t)>=.75||S.liftedToPrio.has(t.id))&&!S.hiddenToday[t.id]);
+  const items=all.filter(t=>(urg(t)>=.75||S.liftedToPrio.has(t.id))&&!S.hiddenToday[t.id]&&taskOpen(t));
   items.sort((a,b)=>urg(b)-urg(a));
   if(!items.length)return'';
   let h=`<div style="margin-bottom:4px">`;
@@ -666,6 +720,24 @@ function rCard(t,i,ctx){
 // ═══════════════════════════════════════════
 // CATEGORIES – hidden by default
 // ═══════════════════════════════════════════
+// Banner: tells you when a level opened, or what's holding it shut
+function rUnlock(){
+  let h='';
+  for(const cid of LEVEL_CATS){
+    const cat=getCats().find(c=>c.id===cid);if(!cat)continue;
+    const ts=ctasks(cid);
+    const upper=ts.filter(t=>tlvl(t)>=2);
+    if(!upper.length)continue;
+    const open=lvlOpen(cid,2);
+    if(open){
+      h+=`<div class="unlock-bar open" data-action="expandCat" data-cat="${cid}"><span class="ub-ico">🔓</span><div class="ub-txt"><b>Nivå 2 upplåst — ${cat.label}</b><span>${upper.length} uppgift${upper.length>1?'er':''} du förtjänat tid till</span></div><span class="ub-go">→</span></div>`;
+    }else{
+      const b=blockers(cid,2);
+      h+=`<div class="unlock-bar shut" data-action="expandCat" data-cat="${cid}"><span class="ub-ico">🔒</span><div class="ub-txt"><b>${upper.length} låst${upper.length>1?'a':''} i ${cat.label}</b><span>Gör ${b.map(x=>x.name).join(' + ')} först</span></div><span class="ub-go">→</span></div>`;
+    }
+  }
+  return h;
+}
 function rDivider(){
   return`<div class="divider" data-action="toggleCats"><div class="divider-line"></div><div class="divider-text">${S.showCats?'▾ Dölj kategorier':'▸ Visa kategorier'}</div><div class="divider-line"></div></div>`;
 }
@@ -674,8 +746,11 @@ function rCats(){
   let h='<div class="cat-row">';
   for(const cat of getCats()){
     const ts=ctasks(cat.id);if(!ts.length)continue;
-    const urgN=ts.filter(t=>urg(t)>=.75).length;
-    h+=`<div class="cat-chip" data-action="expandCat" data-cat="${cat.id}"><span>${cat.icon}</span><span>${cat.label}</span><span class="cc-cnt${urgN?' cc-urg':''}">${urgN?'⚠ '+urgN:ts.length}</span></div>`;
+    const open=ts.filter(taskOpen);
+    const urgN=open.filter(t=>urg(t)>=.75).length;
+    const lockedN=ts.length-open.length;
+    const lockTag=lockedN?`<span class="cc-lock">🔒${lockedN}</span>`:'';
+    h+=`<div class="cat-chip" data-action="expandCat" data-cat="${cat.id}"><span>${cat.icon}</span><span>${cat.label}</span>${lockTag}<span class="cc-cnt${urgN?' cc-urg':''}">${urgN?'⚠ '+urgN:open.length}</span></div>`;
   }
   return h+'</div>';
 }
@@ -685,11 +760,44 @@ function rCats(){
 // ═══════════════════════════════════════════
 function rCatView(){
   const cat=getCats().find(c=>c.id===S.expandedCat);if(!cat)return'';
-  const ts=ctasks(cat.id),sorted=sortTasks(ts);
+  const ts=ctasks(cat.id);
   const shared=isShared(cat.id);
   let h=`<div><div class="cat-back" data-action="collapseCat">← ${cat.icon} ${cat.label}${shared?' <span class="shared-tag">👥</span>':''} <span style="color:var(--t3);margin-left:auto;font-size:11px">${ts.length}</span></div>`;
-  sorted.forEach((t,i)=>{h+=rCard(t,i,'cat')});
+  if(!LEVEL_CATS.includes(cat.id)){
+    sortTasks(ts).forEach((t,i)=>{h+=rCard(t,i,'cat')});
+    return h+'</div>';
+  }
+  // Levelled category
+  const top=maxLvl(cat.id);
+  let idx=0;
+  for(let lvl=1;lvl<=Math.max(2,top);lvl++){
+    const items=sortTasks(ts.filter(t=>tlvl(t)===lvl));
+    const open=lvlOpen(cat.id,lvl);
+    const blocks=blockers(cat.id,lvl);
+    if(lvl===1){
+      h+=`<div class="lvl-hdr lvl-base"><span class="lvl-tag">Nivå 1</span><span class="lvl-name">Grund</span><span class="lvl-note">${items.length?'alltid synlig':'inga uppgifter'}</span></div>`;
+      items.forEach(t=>{h+=rCard(t,idx++,'cat')});
+      continue;
+    }
+    if(!items.length&&lvl>top)continue;
+    const peeking=!!S.peekLvl[cat.id+':'+lvl];
+    if(open){
+      h+=`<div class="lvl-hdr lvl-open"><span class="lvl-tag open">Nivå ${lvl}</span><span class="lvl-name">Upplåst</span><span class="lvl-note">grunden är grön</span></div>`;
+      if(!items.length)h+=`<div class="lvl-empty">Inga uppgifter på den här nivån än.</div>`;
+      items.forEach(t=>{h+=rCard(t,idx++,'cat')});
+    }else{
+      h+=`<div class="lvl-hdr lvl-locked" data-action="peekLvl" data-cat="${cat.id}" data-lvl="${lvl}"><span class="lvl-tag locked">🔒 Nivå ${lvl}</span><span class="lvl-name">Låst</span><span class="lvl-note">${peeking?'▾':'▸'} ${items.length} i pipeline</span></div>`;
+      if(peeking){
+        h+=`<div class="lvl-block">Lås upp genom att göra:${blocks.map(b=>`<div class="lvl-block-item"><span class="lvl-block-dot"></span>${b.name} <span class="lvl-block-days">${dsince(b.lastDone)??'–'} dagar sen</span></div>`).join('')}</div>`;
+        items.forEach(t=>{h+=rLockedCard(t)});
+      }
+    }
+  }
   return h+'</div>';
+}
+// Dimmed, non-actionable preview of a locked task
+function rLockedCard(t){
+  return`<div class="tc lvl-ghost"><div class="tc-days"><div class="tc-days-num" style="color:var(--t3)">🔒</div><div class="tc-days-lbl">låst</div></div><div class="tc-info"><div class="tc-name">${t.name}</div><div class="tc-meta">${ffreqLabel(t)}</div></div></div>`;
 }
 
 // ═══════════════════════════════════════════
@@ -923,6 +1031,12 @@ function rTaskModal(){
   h+='</div><div class="add-cat-row"><input id="new-cat-name" placeholder="Ny kategori..." maxlength="20">';
   h+='<button data-action="addCategory">+ Lägg till</button></div></div>';
   h+=freqHTML;
+  // Level picker
+  const cl=tlvl(t);
+  h+='<div class="fg"><label class="fl">Nivå</label><div class="lvl-pick" id="lvlPick" data-level="'+cl+'">';
+  h+=`<button class="lvl-opt${cl===1?' sel':''}" data-action="setLevel" data-lvl="1"><b>Nivå 1</b><span>Grund — alltid synlig</span></button>`;
+  h+=`<button class="lvl-opt${cl===2?' sel':''}" data-action="setLevel" data-lvl="2"><b>Nivå 2</b><span>Låses upp när grunden är grön</span></button>`;
+  h+=`</div><p class="fh">Gäller just nu bara i Innehåll.</p></div>`;
   if(isE)h+=`<div class="fg"><label class="fl">Senast gjord</label><input class="fi" type="date" id="tl" value="${t.lastDone?t.lastDone.split('T')[0]:''}" max="${today()}"></div>`;
   h+=assignF;
   h+='<div class="br">';
@@ -1158,11 +1272,13 @@ function H(e){
     case 'signInGoogle':S.modal=null;R();authWithProvider(gProv);break;
     case 'signInAnon':S.modal=null;R();anonSignIn();break;
     case 'signOut':doSignOut();break;
+    case 'retrySync':{S.syncErr=null;S.syncStatus='syncing';R();saveCloud();startSync();break}
     case 'addTask':S.modal={type:S.tab==='todos'?'todo':'task'};pNav();R();break;
     case 'setTab':S.tab=el.dataset.tab;S.expandedCat=null;S.expandedTask=null;R();break;
     case 'toggleCats':S.showCats=!S.showCats;R();break;
     case 'expandCat':S.expandedCat=el.dataset.cat;S.datePicking=null;S.expandedTask=null;pNav();R();break;
     case 'collapseCat':S.expandedCat=null;S.datePicking=null;S.expandedTask=null;R();break;
+    case 'peekLvl':{const k=el.dataset.cat+':'+el.dataset.lvl;if(S.peekLvl[k])delete S.peekLvl[k];else S.peekLvl[k]=true;R();break}
     case 'toggleTask':S.expandedTask=S.expandedTask===el.dataset.id?null:el.dataset.id;S.datePicking=null;R();break;
     case 'hideToday':e.stopPropagation();S.hiddenToday[el.dataset.id]=today();S.expandedTask=null;save();R();break;
     case 'liftPrio':e.stopPropagation();S.liftedToPrio.add(el.dataset.id);delete S.hiddenToday[el.dataset.id];S.expandedTask=null;R();break;
@@ -1181,6 +1297,7 @@ function H(e){
     case 'setWeekday':{if(!S.modal.task)S.modal.task={};S.modal.task.freqWeekday=parseInt(el.dataset.wd);document.querySelectorAll('.wd-btn').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');break}
     case 'setMonthDay':{if(!S.modal.task)S.modal.task={};S.modal.task.freqMonthDay=parseInt(el.dataset.md);document.querySelectorAll('.md-btn').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');break}
     case 'setAssign':{if(S.modal?.task)S.modal.task.assignedTo=el.dataset.uid||null;document.querySelectorAll('.assign-opt').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');break}
+    case 'setLevel':{if(!S.modal.task)S.modal.task={};S.modal.task.level=parseInt(el.dataset.lvl)||1;const lp=document.getElementById('lvlPick');if(lp)lp.dataset.level=S.modal.task.level;document.querySelectorAll('.lvl-opt').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');break}
     case 'addCategory':{const inp=document.getElementById('new-cat-name');const name=inp?.value?.trim();if(!name)return;const id=name.toLowerCase().replace(/[^a-zåäö0-9]/g,'_');if(getCats().find(c=>c.id===id))return;const emoji=EMOJI_POOL[S.customCats.length%EMOJI_POOL.length];S.customCats.push({id,label:name,icon:emoji,v:'--c-oth'});save();R();break}
     case 'saveTask':{
       const ne=document.getElementById('tn'),fe=document.getElementById('tf');
@@ -1191,16 +1308,17 @@ function H(e){
       const freqType=mt.freqType||'days';
       const freqWeekday=mt.freqWeekday!=null?mt.freqWeekday:null;
       const freqMonthDay=mt.freqMonthDay||null;
+      const lvl=parseInt(document.getElementById('lvlPick')?.dataset.level)||mt.level||1;
       if(mt.id){
         const f=findTask(mt.id);if(f){const t=f.task;const was=f.src==='h';const now=shared;
-          t.name=n;t.category=sc;t.frequencyDays=freq;
+          t.name=n;t.category=sc;t.frequencyDays=freq;t.level=lvl;
           t.freqType=freqType;t.freqWeekday=freqWeekday;t.freqMonthDay=freqMonthDay;
           if(mt.assignedTo!==undefined)t.assignedTo=mt.assignedTo;
           const lde=document.getElementById('tl');if(lde?.value)t.lastDone=new Date(lde.value+'T12:00:00').toISOString();else if(lde&&!lde.value)t.lastDone=null;
           if(!was&&now&&S.household){S.tasks=S.tasks.filter(x=>x.id!==t.id);S.household.tasks.push(t)}
           else if(was&&!now&&S.household){S.household.tasks=S.household.tasks.filter(x=>x.id!==t.id);S.tasks.push(t)}
         }
-      }else{const nt={id:gid(),name:n,category:sc,frequencyDays:freq,freqType,freqWeekday,freqMonthDay,lastDone:null,assignedTo:null};if(shared&&S.household)S.household.tasks.push(nt);else S.tasks.push(nt)}
+      }else{const nt={id:gid(),name:n,category:sc,frequencyDays:freq,freqType,freqWeekday,freqMonthDay,level:lvl,lastDone:null,assignedTo:null};if(shared&&S.household)S.household.tasks.push(nt);else S.tasks.push(nt)}
       S.modal=null;save();R();break}
     case 'deleteTask':S.modal={type:'confirm',taskId:el.dataset.id};R();break;
     case 'confirmDelete':{const id=el.dataset.id;S.tasks=S.tasks.filter(t=>t.id!==id);if(S.household)S.household.tasks=(S.household.tasks||[]).filter(t=>t.id!==id);S.modal=null;save();R();break}
