@@ -60,14 +60,8 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .sync-dot.synced{background:var(--grn)}.sync-dot.syncing{background:var(--yel);animation:blink 1.2s ease infinite}.sync-dot.offline{background:var(--t3)}.sync-dot.error{background:var(--red);animation:blink 1s ease infinite}
 .p-syncerr{font-size:10px;line-height:1.45;color:var(--red);background:rgba(255,80,80,.09);border:1px solid rgba(255,80,80,.25);border-radius:7px;padding:7px 9px;margin:6px 0 2px}
 .cc-lock{font-size:9px;opacity:.6;margin-left:2px}
-.lvl-hdr{display:flex;align-items:center;gap:8px;padding:12px 2px 7px;margin-top:4px}
-.lvl-hdr.lvl-locked{cursor:pointer;user-select:none}
-.lvl-hdr.lvl-locked:hover .lvl-name{color:var(--t2)}
-.lvl-tag{font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:3px 7px;border-radius:5px;background:var(--bg2);color:var(--t3);border:1px solid var(--brd);white-space:nowrap}
-.lvl-tag.open{background:rgba(80,200,120,.12);color:var(--grn);border-color:rgba(80,200,120,.3)}
-.lvl-tag.locked{opacity:.75}
-.lvl-name{font-size:12px;font-weight:600;color:var(--t2)}
-.lvl-note{font-size:10px;color:var(--tm);margin-left:auto;white-space:nowrap}
+.lvl-div.open .divider-text{color:var(--grn)}
+.lvl-div.open .divider-line{background:rgba(80,200,120,.3)}
 .lvl-empty{font-size:12px;color:var(--tm);padding:8px 2px 4px;font-style:italic}
 .lvl-block{font-size:11px;color:var(--t3);background:var(--bg2);border:1px dashed var(--brd);border-radius:9px;padding:9px 11px;margin:2px 0 8px}
 .lvl-block-item{display:flex;align-items:center;gap:7px;padding:5px 0 0;color:var(--t2);font-size:12px}
@@ -770,28 +764,21 @@ function rCatView(){
   // Levelled category
   const top=maxLvl(cat.id);
   let idx=0;
-  for(let lvl=1;lvl<=Math.max(2,top);lvl++){
+  // Level 1 — always listed
+  const base=sortTasks(ts.filter(t=>tlvl(t)===1));
+  base.forEach(t=>{h+=rCard(t,idx++,'cat')});
+  // Level 2+ — collapsible divider, same pattern as "Visa kategorier"
+  for(let lvl=2;lvl<=Math.max(2,top);lvl++){
     const items=sortTasks(ts.filter(t=>tlvl(t)===lvl));
     const open=lvlOpen(cat.id,lvl);
     const blocks=blockers(cat.id,lvl);
-    if(lvl===1){
-      h+=`<div class="lvl-hdr lvl-base"><span class="lvl-tag">Nivå 1</span><span class="lvl-name">Grund</span><span class="lvl-note">${items.length?'alltid synlig':'inga uppgifter'}</span></div>`;
-      items.forEach(t=>{h+=rCard(t,idx++,'cat')});
-      continue;
-    }
-    if(!items.length&&lvl>top)continue;
-    const peeking=!!S.peekLvl[cat.id+':'+lvl];
-    if(open){
-      h+=`<div class="lvl-hdr lvl-open"><span class="lvl-tag open">Nivå ${lvl}</span><span class="lvl-name">Upplåst</span><span class="lvl-note">grunden är grön</span></div>`;
-      if(!items.length)h+=`<div class="lvl-empty">Inga uppgifter på den här nivån än.</div>`;
-      items.forEach(t=>{h+=rCard(t,idx++,'cat')});
-    }else{
-      h+=`<div class="lvl-hdr lvl-locked" data-action="peekLvl" data-cat="${cat.id}" data-lvl="${lvl}"><span class="lvl-tag locked">🔒 Nivå ${lvl}</span><span class="lvl-name">Låst</span><span class="lvl-note">${peeking?'▾':'▸'} ${items.length} i pipeline</span></div>`;
-      if(peeking){
-        h+=`<div class="lvl-block">Lås upp genom att göra:${blocks.map(b=>`<div class="lvl-block-item"><span class="lvl-block-dot"></span>${b.name} <span class="lvl-block-days">${dsince(b.lastDone)??'–'} dagar sen</span></div>`).join('')}</div>`;
-        items.forEach(t=>{h+=rLockedCard(t)});
-      }
-    }
+    const shown=!!S.peekLvl[cat.id+':'+lvl];
+    const cnt=items.length?` (${items.length})`:'';
+    h+=`<div class="divider lvl-div${open?' open':''}" data-action="peekLvl" data-cat="${cat.id}" data-lvl="${lvl}"><div class="divider-line"></div><div class="divider-text">${shown?'▾':'▸'} ${open?'🔓':'🔒'} Nivå ${lvl}${cnt}</div><div class="divider-line"></div></div>`;
+    if(!shown)continue;
+    if(!open)h+=`<div class="lvl-block">Lås upp genom att göra:${blocks.map(b=>`<div class="lvl-block-item"><span class="lvl-block-dot"></span>${b.name} <span class="lvl-block-days">${dsince(b.lastDone)??'–'} dagar sen</span></div>`).join('')}</div>`;
+    if(!items.length)h+=`<div class="lvl-empty">Inget här än. Sätt en uppgift till nivå ${lvl} när du redigerar den.</div>`;
+    items.forEach(t=>{h+=open?rCard(t,idx++,'cat'):rLockedCard(t)});
   }
   return h+'</div>';
 }
