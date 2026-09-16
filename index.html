@@ -27,6 +27,7 @@
   --ov:rgba(0,0,0,0.7);
   --c-cnt:#FF6B6B;--c-fit:#51CF66;--c-hem:#339AF0;--c-per:#DA77F2;
   --c-biz:#FFD43B;--c-rec:#74C0FC;--c-oth:#868E96;
+  --lv2:#3B82F6;--lv2-s:rgba(59,130,246,0.10);
 }
 [data-theme="light"]{
   --bg:#FFF5F7;--bg2:rgba(255,255,255,0.85);--bg3:rgba(255,255,255,1);
@@ -41,6 +42,7 @@
   --ov:rgba(255,245,247,0.85);
   --c-cnt:#D4798C;--c-fit:#7BC5A0;--c-hem:#7BAED4;--c-per:#B88DC4;
   --c-biz:#D4C07B;--c-rec:#7BB8D4;--c-oth:#A8A0AC;
+  --lv2:#6B9BD4;--lv2-s:rgba(107,155,212,0.12);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{height:100%;overflow-y:scroll}
@@ -60,6 +62,16 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .sync-dot.synced{background:var(--grn)}.sync-dot.syncing{background:var(--yel);animation:blink 1.2s ease infinite}.sync-dot.offline{background:var(--t3)}.sync-dot.error{background:var(--red);animation:blink 1s ease infinite}
 .p-syncerr{font-size:10px;line-height:1.45;color:var(--red);background:rgba(255,80,80,.09);border:1px solid rgba(255,80,80,.25);border-radius:7px;padding:7px 9px;margin:6px 0 2px}
 .cc-lock{font-size:9px;opacity:.6;margin-left:2px}
+.mode-tog{display:flex;gap:2px;background:var(--bg2);border:1px solid var(--brd);border-radius:8px;padding:2px;margin-left:10px}
+.mt-b{font-size:10px;font-weight:600;padding:4px 8px;border-radius:6px;background:transparent;border:none;color:var(--t3);cursor:pointer;transition:all .15s;line-height:1.4}
+.mt-b.on{background:var(--acc);color:#fff}
+.mt-b:not(.on):hover{color:var(--t2)}
+.cm-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--brd)}
+.cm-row:last-child{border-bottom:none}
+.cm-name{font-size:13px;color:var(--t2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cm-opts{display:flex;gap:3px;flex-shrink:0}
+.cm-b{font-size:10px;padding:4px 8px;border-radius:6px;border:1px solid var(--brd);background:var(--bg2);color:var(--t3);cursor:pointer;white-space:nowrap}
+.cm-b.on{border-color:var(--acc);color:var(--acc);font-weight:600}
 .lvl-div.open .divider-text{color:var(--grn)}
 .lvl-div.open .divider-line{background:rgba(80,200,120,.3)}
 .lvl-empty{font-size:12px;color:var(--tm);padding:8px 2px 4px;font-style:italic}
@@ -129,6 +141,18 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .tc.u-org{border-color:rgba(255,140,66,.4);background:var(--org-s)}
 .tc.u-red{border-color:rgba(255,71,87,.45);background:var(--red-s)}
 /* Shared */
+.tc.lv2{box-shadow:inset 3px 0 0 var(--lv2)}
+.tc.lv2 .tc-days-num{color:var(--lv2)!important}
+.tc.lv2 .tc-lamp{background:var(--lv2)!important;box-shadow:0 0 8px var(--lv2)!important;animation:none!important}
+.lv-bars{display:inline-flex;align-items:flex-end;gap:2px;height:10px;margin-left:7px;vertical-align:middle}
+.lv-bars i{width:3px;border-radius:1px;background:var(--lv2);opacity:.9}
+.lv-bars i:nth-child(1){height:5px}
+.lv-bars i:nth-child(2){height:8px}
+.lv-bars i:nth-child(3){height:11px}
+.lv-bars i:nth-child(4){height:14px}
+.lv2-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--lv2);margin-left:6px;vertical-align:middle}
+.lvl-div.open .divider-text{color:var(--lv2)}
+.lvl-div.open .divider-line{background:rgba(59,130,246,.3)}
 .tc.shared{box-shadow:inset 3px 0 0 var(--acc)}
 .shared-tag{font-size:9px;font-weight:600;padding:2px 5px;border-radius:4px;background:var(--acc-g);color:var(--acc)}
 
@@ -344,6 +368,12 @@ const DEFAULT_CATS=[
   {id:'other',label:'Övrigt',icon:'📌',v:'--c-oth'},
 ];
 const EMOJI_POOL=['🎯','🧹','👶','🎨','📚','🏃','🎵','🐾','🌱','💊','🛒','🍳','📱','🚗','❤','🎓'];
+// Work / private split. Mode lives on the category, tasks inherit it.
+// 'both' = always visible in either mode.
+const DEFAULT_CATMODE={content:'work',business:'work',fitness:'private',hem:'private',personligt:'private',recovery:'both',other:'both'};
+const catMode=id=>S.catMode[id]||DEFAULT_CATMODE[id]||'both';
+const inMode=id=>{if(S.mode==='all')return true;const m=catMode(id);return m==='both'||m===S.mode};
+const modeOK=t=>inMode(t.category);
 const VTASK={id:'__vacation__',name:'Semester',category:'recovery',frequencyDays:90,lastDone:null,isProtected:true};
 function daysAgo(n){const d=new Date();d.setDate(d.getDate()-n);return d.toISOString()}
 const DEFAULTS=[
@@ -357,7 +387,7 @@ const DEFAULTS=[
 // STATE
 // ═══════════════════════════════════════════
 let S={
-  tasks:[],customCats:[],theme:'light',expandedCat:null,peekLvl:{},
+  tasks:[],customCats:[],theme:'light',expandedCat:null,peekLvl:{},mode:'all',catMode:{},
   modal:null,datePicking:null,expandedTask:null,showCats:false,
   tab:'pulser',todos:[],todoGroups:[],todoHistory:[],collapsedGroups:{},showDone:false,showHistory:false,historyPage:0,
   user:null,syncStatus:'offline',syncErr:null,profileOpen:false,
@@ -371,7 +401,7 @@ function getCats(){return[...DEFAULT_CATS,...S.customCats]}
 // ═══════════════════════════════════════════
 // PERSISTENCE
 // ═══════════════════════════════════════════
-function saveLocal(){try{localStorage.setItem('puls',JSON.stringify({tasks:S.tasks,todos:S.todos,todoGroups:S.todoGroups,todoHistory:S.todoHistory,collapsedGroups:S.collapsedGroups,theme:S.theme,householdId:S.householdId,customCats:S.customCats,hiddenToday:S.hiddenToday,onboarded:S.onboarding===-1}))}catch(e){}}
+function saveLocal(){try{localStorage.setItem('puls',JSON.stringify({tasks:S.tasks,todos:S.todos,todoGroups:S.todoGroups,todoHistory:S.todoHistory,collapsedGroups:S.collapsedGroups,theme:S.theme,householdId:S.householdId,customCats:S.customCats,catMode:S.catMode,mode:S.mode,hiddenToday:S.hiddenToday,onboarded:S.onboarding===-1}))}catch(e){}}
 function loadLocal(){
   try{const d=JSON.parse(localStorage.getItem('puls'));
     if(d?.tasks){S.tasks=d.tasks;ensV();S.onboarding=-1}else{S.tasks=DEFAULTS.map(t=>({...t}));S.onboarding=1}
@@ -381,6 +411,8 @@ function loadLocal(){
     if(d?.todoHistory)S.todoHistory=d.todoHistory;
     if(d?.theme)S.theme=d.theme;if(d?.householdId)S.householdId=d.householdId;
     if(d?.customCats)S.customCats=d.customCats;
+    if(d?.catMode)S.catMode=d.catMode;
+    if(d?.mode)S.mode=d.mode;
     if(d?.hiddenToday){const td=today();S.hiddenToday={};for(const[id,date]of Object.entries(d.hiddenToday)){if(date===td)S.hiddenToday[id]=date}}
   }catch(e){S.tasks=DEFAULTS.map(t=>({...t}));S.onboarding=1}
 }
@@ -394,13 +426,13 @@ function syncErrMsg(code){
   if(code==='failed-precondition')return'Firestore-databasen saknas eller är inte aktiverad i projektet.';
   return code||'Okänt fel';
 }
-async function saveCloud(){if(!S.user||S.user.isAnonymous)return;S.syncStatus='syncing';try{await db.collection('users').doc(S.user.uid).set({tasks:S.tasks,todos:S.todos,todoGroups:S.todoGroups,todoHistory:S.todoHistory,theme:S.theme,householdId:S.householdId||null,customCats:S.customCats,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});S.syncStatus='synced';S.syncErr=null;_qR()}catch(e){console.error('Firestore write:',e.code,e.message);S.syncErr={code:e.code,msg:syncErrMsg(e.code)};S.syncStatus=e.code==='unavailable'?'offline':'error';_qR()}}
+async function saveCloud(){if(!S.user||S.user.isAnonymous)return;S.syncStatus='syncing';try{await db.collection('users').doc(S.user.uid).set({tasks:S.tasks,todos:S.todos,todoGroups:S.todoGroups,todoHistory:S.todoHistory,theme:S.theme,householdId:S.householdId||null,customCats:S.customCats,catMode:S.catMode,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});S.syncStatus='synced';S.syncErr=null;_qR()}catch(e){console.error('Firestore write:',e.code,e.message);S.syncErr={code:e.code,msg:syncErrMsg(e.code)};S.syncStatus=e.code==='unavailable'?'offline':'error';_qR()}}
 async function saveHH(){if(!S.household||!S.householdId)return;try{await db.collection('households').doc(S.householdId).set({members:S.household.members,sharedCats:S.household.sharedCats||[],tasks:S.household.tasks||[],updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.error('HH:',e)}}
 function save(){saveLocal();clearTimeout(save._t);save._t=setTimeout(()=>{saveCloud();if(S.household)saveHH()},600)}
 save._t=null;
 
 function startSync(){if(_unsub)_unsub();if(!S.user||S.user.isAnonymous)return;
-  _unsub=db.collection('users').doc(S.user.uid).onSnapshot(s=>{if(s.exists){const d=s.data();if(d.tasks){S.tasks=d.tasks;ensV();saveLocal()}if(d.todos)S.todos=d.todos;if(d.todoGroups)S.todoGroups=d.todoGroups;if(d.todoHistory)S.todoHistory=d.todoHistory;if(d.theme)S.theme=d.theme;if(d.customCats)S.customCats=d.customCats;if(d.householdId&&d.householdId!==S.householdId){S.householdId=d.householdId;startHHSync()}S.syncStatus='synced';S.syncErr=null;_qR()}},e=>{console.error('Firestore listen:',e.code,e.message);S.syncErr={code:e.code,msg:syncErrMsg(e.code)};S.syncStatus=e.code==='unavailable'?'offline':'error';_qR()})}
+  _unsub=db.collection('users').doc(S.user.uid).onSnapshot(s=>{if(s.exists){const d=s.data();if(d.tasks){S.tasks=d.tasks;ensV();saveLocal()}if(d.todos)S.todos=d.todos;if(d.todoGroups)S.todoGroups=d.todoGroups;if(d.todoHistory)S.todoHistory=d.todoHistory;if(d.theme)S.theme=d.theme;if(d.customCats)S.customCats=d.customCats;if(d.catMode)S.catMode=d.catMode;if(d.householdId&&d.householdId!==S.householdId){S.householdId=d.householdId;startHHSync()}S.syncStatus='synced';S.syncErr=null;_qR()}},e=>{console.error('Firestore listen:',e.code,e.message);S.syncErr={code:e.code,msg:syncErrMsg(e.code)};S.syncStatus=e.code==='unavailable'?'offline':'error';_qR()})}
 function startHHSync(){if(_hhUnsub)_hhUnsub();if(!S.householdId)return;
   _hhUnsub=db.collection('households').doc(S.householdId).onSnapshot(s=>{if(s.exists){S.household={code:S.householdId,...s.data()};_qR()}else{S.household=null;S.householdId=null;saveLocal();_qR()}},e=>console.error('HH:',e))}
 // Queued render – debounce snapshot re-renders, skip if modal open
@@ -512,18 +544,18 @@ function R(){
   let html=rHeader()+rTabs();
   if(S.tab==='todos'){html+=rTodosView()}
   else{
-    const all=allTasks().filter(taskOpen);
+    const all=allTasks().filter(t=>taskOpen(t)&&modeOK(t));
     const red=all.filter(t=>urg(t)>=1).length,org=all.filter(t=>{const u=urg(t);return u>=.75&&u<1}).length,grn=all.filter(t=>urg(t)<.5).length,allOk=red===0&&org===0;
     html+=rStats(red,org,grn,allOk);
     if(S.expandedCat){html+=rCatView()}
-    else{html+=rTodo()+rUnlock()+rDivider()+rCats()}
+    else{html+=rTodo()+rDivider()+rCats()}
   }
   html+=S.modal?rModal():'';
   app.innerHTML=html;bind();
 }
 
 function rTabs(){
-  const all=allTasks().filter(taskOpen);
+  const all=allTasks().filter(t=>taskOpen(t)&&modeOK(t));
   const urgN=all.filter(t=>urg(t)>=.75).length;
   const todoN=S.todos.filter(t=>!t.done).length;
   return`<div class="tabs"><button class="tab${S.tab==='pulser'?' on':''}" data-action="setTab" data-tab="pulser">⚡ Pulser${urgN?` <span class="tab-count hot">${urgN}</span>`:''}</button><button class="tab${S.tab==='todos'?' on':''}" data-action="setTab" data-tab="todos">☑ Att göra${todoN?` <span class="tab-count">${todoN}</span>`:''}</button><button class="add-btn" data-action="addTask" style="height:36px;padding:0 12px;font-size:12px;flex:0 0 auto"><span>+</span></button></div>`;
@@ -541,10 +573,12 @@ function rHeader(){
       const upgradeBtn=anon?`<button class="p-btn" data-action="openAuth" style="border-color:var(--acc);color:var(--acc)">🔗 Koppla konto (synka)</button>`:'';
       const errBox=S.syncErr?`<div class="p-syncerr"><b>${S.syncErr.code||'fel'}</b><br>${S.syncErr.msg}</div>`:'';
       const retryBtn=S.syncErr?`<button class="p-btn" data-action="retrySync" style="border-color:var(--acc);color:var(--acc)">↻ Försök synka igen</button>`:'';
-      prof+=`<div class="profile-drop"><div class="p-name">${anon?'Anonym':S.user.displayName||'Inloggad'}</div>${!anon?`<div class="p-email">${S.user.email||''}</div>`:''}<div class="p-sync"><div class="sync-dot ${S.syncStatus}" style="width:6px;height:6px"></div> ${st}</div>${errBox}<div class="p-divider"></div>${retryBtn}${upgradeBtn}${hhBtn}<button class="p-btn danger" data-action="signOut">Logga ut</button></div>`;
+      const cmBtn=`<button class="p-btn" data-action="openCatMode">💼 Jobb / Privat</button>`;
+      prof+=`<div class="profile-drop"><div class="p-name">${anon?'Anonym':S.user.displayName||'Inloggad'}</div>${!anon?`<div class="p-email">${S.user.email||''}</div>`:''}<div class="p-sync"><div class="sync-dot ${S.syncStatus}" style="width:6px;height:6px"></div> ${st}</div>${errBox}<div class="p-divider"></div>${retryBtn}${cmBtn}${upgradeBtn}${hhBtn}<button class="p-btn danger" data-action="signOut">Logga ut</button></div>`;
     }
   }else{prof=`<button class="signin-btn" data-action="openAuth">🔑 Logga in</button>`}
-  return`<header class="hdr"><div class="hdr-row"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1><div class="hdr-actions"><div style="position:relative">${prof}</div><button class="icon-btn" data-action="toggleTheme">${S.theme==='dark'?'☀':'🌙'}</button></div></div>${rVacation()}</header>`;
+  const mt=`<div class="mode-tog">${[['all','Allt'],['work','💼'],['private','🏠']].map(([m,l])=>`<button class="mt-b${S.mode===m?' on':''}" data-action="setMode" data-mode="${m}">${l}</button>`).join('')}</div>`;
+  return`<header class="hdr"><div class="hdr-row"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1>${mt}<div class="hdr-actions"><div style="position:relative">${prof}</div><button class="icon-btn" data-action="toggleTheme">${S.theme==='dark'?'☀':'🌙'}</button></div></div>${rVacation()}</header>`;
 }
 function rVacation(){
   const vt=S.tasks.find(t=>t.id==='__vacation__');if(!vt)return'';
@@ -670,7 +704,7 @@ function rStats(red,org,grn,allOk){
 // ═══════════════════════════════════════════
 function rTodo(){
   const all=allTasks();
-  const items=all.filter(t=>(urg(t)>=.75||S.liftedToPrio.has(t.id))&&!S.hiddenToday[t.id]&&taskOpen(t));
+  const items=all.filter(t=>(urg(t)>=.75||S.liftedToPrio.has(t.id))&&!S.hiddenToday[t.id]&&taskOpen(t)&&modeOK(t));
   items.sort((a,b)=>urg(b)-urg(a));
   if(!items.length)return'';
   let h=`<div style="margin-bottom:4px">`;
@@ -691,13 +725,15 @@ function rCard(t,i,ctx){
   const isPrio=ctx==='prio';
   const extra=isPrio?'':'cat-card';
 
-  let h=`<div><div class="tc ${urgCls(t)} ${extra}${shared?' shared':''}" style="animation-delay:${i*.03}s">`;
+  const isL2=tlvl(t)>=2;
+  let h=`<div><div class="tc ${urgCls(t)} ${extra}${shared?' shared':''}${isL2?' lv2':''}" style="animation-delay:${i*.03}s">`;
   // THE number: days since
   h+=`<div class="tc-days"><div class="tc-days-num" style="color:${dayCol(t)}">${daysNum}</div><div class="tc-days-lbl">dagar sen</div></div>`;
   // Signal lamp
   h+=`<div class="tc-lamp ${lampCls(t)}"></div>`;
   // Info
-  h+=`<div class="tc-info" data-action="toggleTask" data-id="${t.id}"><div class="tc-name">${t.name}${isLifted&&!isPrio?' <span class="prio-pin">📌</span>':''}${shared?' <span class="shared-tag">👥</span>':''}</div><div class="tc-meta">${cat?cat.icon+' '+cat.label:''}<span class="dot">·</span>${ffreqLabel(t)}</div></div>`;
+  const lvBars=isL2?`<span class="lv-bars">${'<i></i>'.repeat(Math.min(tlvl(t),4))}</span>`:'';
+  h+=`<div class="tc-info" data-action="toggleTask" data-id="${t.id}"><div class="tc-name">${t.name}${lvBars}${isLifted&&!isPrio?' <span class="prio-pin">📌</span>':''}${shared?' <span class="shared-tag">👥</span>':''}</div><div class="tc-meta">${cat?cat.icon+' '+cat.label:''}<span class="dot">·</span>${ffreqLabel(t)}</div></div>`;
   // Actions
   h+=`<div class="tc-actions">`;
   if(isPrio)h+=`<span style="font-size:10px;color:var(--tm);cursor:pointer;white-space:nowrap" data-action="hideToday" data-id="${t.id}">dölj</span>`;
@@ -714,24 +750,6 @@ function rCard(t,i,ctx){
 // ═══════════════════════════════════════════
 // CATEGORIES – hidden by default
 // ═══════════════════════════════════════════
-// Banner: tells you when a level opened, or what's holding it shut
-function rUnlock(){
-  let h='';
-  for(const cid of LEVEL_CATS){
-    const cat=getCats().find(c=>c.id===cid);if(!cat)continue;
-    const ts=ctasks(cid);
-    const upper=ts.filter(t=>tlvl(t)>=2);
-    if(!upper.length)continue;
-    const open=lvlOpen(cid,2);
-    if(open){
-      h+=`<div class="unlock-bar open" data-action="expandCat" data-cat="${cid}"><span class="ub-ico">🔓</span><div class="ub-txt"><b>Nivå 2 upplåst — ${cat.label}</b><span>${upper.length} uppgift${upper.length>1?'er':''} du förtjänat tid till</span></div><span class="ub-go">→</span></div>`;
-    }else{
-      const b=blockers(cid,2);
-      h+=`<div class="unlock-bar shut" data-action="expandCat" data-cat="${cid}"><span class="ub-ico">🔒</span><div class="ub-txt"><b>${upper.length} låst${upper.length>1?'a':''} i ${cat.label}</b><span>Gör ${b.map(x=>x.name).join(' + ')} först</span></div><span class="ub-go">→</span></div>`;
-    }
-  }
-  return h;
-}
 function rDivider(){
   return`<div class="divider" data-action="toggleCats"><div class="divider-line"></div><div class="divider-text">${S.showCats?'▾ Dölj kategorier':'▸ Visa kategorier'}</div><div class="divider-line"></div></div>`;
 }
@@ -739,11 +757,13 @@ function rCats(){
   if(!S.showCats)return'';
   let h='<div class="cat-row">';
   for(const cat of getCats()){
+    if(!inMode(cat.id))continue;
     const ts=ctasks(cat.id);if(!ts.length)continue;
     const open=ts.filter(taskOpen);
     const urgN=open.filter(t=>urg(t)>=.75).length;
     const lockedN=ts.length-open.length;
-    const lockTag=lockedN?`<span class="cc-lock">🔒${lockedN}</span>`:'';
+    const l2open=open.some(t=>tlvl(t)>=2);
+    const lockTag=lockedN?`<span class="cc-lock">🔒${lockedN}</span>`:(l2open?`<span class="lv2-dot"></span>`:'');
     h+=`<div class="cat-chip" data-action="expandCat" data-cat="${cat.id}"><span>${cat.icon}</span><span>${cat.label}</span>${lockTag}<span class="cc-cnt${urgN?' cc-urg':''}">${urgN?'⚠ '+urgN:open.length}</span></div>`;
   }
   return h+'</div>';
@@ -784,7 +804,8 @@ function rCatView(){
 }
 // Dimmed, non-actionable preview of a locked task
 function rLockedCard(t){
-  return`<div class="tc lvl-ghost"><div class="tc-days"><div class="tc-days-num" style="color:var(--t3)">🔒</div><div class="tc-days-lbl">låst</div></div><div class="tc-info"><div class="tc-name">${t.name}</div><div class="tc-meta">${ffreqLabel(t)}</div></div></div>`;
+  const bars=`<span class="lv-bars">${'<i></i>'.repeat(Math.min(tlvl(t),4))}</span>`;
+  return`<div class="tc lvl-ghost"><div class="tc-days"><div class="tc-days-num" style="color:var(--t3)">🔒</div><div class="tc-days-lbl">låst</div></div><div class="tc-info"><div class="tc-name">${t.name}${bars}</div><div class="tc-meta">${ffreqLabel(t)}</div></div></div>`;
 }
 
 // ═══════════════════════════════════════════
@@ -904,8 +925,22 @@ function rTodoCard(t,i,isDone){
   return`<div class="todo-card${isDone?' done':''}" data-todo-id="${t.id}" style="animation-delay:${i*.03}s">${grip}<button class="todo-check${isDone?' checked':''}" data-action="toggleTodo" data-id="${t.id}">${isDone?'✓':''}</button><div class="todo-info" data-action="editTodo" data-id="${t.id}"><div class="todo-name">${t.name}</div>${t.note?`<div class="todo-note">${t.note}</div>`:''}${due}</div>${calBtn}<button class="todo-del" data-action="deleteTodo" data-id="${t.id}">✕</button></div>`;
 }
 
+function rCatModeModal(){
+  let h='<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()">';
+  h+='<div class="md-head"><h2 class="md-title">💼 Jobb / Privat</h2><button class="md-close" data-action="closeModal">✕</button></div>';
+  h+='<p style="font-size:12px;color:var(--t2);margin-bottom:14px">Var hör varje kategori hemma? "Båda" syns alltid.</p>';
+  for(const c of getCats()){
+    const m=catMode(c.id);
+    h+=`<div class="cm-row"><span class="cm-name">${c.icon} ${c.label}</span><div class="cm-opts">`;
+    h+=[['work','💼'],['private','🏠'],['both','Båda']].map(([v,l])=>`<button class="cm-b${m===v?' on':''}" data-action="setCatMode" data-cat="${c.id}" data-m="${v}">${l}</button>`).join('');
+    h+='</div></div>';
+  }
+  h+='<div class="br"><button class="bp" data-action="closeModal">Klart</button></div></div></div>';
+  return h;
+}
 function rModal(){
   const m=S.modal;if(!m)return'';
+  if(m.type==='catmode')return rCatModeModal();
   if(m.type==='confirm')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><h3 style="font-size:18px;margin-bottom:8px;font-weight:600">Ta bort?</h3><p style="color:var(--t2);font-size:14px;margin-bottom:20px">Kan inte ångras.</p><div class="br"><button class="bs" data-action="closeModal">Avbryt</button><button class="bp" style="background:var(--red)" data-action="confirmDelete" data-id="${m.taskId}">Ta bort</button></div></div></div>`;
   if(m.type==='authError')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">Problem</h2><button class="md-close" data-action="closeModal">✕</button></div><p style="color:var(--t2);font-size:14px;margin-bottom:16px">${m.msg}</p><div class="br"><button class="bp" data-action="openAuth">Försök igen</button></div></div></div>`;
   if(m.type==='auth')return rAuthModal();
@@ -1258,6 +1293,9 @@ function H(e){
     case 'openAuth':S.modal={type:'auth'};S.profileOpen=false;pNav();R();break;
     case 'signInGoogle':S.modal=null;R();authWithProvider(gProv);break;
     case 'signInAnon':S.modal=null;R();anonSignIn();break;
+    case 'setMode':{const m=el.dataset.mode;if(S.mode===m&&m!=='all'){S.modal={type:'catmode'}}else{S.mode=m}saveLocal();R();break}
+    case 'setCatMode':{S.catMode[el.dataset.cat]=el.dataset.m;save();R();break}
+    case 'openCatMode':S.modal={type:'catmode'};S.profileOpen=false;R();break;
     case 'signOut':doSignOut();break;
     case 'retrySync':{S.syncErr=null;S.syncStatus='syncing';R();saveCloud();startSync();break}
     case 'addTask':S.modal={type:S.tab==='todos'?'todo':'task'};pNav();R();break;
