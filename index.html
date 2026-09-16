@@ -27,7 +27,6 @@
   --ov:rgba(0,0,0,0.7);
   --c-cnt:#FF6B6B;--c-fit:#51CF66;--c-hem:#339AF0;--c-per:#DA77F2;
   --c-biz:#FFD43B;--c-rec:#74C0FC;--c-oth:#868E96;
-  --lv2:#3B82F6;--lv2-s:rgba(59,130,246,0.10);
 }
 [data-theme="light"]{
   --bg:#FFF5F7;--bg2:rgba(255,255,255,0.85);--bg3:rgba(255,255,255,1);
@@ -42,7 +41,6 @@
   --ov:rgba(255,245,247,0.85);
   --c-cnt:#D4798C;--c-fit:#7BC5A0;--c-hem:#7BAED4;--c-per:#B88DC4;
   --c-biz:#D4C07B;--c-rec:#7BB8D4;--c-oth:#A8A0AC;
-  --lv2:#6B9BD4;--lv2-s:rgba(107,155,212,0.12);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{height:100%;overflow-y:scroll}
@@ -72,8 +70,6 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .cm-opts{display:flex;gap:3px;flex-shrink:0}
 .cm-b{font-size:10px;padding:4px 8px;border-radius:6px;border:1px solid var(--brd);background:var(--bg2);color:var(--t3);cursor:pointer;white-space:nowrap}
 .cm-b.on{border-color:var(--acc);color:var(--acc);font-weight:600}
-.lvl-div.open .divider-text{color:var(--grn)}
-.lvl-div.open .divider-line{background:rgba(80,200,120,.3)}
 .lvl-empty{font-size:12px;color:var(--tm);padding:8px 2px 4px;font-style:italic}
 .lvl-block{font-size:11px;color:var(--t3);background:var(--bg2);border:1px dashed var(--brd);border-radius:9px;padding:9px 11px;margin:2px 0 8px}
 .lvl-block-item{display:flex;align-items:center;gap:7px;padding:5px 0 0;color:var(--t2);font-size:12px}
@@ -141,18 +137,6 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .tc.u-org{border-color:rgba(255,140,66,.4);background:var(--org-s)}
 .tc.u-red{border-color:rgba(255,71,87,.45);background:var(--red-s)}
 /* Shared */
-.tc.lv2{box-shadow:inset 3px 0 0 var(--lv2)}
-.tc.lv2 .tc-days-num{color:var(--lv2)!important}
-.tc.lv2 .tc-lamp{background:var(--lv2)!important;box-shadow:0 0 8px var(--lv2)!important;animation:none!important}
-.lv-bars{display:inline-flex;align-items:flex-end;gap:2px;height:10px;margin-left:7px;vertical-align:middle}
-.lv-bars i{width:3px;border-radius:1px;background:var(--lv2);opacity:.9}
-.lv-bars i:nth-child(1){height:5px}
-.lv-bars i:nth-child(2){height:8px}
-.lv-bars i:nth-child(3){height:11px}
-.lv-bars i:nth-child(4){height:14px}
-.lv2-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--lv2);margin-left:6px;vertical-align:middle}
-.lvl-div.open .divider-text{color:var(--lv2)}
-.lvl-div.open .divider-line{background:rgba(59,130,246,.3)}
 .tc.shared{box-shadow:inset 3px 0 0 var(--acc)}
 .shared-tag{font-size:9px;font-weight:600;padding:2px 5px;border-radius:4px;background:var(--acc-g);color:var(--acc)}
 
@@ -174,6 +158,7 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .tc-info{flex:1;min-width:0}
 .tc-name{font-size:15px;font-weight:600;margin-bottom:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .tc-meta{font-size:11px;color:var(--t2);display:flex;align-items:center;gap:4px}
+.lv-meta{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--t3);border:1px solid var(--brd);border-radius:4px;padding:1px 5px}
 .tc-meta .dot{color:var(--tm);font-size:8px}
 .prio-pin{font-size:10px;color:var(--acc)}
 
@@ -726,14 +711,14 @@ function rCard(t,i,ctx){
   const extra=isPrio?'':'cat-card';
 
   const isL2=tlvl(t)>=2;
-  let h=`<div><div class="tc ${urgCls(t)} ${extra}${shared?' shared':''}${isL2?' lv2':''}" style="animation-delay:${i*.03}s">`;
+  let h=`<div><div class="tc ${urgCls(t)} ${extra}${shared?' shared':''}" style="animation-delay:${i*.03}s">`;
   // THE number: days since
   h+=`<div class="tc-days"><div class="tc-days-num" style="color:${dayCol(t)}">${daysNum}</div><div class="tc-days-lbl">dagar sen</div></div>`;
   // Signal lamp
   h+=`<div class="tc-lamp ${lampCls(t)}"></div>`;
   // Info
-  const lvBars=isL2?`<span class="lv-bars">${'<i></i>'.repeat(Math.min(tlvl(t),4))}</span>`:'';
-  h+=`<div class="tc-info" data-action="toggleTask" data-id="${t.id}"><div class="tc-name">${t.name}${lvBars}${isLifted&&!isPrio?' <span class="prio-pin">📌</span>':''}${shared?' <span class="shared-tag">👥</span>':''}</div><div class="tc-meta">${cat?cat.icon+' '+cat.label:''}<span class="dot">·</span>${ffreqLabel(t)}</div></div>`;
+  const lvMeta=(isL2&&isPrio)?`<span class="dot">·</span><span class="lv-meta">Nivå ${tlvl(t)}</span>`:'';
+  h+=`<div class="tc-info" data-action="toggleTask" data-id="${t.id}"><div class="tc-name">${t.name}${isLifted&&!isPrio?' <span class="prio-pin">📌</span>':''}${shared?' <span class="shared-tag">👥</span>':''}</div><div class="tc-meta">${cat?cat.icon+' '+cat.label:''}<span class="dot">·</span>${ffreqLabel(t)}${lvMeta}</div></div>`;
   // Actions
   h+=`<div class="tc-actions">`;
   if(isPrio)h+=`<span style="font-size:10px;color:var(--tm);cursor:pointer;white-space:nowrap" data-action="hideToday" data-id="${t.id}">dölj</span>`;
@@ -762,8 +747,7 @@ function rCats(){
     const open=ts.filter(taskOpen);
     const urgN=open.filter(t=>urg(t)>=.75).length;
     const lockedN=ts.length-open.length;
-    const l2open=open.some(t=>tlvl(t)>=2);
-    const lockTag=lockedN?`<span class="cc-lock">🔒${lockedN}</span>`:(l2open?`<span class="lv2-dot"></span>`:'');
+    const lockTag=lockedN?`<span class="cc-lock">🔒${lockedN}</span>`:'';
     h+=`<div class="cat-chip" data-action="expandCat" data-cat="${cat.id}"><span>${cat.icon}</span><span>${cat.label}</span>${lockTag}<span class="cc-cnt${urgN?' cc-urg':''}">${urgN?'⚠ '+urgN:open.length}</span></div>`;
   }
   return h+'</div>';
@@ -804,8 +788,7 @@ function rCatView(){
 }
 // Dimmed, non-actionable preview of a locked task
 function rLockedCard(t){
-  const bars=`<span class="lv-bars">${'<i></i>'.repeat(Math.min(tlvl(t),4))}</span>`;
-  return`<div class="tc lvl-ghost"><div class="tc-days"><div class="tc-days-num" style="color:var(--t3)">🔒</div><div class="tc-days-lbl">låst</div></div><div class="tc-info"><div class="tc-name">${t.name}${bars}</div><div class="tc-meta">${ffreqLabel(t)}</div></div></div>`;
+  return`<div class="tc lvl-ghost"><div class="tc-days"><div class="tc-days-num" style="color:var(--t3)">🔒</div><div class="tc-days-lbl">låst</div></div><div class="tc-info"><div class="tc-name">${t.name}</div><div class="tc-meta">${ffreqLabel(t)}</div></div></div>`;
 }
 
 // ═══════════════════════════════════════════
