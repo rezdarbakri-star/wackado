@@ -1039,8 +1039,9 @@ function rTaskModal(){
   // Level picker
   const cl=tlvl(t);
   h+='<div class="fg"><label class="fl">Nivå</label><div class="lvl-pick" id="lvlPick" data-level="'+cl+'">';
-  h+=`<button class="lvl-opt${cl===1?' sel':''}" data-action="setLevel" data-lvl="1"><b>Nivå 1</b><span>Grund — alltid synlig</span></button>`;
-  h+=`<button class="lvl-opt${cl===2?' sel':''}" data-action="setLevel" data-lvl="2"><b>Nivå 2</b><span>Låses upp när grunden är grön</span></button>`;
+  h+=`<button class="lvl-opt${cl===1?' sel':''}" data-action="setLevel" data-lvl="1"><b>Nivå 1</b><span>Grund</span></button>`;
+  h+=`<button class="lvl-opt${cl===2?' sel':''}" data-action="setLevel" data-lvl="2"><b>Nivå 2</b><span>Öppnas när nivå 1 är grön</span></button>`;
+  h+=`<button class="lvl-opt${cl===3?' sel':''}" data-action="setLevel" data-lvl="3"><b>Nivå 3</b><span>Öppnas när 1 och 2 är gröna</span></button>`;
   h+=`</div><p class="fh">Gäller just nu bara i Innehåll.</p></div>`;
   if(isE)h+=`<div class="fg"><label class="fl">Senast gjord</label><input class="fi" type="date" id="tl" value="${t.lastDone?t.lastDone.split('T')[0]:''}" max="${today()}"></div>`;
   h+=assignF;
