@@ -75,7 +75,8 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .lvl-block-item{display:flex;align-items:center;gap:7px;padding:5px 0 0;color:var(--t2);font-size:12px}
 .lvl-block-dot{width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;animation:blink 1.4s ease infinite}
 .lvl-block-days{margin-left:auto;font-size:10px;color:var(--red);white-space:nowrap}
-.tc.lvl-ghost{opacity:.4;filter:grayscale(1);pointer-events:none;border-left-color:var(--brd)}
+.tc.lvl-ghost{opacity:.55}
+.tc.lvl-ghost:hover{opacity:1}
 .unlock-bar{display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:11px;margin:8px 0 2px;cursor:pointer;border:1px solid var(--brd);background:var(--bg2);transition:all .15s}
 .unlock-bar:hover{transform:translateY(-1px)}
 .unlock-bar.open{border-color:rgba(80,200,120,.35);background:rgba(80,200,120,.08)}
@@ -771,7 +772,7 @@ function rTimeline(t){
       :(d4===0?'Deadline idag':`${Math.abs(d4)} dag${Math.abs(d4)!==1?'ar':''} över deadline`)}
   return`<div class="tl"><div class="tl-bar"><div class="tl-fill${late?' late':''}" style="width:${used*100}%"></div><span class="tl-tick" style="left:${m2}%"></span><span class="tl-tick strong" style="left:${m3}%"></span></div><div class="tl-note${late?' late':''}">${note}</div></div>`;
 }
-function rCard(t,i,ctx){
+function rCard(t,i,ctx,dim){
   const ds=dsince(t.lastDone);
   const daysNum=ds===null?'–':ds;
   const _dl=dlLeft(t);
@@ -783,7 +784,7 @@ function rCard(t,i,ctx){
   const extra=isPrio?'':'cat-card';
 
   const isL2=tlvl(t)>=2;
-  let h=`<div><div class="tc ${urgCls(t)} ${extra}${shared?' shared':''}" style="animation-delay:${i*.03}s">`;
+  let h=`<div><div class="tc ${urgCls(t)} ${extra}${shared?' shared':''}${dim?' lvl-ghost':''}" style="animation-delay:${i*.03}s">`;
   // THE number: days since
   h+=`<div class="tc-days"><div class="tc-days-num" style="color:${dayCol(t)}">${daysNum}</div><div class="tc-days-lbl">dagar sen</div></div>`;
   // Signal lamp
@@ -855,14 +856,11 @@ function rCatView(){
     if(!shown)continue;
     if(!open)h+=`<div class="lvl-block">Lås upp genom att göra:${blocks.map(b=>`<div class="lvl-block-item"><span class="lvl-block-dot"></span>${b.name} <span class="lvl-block-days">${dsince(b.lastDone)??'–'} dagar sen</span></div>`).join('')}</div>`;
     if(!items.length)h+=`<div class="lvl-empty">Inget här än. Sätt en uppgift till nivå ${lvl} när du redigerar den.</div>`;
-    items.forEach(t=>{h+=open?rCard(t,idx++,'cat'):rLockedCard(t)});
+    items.forEach(t=>{h+=rCard(t,idx++,'cat',!open)});
   }
   return h+'</div>';
 }
 // Dimmed, non-actionable preview of a locked task
-function rLockedCard(t){
-  return`<div class="tc lvl-ghost"><div class="tc-days"><div class="tc-days-num" style="color:var(--t3)">🔒</div><div class="tc-days-lbl">låst</div></div><div class="tc-info"><div class="tc-name">${t.name}</div><div class="tc-meta">${ffreqLabel(t)}</div></div></div>`;
-}
 
 // ═══════════════════════════════════════════
 // MODALS
