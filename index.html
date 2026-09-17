@@ -726,9 +726,17 @@ function rStats(red,org,grn,allOk){
 // ═══════════════════════════════════════════
 function rTodo(){
   const all=allTasks();
-  // Upplåsta nivå 2+ visas alltid — det är belöningen för att grunden är grön.
-  // De sorteras på urgency som allt annat och hamnar därför längst ner.
-  const items=all.filter(t=>(urg(t)>=.75||tlvl(t)>=2||S.liftedToPrio.has(t.id))&&!S.hiddenToday[t.id]&&taskOpen(t)&&modeOK(t));
+  // Upplåsta nivå 2+ syns tidigare än nivå 1 (belöningen för grön grund),
+  // men en nyss avbockad task är under 0.25 och försvinner som allt annat.
+  // En nivå i taget: inom en nivåstyrd kategori visas bara den lägsta nivå
+  // som har något att visa. Är något kvar på nivå 1 syns inte nivå 2 alls.
+  let items=all.filter(t=>(urg(t)>=.75||(tlvl(t)>=2&&urg(t)>=.25)||S.liftedToPrio.has(t.id))&&!S.hiddenToday[t.id]&&taskOpen(t)&&modeOK(t));
+  for(const cid of LEVEL_CATS){
+    const inCat=items.filter(t=>t.category===cid);
+    if(inCat.length<2)continue;
+    const low=Math.min(...inCat.map(tlvl));
+    items=items.filter(t=>t.category!==cid||tlvl(t)===low);
+  }
   items.sort((a,b)=>urg(b)-urg(a));
   if(!items.length)return'';
   let h=`<div style="margin-bottom:4px">`;
@@ -752,8 +760,9 @@ function rTimeline(t){
   let note;
   if(left>p3){
     const pass=Math.max(1,Math.floor((left-p3)/freq));
-    note=`${pass} pass kvar till deadline`;
+    note=`${left} dagar kvar · ${pass} pass till deadline`;
   }else if(left>0){note=`${left} dag${left>1?'ar':''} marginal kvar`}
+  else if(left===0){note='Sista dagen'}
   else{note=`${Math.abs(left)} dag${Math.abs(left)!==1?'ar':''} över slutdatum`}
   const late=left<=p3;
   return`<div class="tl"><div class="tl-bar"><div class="tl-fill${late?' late':''}" style="width:${used*100}%"></div><span class="tl-tick" style="left:${m2}%"></span><span class="tl-tick strong" style="left:${m3}%"></span></div><div class="tl-note${late?' late':''}">${note}</div></div>`;
@@ -772,10 +781,7 @@ function rCard(t,i,ctx){
   const isL2=tlvl(t)>=2;
   let h=`<div><div class="tc ${urgCls(t)} ${extra}${shared?' shared':''}" style="animation-delay:${i*.03}s">`;
   // THE number: days since
-  // Med slutdatum är dagar kvar det som styr, så det är den siffran som visas.
-  const _big=_dl!==null?(_dl>0?_dl:Math.abs(_dl)):daysNum;
-  const _lbl=_dl!==null?(_dl>0?'dagar kvar':(_dl===0?'sista dagen':'dagar över')):'dagar sen';
-  h+=`<div class="tc-days"><div class="tc-days-num" style="color:${dayCol(t)}">${_big}</div><div class="tc-days-lbl">${_lbl}</div></div>`;
+  h+=`<div class="tc-days"><div class="tc-days-num" style="color:${dayCol(t)}">${daysNum}</div><div class="tc-days-lbl">dagar sen</div></div>`;
   // Signal lamp
   h+=`<div class="tc-lamp ${lampCls(t)}"></div>`;
   // Info
