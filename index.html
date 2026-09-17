@@ -744,8 +744,8 @@ function rTodo(){
     const active=lvls.find(L=>ts.some(t=>tlvl(t)===L&&urg(t)>=.75));
     activeLvl[side]=active??lvls[lvls.length-1]??1;
   }
-  // Niv\u00e5 1 \u00e4r skulder \u2014 avbockat f\u00f6rsvinner, bara det som beh\u00f6ver g\u00f6ras syns.
-  // Niv\u00e5 2+ \u00e4r m\u00f6jligheter \u2014 ingenting \u00e4r n\u00e5gonsin "klart", allt visas.
+  // Samma regel på alla nivåer: avbockat försvinner, frekvensen avgör när
+  // det kommer tillbaka. Nivån avgör bara vilka uppgifter som är i spel.
   const onActive=t=>{
     const m=catMode(t.category);
     return m==='both'?(tlvl(t)===activeLvl.work||tlvl(t)===activeLvl.private):tlvl(t)===activeLvl[m];
@@ -754,7 +754,7 @@ function rTodo(){
     if(S.hiddenToday[t.id]||!modeOK(t))return false;
     if(S.liftedToPrio.has(t.id))return true;
     if(!onActive(t))return false;
-    return tlvl(t)>=2||urg(t)>=.75;
+    return urg(t)>=.75;
   });
   items.sort((a,b)=>urg(b)-urg(a));
   if(!items.length)return'';
@@ -848,9 +848,9 @@ function rCatView(){
   const ts=ctasks(cat.id);
   const shared=isShared(cat.id);
   const side=sideOf(cat.id);
-  let h=`<div><div class="cat-back" data-action="collapseCat">\u2190 ${cat.icon} ${cat.label}${shared?' <span class="shared-tag">\u{1F465}</span>':''} <span style="color:var(--t3);margin-left:auto;font-size:11px">${ts.length}</span></div>`;
+  let h=`<div><div class="cat-back" data-action="collapseCat">← ${cat.icon} ${cat.label}${shared?' <span class="shared-tag">👥</span>':''} <span style="color:var(--t3);margin-left:auto;font-size:11px">${ts.length}</span></div>`;
   const lvlsHere=[...new Set(ts.map(tlvl))];
-  // Ingen niv\u00e5uppdelning beh\u00f6vs om allt h\u00e4r ligger p\u00e5 niv\u00e5 1
+  // Ingen nivåuppdelning behövs om allt här ligger på nivå 1
   if(side==='both'||(lvlsHere.length===1&&lvlsHere[0]===1)){
     sortTasks(ts).forEach((t,i)=>{h+=rCard(t,i,'cat')});
     return h+'</div>';
@@ -860,14 +860,14 @@ function rCatView(){
   sortTasks(ts.filter(t=>tlvl(t)===1)).forEach(t=>{h+=rCard(t,idx++,'cat')});
   for(let lvl=2;lvl<=top;lvl++){
     const items=sortTasks(ts.filter(t=>tlvl(t)===lvl));
-    const open=lvlOpen(side,lvl);          // l\u00e5set g\u00e4ller hela sidan, inte bara denna kategori
+    const open=lvlOpen(side,lvl);          // låset gäller hela sidan, inte bara denna kategori
     const blocks=blockers(side,lvl);
     const shown=!!S.peekLvl[cat.id+':'+lvl];
     const cnt=items.length?` (${items.length})`:'';
-    h+=`<div class="divider lvl-div${open?' open':''}" data-action="peekLvl" data-cat="${cat.id}" data-lvl="${lvl}"><div class="divider-line"></div><div class="divider-text">${shown?'\u25be':'\u25b8'} ${open?'\u{1F513}':'\u{1F512}'} Niv\u00e5 ${lvl}${cnt}</div><div class="divider-line"></div></div>`;
+    h+=`<div class="divider lvl-div${open?' open':''}" data-action="peekLvl" data-cat="${cat.id}" data-lvl="${lvl}"><div class="divider-line"></div><div class="divider-text">${shown?'▾':'▸'} ${open?'🔓':'🔒'} Nivå ${lvl}${cnt}</div><div class="divider-line"></div></div>`;
     if(!shown)continue;
-    if(!open)h+=`<div class="lvl-block">L\u00e5s upp genom att g\u00f6ra:${blocks.map(b=>{const bc=getCats().find(c=>c.id===b.category);return `<div class="lvl-block-item"><span class="lvl-block-dot"></span>${bc?bc.icon+' ':''}${b.name} <span class="lvl-block-days">${dsince(b.lastDone)??'\u2013'} dagar sen</span></div>`}).join('')}</div>`;
-    if(!items.length)h+=`<div class="lvl-empty">Inget h\u00e4r \u00e4n. S\u00e4tt en uppgift till niv\u00e5 ${lvl} n\u00e4r du redigerar den.</div>`;
+    if(!open)h+=`<div class="lvl-block">Lås upp genom att göra:${blocks.map(b=>{const bc=getCats().find(c=>c.id===b.category);return `<div class="lvl-block-item"><span class="lvl-block-dot"></span>${bc?bc.icon+' ':''}${b.name} <span class="lvl-block-days">${dsince(b.lastDone)??'–'} dagar sen</span></div>`}).join('')}</div>`;
+    if(!items.length)h+=`<div class="lvl-empty">Inget här än. Sätt en uppgift till nivå ${lvl} när du redigerar den.</div>`;
     items.forEach(t=>{h+=rCard(t,idx++,'cat',!open)});
   }
   return h+'</div>';
@@ -1136,12 +1136,12 @@ function rTaskModal(){
   h+='</div><div class="add-cat-row"><input id="new-cat-name" placeholder="Ny kategori..." maxlength="20">';
   h+='<button data-action="addCategory">+ Lägg till</button></div></div>';
   h+=freqHTML;
-  // Niv\u00e5 \u2014 stegen delas av alla jobbkategorier
+  // Nivå — stegen delas av alla jobbkategorier
   const cl=tlvl(t);
-  h+='<div class="fg"><label class="fl">Niv\u00e5</label><div class="lvl-pick" id="lvlPick" data-level="'+cl+'">';
-  h+=`<button class="lvl-opt${cl===1?' sel':''}" data-action="setLevel" data-lvl="1"><b>Niv\u00e5 1</b><span>Grund</span></button>`;
-  h+=`<button class="lvl-opt${cl===2?' sel':''}" data-action="setLevel" data-lvl="2"><b>Niv\u00e5 2</b><span>\u00d6ppnas n\u00e4r niv\u00e5 1 \u00e4r gr\u00f6n</span></button>`;
-  h+=`<button class="lvl-opt${cl===3?' sel':''}" data-action="setLevel" data-lvl="3"><b>Niv\u00e5 3</b><span>\u00d6ppnas n\u00e4r 1 och 2 \u00e4r gr\u00f6na</span></button>`;
+  h+='<div class="fg"><label class="fl">Nivå</label><div class="lvl-pick" id="lvlPick" data-level="'+cl+'">';
+  h+=`<button class="lvl-opt${cl===1?' sel':''}" data-action="setLevel" data-lvl="1"><b>Nivå 1</b><span>Grund</span></button>`;
+  h+=`<button class="lvl-opt${cl===2?' sel':''}" data-action="setLevel" data-lvl="2"><b>Nivå 2</b><span>Öppnas när nivå 1 är grön</span></button>`;
+  h+=`<button class="lvl-opt${cl===3?' sel':''}" data-action="setLevel" data-lvl="3"><b>Nivå 3</b><span>Öppnas när 1 och 2 är gröna</span></button>`;
   h+='</div><p class="fh">Stegen delas av alla jobbkategorier. Privat har sin egen.</p></div>';
   // Deadline (P4) + klart senast (P3)
   const ed=t.endDate||'', cb=t.clearBy||'';
