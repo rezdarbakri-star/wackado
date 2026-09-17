@@ -509,17 +509,25 @@ const urg=t=>{
   return ds===null?1:ds/effFreq(t);
 };
 // ── LEVEL GATING ──────────────────────────────
-// Only active in these categories for now. Level 1 = foundation (always visible).
-// Level 2+ only exists once nothing below it is overdue (red).
-const LEVEL_CATS=['content'];
+// Stegen följer jobb/privat, inte kategori. Alla jobbkategorier delar en stege:
+// TikTok, Instagram, mejla sponsor och social proof är samma grund.
+// Privat har sin egen stege och blockerar aldrig jobb, eller tvärtom.
+const LEVEL_SIDES=['work','private'];
+const sideOf=cid=>catMode(cid)==='work'?'work':(catMode(cid)==='private'?'private':'both');
 const tlvl=t=>t.level||1;
-const maxLvl=catId=>Math.max(1,...ctasks(catId).map(tlvl));
-function blockers(catId,lvl){
-  if(!LEVEL_CATS.includes(catId)||lvl<=1)return[];
-  return ctasks(catId).filter(t=>tlvl(t)<lvl&&urg(t)>=1).sort((a,b)=>urg(b)-urg(a));
+// Uppgifter på samma sida av stegen. 'both' räknas till båda.
+const sideTasks=side=>allTasks().filter(t=>{const m=catMode(t.category);return m===side||m==='both'});
+const maxLvl=side=>Math.max(1,...sideTasks(side).map(tlvl));
+function blockers(side,lvl){
+  if(lvl<=1)return[];
+  return sideTasks(side).filter(t=>tlvl(t)<lvl&&urg(t)>=1).sort((a,b)=>urg(b)-urg(a));
 }
-const lvlOpen=(catId,lvl)=>blockers(catId,lvl).length===0;
-const taskOpen=t=>lvlOpen(t.category,tlvl(t));
+const lvlOpen=(side,lvl)=>blockers(side,lvl).length===0;
+const taskOpen=t=>{
+  const m=catMode(t.category);
+  if(m==='both')return lvlOpen('work',tlvl(t))||lvlOpen('private',tlvl(t));
+  return lvlOpen(m,tlvl(t));
+};
 const urgCls=t=>{const u=urg(t);return u>=1?'u-red':u>=.75?'u-org':u>=.5?'u-yel':'u-grn'};
 const lampCls=t=>{const u=urg(t);return u>=1?'red':u>=.75?'org':u>=.5?'yel':'grn'};
 const dayCol=t=>{const u=urg(t);return u>=1?'var(--red)':u>=.75?'var(--org)':u>=.5?'var(--yel)':'var(--grn)'};
@@ -726,22 +734,22 @@ function rStats(red,org,grn,allOk){
 // ═══════════════════════════════════════════
 function rTodo(){
   const all=allTasks();
-  // Nivåstyrda kategorier: hitta den lägsta nivå som fortfarande har något
-  // att göra. Allt på den nivån visas — ingen tröskel, ingen delvis nivå.
-  // Högre nivåer syns inte alls förrän den är tom.
-  const lvlCat={};
-  for(const cid of LEVEL_CATS){
-    const ts=ctasks(cid).filter(t=>!S.hiddenToday[t.id]&&modeOK(t));
+  // En aktiv nivå per sida (jobb / privat). Den lägsta nivå som fortfarande
+  // har något att göra styr. Hela den nivån visas — ingen tröskel, ingen
+  // delvis nivå. Högre nivåer syns inte alls förrän den är tom.
+  const activeLvl={};
+  for(const side of LEVEL_SIDES){
+    const ts=sideTasks(side).filter(t=>!S.hiddenToday[t.id]&&modeOK(t));
     const lvls=[...new Set(ts.map(tlvl))].sort((x,y)=>x-y);
-    // Lägsta nivån som fortfarande har något att göra styr.
-    // Är alla nivåer tysta hamnar du högst upp i stegen — där övrig tid ska läggas.
     const active=lvls.find(L=>ts.some(t=>tlvl(t)===L&&urg(t)>=.75));
-    lvlCat[cid]=active??lvls[lvls.length-1]??1;
+    activeLvl[side]=active??lvls[lvls.length-1]??1;
   }
   let items=all.filter(t=>{
     if(S.hiddenToday[t.id]||!modeOK(t))return false;
-    if(LEVEL_CATS.includes(t.category))return tlvl(t)===lvlCat[t.category];
-    return urg(t)>=.75||S.liftedToPrio.has(t.id);
+    if(S.liftedToPrio.has(t.id))return true;
+    const m=catMode(t.category);
+    if(m==='both')return tlvl(t)===activeLvl.work||tlvl(t)===activeLvl.private;
+    return tlvl(t)===activeLvl[m];
   });
   items.sort((a,b)=>urg(b)-urg(a));
   if(!items.length)return'';
@@ -834,28 +842,27 @@ function rCatView(){
   const cat=getCats().find(c=>c.id===S.expandedCat);if(!cat)return'';
   const ts=ctasks(cat.id);
   const shared=isShared(cat.id);
-  let h=`<div><div class="cat-back" data-action="collapseCat">← ${cat.icon} ${cat.label}${shared?' <span class="shared-tag">👥</span>':''} <span style="color:var(--t3);margin-left:auto;font-size:11px">${ts.length}</span></div>`;
-  if(!LEVEL_CATS.includes(cat.id)){
+  const side=sideOf(cat.id);
+  let h=`<div><div class="cat-back" data-action="collapseCat">\u2190 ${cat.icon} ${cat.label}${shared?' <span class="shared-tag">\u{1F465}</span>':''} <span style="color:var(--t3);margin-left:auto;font-size:11px">${ts.length}</span></div>`;
+  const lvlsHere=[...new Set(ts.map(tlvl))];
+  // Ingen niv\u00e5uppdelning beh\u00f6vs om allt h\u00e4r ligger p\u00e5 niv\u00e5 1
+  if(side==='both'||(lvlsHere.length===1&&lvlsHere[0]===1)){
     sortTasks(ts).forEach((t,i)=>{h+=rCard(t,i,'cat')});
     return h+'</div>';
   }
-  // Levelled category
-  const top=maxLvl(cat.id);
+  const top=Math.max(2,...lvlsHere);
   let idx=0;
-  // Level 1 — always listed
-  const base=sortTasks(ts.filter(t=>tlvl(t)===1));
-  base.forEach(t=>{h+=rCard(t,idx++,'cat')});
-  // Level 2+ — collapsible divider, same pattern as "Visa kategorier"
-  for(let lvl=2;lvl<=Math.max(2,top);lvl++){
+  sortTasks(ts.filter(t=>tlvl(t)===1)).forEach(t=>{h+=rCard(t,idx++,'cat')});
+  for(let lvl=2;lvl<=top;lvl++){
     const items=sortTasks(ts.filter(t=>tlvl(t)===lvl));
-    const open=lvlOpen(cat.id,lvl);
-    const blocks=blockers(cat.id,lvl);
+    const open=lvlOpen(side,lvl);          // l\u00e5set g\u00e4ller hela sidan, inte bara denna kategori
+    const blocks=blockers(side,lvl);
     const shown=!!S.peekLvl[cat.id+':'+lvl];
     const cnt=items.length?` (${items.length})`:'';
-    h+=`<div class="divider lvl-div${open?' open':''}" data-action="peekLvl" data-cat="${cat.id}" data-lvl="${lvl}"><div class="divider-line"></div><div class="divider-text">${shown?'▾':'▸'} ${open?'🔓':'🔒'} Nivå ${lvl}${cnt}</div><div class="divider-line"></div></div>`;
+    h+=`<div class="divider lvl-div${open?' open':''}" data-action="peekLvl" data-cat="${cat.id}" data-lvl="${lvl}"><div class="divider-line"></div><div class="divider-text">${shown?'\u25be':'\u25b8'} ${open?'\u{1F513}':'\u{1F512}'} Niv\u00e5 ${lvl}${cnt}</div><div class="divider-line"></div></div>`;
     if(!shown)continue;
-    if(!open)h+=`<div class="lvl-block">Lås upp genom att göra:${blocks.map(b=>`<div class="lvl-block-item"><span class="lvl-block-dot"></span>${b.name} <span class="lvl-block-days">${dsince(b.lastDone)??'–'} dagar sen</span></div>`).join('')}</div>`;
-    if(!items.length)h+=`<div class="lvl-empty">Inget här än. Sätt en uppgift till nivå ${lvl} när du redigerar den.</div>`;
+    if(!open)h+=`<div class="lvl-block">L\u00e5s upp genom att g\u00f6ra:${blocks.map(b=>{const bc=getCats().find(c=>c.id===b.category);return `<div class="lvl-block-item"><span class="lvl-block-dot"></span>${bc?bc.icon+' ':''}${b.name} <span class="lvl-block-days">${dsince(b.lastDone)??'\u2013'} dagar sen</span></div>`}).join('')}</div>`;
+    if(!items.length)h+=`<div class="lvl-empty">Inget h\u00e4r \u00e4n. S\u00e4tt en uppgift till niv\u00e5 ${lvl} n\u00e4r du redigerar den.</div>`;
     items.forEach(t=>{h+=rCard(t,idx++,'cat',!open)});
   }
   return h+'</div>';
@@ -1124,6 +1131,13 @@ function rTaskModal(){
   h+='</div><div class="add-cat-row"><input id="new-cat-name" placeholder="Ny kategori..." maxlength="20">';
   h+='<button data-action="addCategory">+ Lägg till</button></div></div>';
   h+=freqHTML;
+  // Niv\u00e5 \u2014 stegen delas av alla jobbkategorier
+  const cl=tlvl(t);
+  h+='<div class="fg"><label class="fl">Niv\u00e5</label><div class="lvl-pick" id="lvlPick" data-level="'+cl+'">';
+  h+=`<button class="lvl-opt${cl===1?' sel':''}" data-action="setLevel" data-lvl="1"><b>Niv\u00e5 1</b><span>Grund</span></button>`;
+  h+=`<button class="lvl-opt${cl===2?' sel':''}" data-action="setLevel" data-lvl="2"><b>Niv\u00e5 2</b><span>\u00d6ppnas n\u00e4r niv\u00e5 1 \u00e4r gr\u00f6n</span></button>`;
+  h+=`<button class="lvl-opt${cl===3?' sel':''}" data-action="setLevel" data-lvl="3"><b>Niv\u00e5 3</b><span>\u00d6ppnas n\u00e4r 1 och 2 \u00e4r gr\u00f6na</span></button>`;
+  h+='</div><p class="fh">Stegen delas av alla jobbkategorier. Privat har sin egen.</p></div>';
   // Deadline (P4) + klart senast (P3)
   const ed=t.endDate||'', cb=t.clearBy||'';
   h+='<div class="fg"><label class="fl">Deadline (valfritt)</label>';
