@@ -726,7 +726,9 @@ function rStats(red,org,grn,allOk){
 // ═══════════════════════════════════════════
 function rTodo(){
   const all=allTasks();
-  const items=all.filter(t=>(urg(t)>=.75||S.liftedToPrio.has(t.id))&&!S.hiddenToday[t.id]&&taskOpen(t)&&modeOK(t));
+  // Upplåsta nivå 2+ visas alltid — det är belöningen för att grunden är grön.
+  // De sorteras på urgency som allt annat och hamnar därför längst ner.
+  const items=all.filter(t=>(urg(t)>=.75||tlvl(t)>=2||S.liftedToPrio.has(t.id))&&!S.hiddenToday[t.id]&&taskOpen(t)&&modeOK(t));
   items.sort((a,b)=>urg(b)-urg(a));
   if(!items.length)return'';
   let h=`<div style="margin-bottom:4px">`;
