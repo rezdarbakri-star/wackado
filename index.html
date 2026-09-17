@@ -726,17 +726,23 @@ function rStats(red,org,grn,allOk){
 // ═══════════════════════════════════════════
 function rTodo(){
   const all=allTasks();
-  // Upplåsta nivå 2+ syns tidigare än nivå 1 (belöningen för grön grund),
-  // men en nyss avbockad task är under 0.25 och försvinner som allt annat.
-  // En nivå i taget: inom en nivåstyrd kategori visas bara den lägsta nivå
-  // som har något att visa. Är något kvar på nivå 1 syns inte nivå 2 alls.
-  let items=all.filter(t=>(urg(t)>=.75||(tlvl(t)>=2&&urg(t)>=.25)||S.liftedToPrio.has(t.id))&&!S.hiddenToday[t.id]&&taskOpen(t)&&modeOK(t));
+  // Nivåstyrda kategorier: hitta den lägsta nivå som fortfarande har något
+  // att göra. Allt på den nivån visas — ingen tröskel, ingen delvis nivå.
+  // Högre nivåer syns inte alls förrän den är tom.
+  const lvlCat={};
   for(const cid of LEVEL_CATS){
-    const inCat=items.filter(t=>t.category===cid);
-    if(inCat.length<2)continue;
-    const low=Math.min(...inCat.map(tlvl));
-    items=items.filter(t=>t.category!==cid||tlvl(t)===low);
+    const ts=ctasks(cid).filter(t=>!S.hiddenToday[t.id]&&modeOK(t));
+    const lvls=[...new Set(ts.map(tlvl))].sort((x,y)=>x-y);
+    // Lägsta nivån som fortfarande har något att göra styr.
+    // Är alla nivåer tysta hamnar du högst upp i stegen — där övrig tid ska läggas.
+    const active=lvls.find(L=>ts.some(t=>tlvl(t)===L&&urg(t)>=.75));
+    lvlCat[cid]=active??lvls[lvls.length-1]??1;
   }
+  let items=all.filter(t=>{
+    if(S.hiddenToday[t.id]||!modeOK(t))return false;
+    if(LEVEL_CATS.includes(t.category))return tlvl(t)===lvlCat[t.category];
+    return urg(t)>=.75||S.liftedToPrio.has(t.id);
+  });
   items.sort((a,b)=>urg(b)-urg(a));
   if(!items.length)return'';
   let h=`<div style="margin-bottom:4px">`;
@@ -756,11 +762,9 @@ function rTimeline(t){
   const span=p1;
   const used=Math.min(1,Math.max(0,(p1-left)/span));
   const m2=((p1-p2)/span)*100, m3=((p1-p3)/span)*100;
-  const freq=effFreq(t);
   let note;
   if(left>p3){
-    const pass=Math.max(1,Math.floor((left-p3)/freq));
-    note=`${left} dagar kvar · ${pass} pass till deadline`;
+    note=`${left} dagar kvar`;
   }else if(left>0){note=`${left} dag${left>1?'ar':''} marginal kvar`}
   else if(left===0){note='Sista dagen'}
   else{note=`${Math.abs(left)} dag${Math.abs(left)!==1?'ar':''} över slutdatum`}
