@@ -481,28 +481,27 @@ function effFreq(t){
   return t.frequencyDays||7;
 }
 // ── DEADLINE-KURVA ────────────────────────────
-// P4 = slutdatum. D = marginal, dagar före P4 då det ska vara klart (P3).
-// Uttryckt i "dagar kvar": P3=D, P2=2D, P1=3D, P4=0.
-const _S=x=>x*x*(3-2*x);                      // smoothstep
-const PEAK_DL=1.6, MID_DL=0.5;                // tak, och gultröskeln vid P2
-const dlLeft=t=>t.endDate?Math.ceil((new Date(t.endDate+'T00:00:00')-new Date(today()+'T00:00:00'))/864e5):null;
+// Två datum: endDate (P4, deadline) och clearBy (P3, klart senast).
+// P2 och P1 räknas bakåt från P3 med samma skala för ALLA uppgifter —
+// det är det som gör att dagar kvar betyder samma sak överallt.
+const DL_RAMP=21, DL_LEAD=42;          // klättring resp. första synlighet, dagar före P3
+const DL_LOW=0.25, DL_PEAK=1.6;        // låg platå resp. tak
+const daysUntil=d=>d?Math.ceil((new Date(d+'T00:00:00')-new Date(today()+'T00:00:00'))/864e5):null;
+const dlLeft=t=>daysUntil(t.endDate);                       // dagar till deadline
+const clearDate=t=>t.clearBy||t.endDate||null;              // P3, faller tillbaka på P4
+const dlClear=t=>daysUntil(clearDate(t));                   // dagar till klart-senast
 function dlPoints(t){
   if(!t.endDate)return null;
-  const d=Math.max(0,t.dlMargin??0);
-  return{p1:3*d,p2:2*d,p3:d,p4:0,d,left:dlLeft(t)};
+  return{left4:dlLeft(t),left3:dlClear(t),ramp:DL_RAMP,lead:DL_LEAD};
 }
-// Brådska enbart från slutdatumet. 0 innan kurvan startat.
 function dlUrg(t){
-  const P=dlPoints(t);if(!P)return 0;
-  const {p1,p2,p3,d,left}=P;
-  if(d===0)return left<=0?PEAK_DL:0;           // ingen marginal: slår till på slutdatumet
-  if(left>p1)return 0;
-  if(left>p2)return MID_DL*_S((p1-left)/(p1-p2));
-  if(left>p3)return MID_DL+(PEAK_DL-MID_DL)*_S((p2-left)/(p2-p3));
-  return PEAK_DL;
+  if(!t.endDate)return 0;
+  const K=dlClear(t);
+  if(K>DL_LEAD)return 0;
+  if(K>DL_RAMP)return DL_LOW;
+  if(K>0)return DL_LOW+(DL_PEAK-DL_LOW)*((DL_RAMP-K)/DL_RAMP);
+  return DL_PEAK;
 }
-// Har tasken slutdatum styr kurvan ensam — rytmen är då en ambition,
-// inte en skuld, och frekvensen används bara för att räkna pass kvar.
 const urg=t=>{
   if(t.endDate)return dlUrg(t);
   const ds=dsince(t.lastDone);
@@ -753,22 +752,23 @@ function rTodo(){
 // ═══════════════════════════════════════════
 // CARD – universal, used in both views
 // ═══════════════════════════════════════════
-// Tidslinje: förbrukad tid från P1, med markörer vid P2 och P3.
-// Mäter tid som gått, inte utfört arbete.
+// Tidslinje: P1 → P4. Fylld del är förbrukad tid.
+// Markeringar vid P2 (börjar klättra) och P3 (ska vara klart).
 function rTimeline(t){
-  const P=dlPoints(t);if(!P||!P.d)return'';
-  const {p1,p2,p3,left}=P;
-  if(left>p1)return'';                                  // före P1 syns ingenting
-  const span=p1;
-  const used=Math.min(1,Math.max(0,(p1-left)/span));
-  const m2=((p1-p2)/span)*100, m3=((p1-p3)/span)*100;
-  let note;
-  if(left>p3){
-    note=`${left} dagar kvar`;
-  }else if(left>0){note=`${left} dag${left>1?'ar':''} marginal kvar`}
-  else if(left===0){note='Sista dagen'}
-  else{note=`${Math.abs(left)} dag${Math.abs(left)!==1?'ar':''} över slutdatum`}
-  const late=left<=p3;
+  if(!t.endDate)return'';
+  const K=dlClear(t);
+  if(K>DL_LEAD)return'';                       // före P1 syns ingenting
+  const buf=Math.max(0,daysUntil(t.endDate)-K);// dagar mellan P3 och P4
+  const span=DL_LEAD+buf;                      // hela linjen, P1 till P4
+  const gone=DL_LEAD-K;
+  const used=Math.min(1,Math.max(0,gone/span));
+  const m2=((DL_LEAD-DL_RAMP)/span)*100, m3=(DL_LEAD/span)*100;
+  let note,late=false;
+  if(K>DL_RAMP)note=`${K} dagar tills det ska vara klart`;
+  else if(K>0)note=`${K} dag${K>1?'ar':''} kvar att bli klar`;
+  else{late=true;const d4=daysUntil(t.endDate);
+    note=d4>0?`Skulle varit klart — ${d4} dag${d4>1?'ar':''} till deadline`
+      :(d4===0?'Deadline idag':`${Math.abs(d4)} dag${Math.abs(d4)!==1?'ar':''} över deadline`)}
   return`<div class="tl"><div class="tl-bar"><div class="tl-fill${late?' late':''}" style="width:${used*100}%"></div><span class="tl-tick" style="left:${m2}%"></span><span class="tl-tick strong" style="left:${m3}%"></span></div><div class="tl-note${late?' late':''}">${note}</div></div>`;
 }
 function rCard(t,i,ctx){
@@ -1003,7 +1003,7 @@ function rExpiredModal(){
   h+=`<p style="font-size:12px;color:var(--t3);margin-bottom:16px">Slutdatumet var ${t.endDate}${past?` — ${past} dag${past>1?'ar':''} sedan`:''}.</p>`;
   h+='<div class="fg"><label class="fl">Förnya med nytt slutdatum</label>';
   h+=`<input class="fi" type="date" id="exp-date" min="${today()}">`;
-  h+=`<p class="fh">Marginalen (${t.dlMargin??0} dagar) följer med.</p></div>`;
+  h+=`<p class="fh">Samma framförhållning (${Math.max(0,daysUntil(t.endDate)-dlClear(t))} dagar) följer med.</p></div>`;
   h+='<button class="bp" data-action="expRenew" style="margin-bottom:8px">Förnya</button>';
   h+='<button class="bs" data-action="expClear" style="margin-bottom:8px">Bocka av, ta bort slutdatum</button>';
   h+='<button class="bd" data-action="expDelete" style="width:100%">Ta bort uppgiften helt</button>';
@@ -1126,21 +1126,14 @@ function rTaskModal(){
   h+='</div><div class="add-cat-row"><input id="new-cat-name" placeholder="Ny kategori..." maxlength="20">';
   h+='<button data-action="addCategory">+ Lägg till</button></div></div>';
   h+=freqHTML;
-  // Slutdatum + marginal
-  const ed=t.endDate||'', dm=t.dlMargin??0;
-  h+='<div class="fg"><label class="fl">Slutdatum (valfritt)</label>';
+  // Deadline (P4) + klart senast (P3)
+  const ed=t.endDate||'', cb=t.clearBy||'';
+  h+='<div class="fg"><label class="fl">Deadline (valfritt)</label>';
   h+=`<input class="fi" type="date" id="t-end" value="${ed}">`;
   h+=`<div id="dl-extra" style="display:${ed?'block':'none'};margin-top:8px">`;
-  h+='<label class="fl" style="font-size:11px">Ska vara klart så här många dagar innan</label>';
-  h+=`<input class="fi" type="number" id="t-margin" min="0" max="365" value="${dm}" placeholder="0">`;
+  h+='<label class="fl" style="font-size:11px">Klart senast</label>';
+  h+=`<input class="fi" type="date" id="t-clear" value="${cb}" max="${ed}">`;
   h+='<p class="fh" id="dl-hint"></p></div></div>';
-  // Level picker
-  const cl=tlvl(t);
-  h+='<div class="fg"><label class="fl">Nivå</label><div class="lvl-pick" id="lvlPick" data-level="'+cl+'">';
-  h+=`<button class="lvl-opt${cl===1?' sel':''}" data-action="setLevel" data-lvl="1"><b>Nivå 1</b><span>Grund</span></button>`;
-  h+=`<button class="lvl-opt${cl===2?' sel':''}" data-action="setLevel" data-lvl="2"><b>Nivå 2</b><span>Öppnas när nivå 1 är grön</span></button>`;
-  h+=`<button class="lvl-opt${cl===3?' sel':''}" data-action="setLevel" data-lvl="3"><b>Nivå 3</b><span>Öppnas när 1 och 2 är gröna</span></button>`;
-  h+=`</div><p class="fh">Gäller just nu bara i Innehåll.</p></div>`;
   if(isE)h+=`<div class="fg"><label class="fl">Senast gjord</label><input class="fi" type="date" id="tl" value="${t.lastDone?t.lastDone.split('T')[0]:''}" max="${today()}"></div>`;
   h+=assignF;
   h+='<div class="br">';
@@ -1333,16 +1326,17 @@ function bind(){
   const af=document.querySelector('[autofocus]');if(af)setTimeout(()=>af.focus(),50);
   // Group dropdown toggle new-input
   // Slutdatum: visa kurvans fyra punkter live
-  const te=document.getElementById('t-end'),tm=document.getElementById('t-margin');
+  const te=document.getElementById('t-end'),tm=document.getElementById('t-clear');
   if(te){
     const upd=()=>{
       const ex=document.getElementById('dl-extra'),hint=document.getElementById('dl-hint');
       if(ex)ex.style.display=te.value?'block':'none';
       if(!hint||!te.value)return;
-      const d=Math.max(0,parseInt(tm?.value)||0);
-      if(!d){hint.textContent='Utan marginal slår den till först på slutdatumet.';return}
-      const fmt=n=>{const x=new Date(te.value+'T00:00:00');x.setDate(x.getDate()-n);return x.toISOString().split('T')[0].slice(5)};
-      hint.textContent=`Syns ${fmt(3*d)} · gul ${fmt(2*d)} · max ${fmt(d)} · slut ${te.value.slice(5)}`;
+      if(tm&&!tm.value)tm.value=te.value;        // klart senast = deadline som standard
+      if(tm)tm.max=te.value;
+      const base=tm?.value||te.value;
+      const fmt=n=>{const x=new Date(base+'T00:00:00');x.setDate(x.getDate()-n);return x.toISOString().split('T')[0].slice(5)};
+      hint.textContent=`Syns ${fmt(42)} · klättrar från ${fmt(21)} · max ${base.slice(5)} · deadline ${te.value.slice(5)}`;
     };
     te.addEventListener('change',upd);te.addEventListener('input',upd);
     tm?.addEventListener('input',upd);
@@ -1419,7 +1413,7 @@ function H(e){
       S.modal=null;save();R();break}
     case 'expClear':{
       const t=findTask(S.modal.id)?.task;if(!t)break;
-      t.lastDone=new Date().toISOString();t.endDate=null;t.dlMargin=0;
+      t.lastDone=new Date().toISOString();t.endDate=null;t.clearBy=null;
       S.modal=null;save();R();break}
     case 'expDelete':{
       const id=S.modal.id;
@@ -1452,17 +1446,17 @@ function H(e){
       const freqMonthDay=mt.freqMonthDay||null;
       const lvl=parseInt(document.getElementById('lvlPick')?.dataset.level)||mt.level||1;
       const endDate=document.getElementById('t-end')?.value||null;
-      const dlMargin=endDate?Math.max(0,parseInt(document.getElementById('t-margin')?.value)||0):0;
+      const clearBy=endDate?(document.getElementById('t-clear')?.value||endDate):null;
       if(mt.id){
         const f=findTask(mt.id);if(f){const t=f.task;const was=f.src==='h';const now=shared;
-          t.name=n;t.category=sc;t.frequencyDays=freq;t.level=lvl;t.endDate=endDate;t.dlMargin=dlMargin;
+          t.name=n;t.category=sc;t.frequencyDays=freq;t.level=lvl;t.endDate=endDate;t.clearBy=clearBy;
           t.freqType=freqType;t.freqWeekday=freqWeekday;t.freqMonthDay=freqMonthDay;
           if(mt.assignedTo!==undefined)t.assignedTo=mt.assignedTo;
           const lde=document.getElementById('tl');if(lde?.value)t.lastDone=new Date(lde.value+'T12:00:00').toISOString();else if(lde&&!lde.value)t.lastDone=null;
           if(!was&&now&&S.household){S.tasks=S.tasks.filter(x=>x.id!==t.id);S.household.tasks.push(t)}
           else if(was&&!now&&S.household){S.household.tasks=S.household.tasks.filter(x=>x.id!==t.id);S.tasks.push(t)}
         }
-      }else{const nt={id:gid(),name:n,category:sc,frequencyDays:freq,freqType,freqWeekday,freqMonthDay,level:lvl,endDate,dlMargin,lastDone:null,assignedTo:null};if(shared&&S.household)S.household.tasks.push(nt);else S.tasks.push(nt)}
+      }else{const nt={id:gid(),name:n,category:sc,frequencyDays:freq,freqType,freqWeekday,freqMonthDay,level:lvl,endDate,clearBy,lastDone:null,assignedTo:null};if(shared&&S.household)S.household.tasks.push(nt);else S.tasks.push(nt)}
       S.modal=null;save();R();break}
     case 'deleteTask':S.modal={type:'confirm',taskId:el.dataset.id};R();break;
     case 'confirmDelete':{const id=el.dataset.id;S.tasks=S.tasks.filter(t=>t.id!==id);if(S.household)S.household.tasks=(S.household.tasks||[]).filter(t=>t.id!==id);S.modal=null;save();R();break}
