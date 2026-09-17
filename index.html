@@ -744,12 +744,17 @@ function rTodo(){
     const active=lvls.find(L=>ts.some(t=>tlvl(t)===L&&urg(t)>=.75));
     activeLvl[side]=active??lvls[lvls.length-1]??1;
   }
+  // Niv\u00e5 1 \u00e4r skulder \u2014 avbockat f\u00f6rsvinner, bara det som beh\u00f6ver g\u00f6ras syns.
+  // Niv\u00e5 2+ \u00e4r m\u00f6jligheter \u2014 ingenting \u00e4r n\u00e5gonsin "klart", allt visas.
+  const onActive=t=>{
+    const m=catMode(t.category);
+    return m==='both'?(tlvl(t)===activeLvl.work||tlvl(t)===activeLvl.private):tlvl(t)===activeLvl[m];
+  };
   let items=all.filter(t=>{
     if(S.hiddenToday[t.id]||!modeOK(t))return false;
     if(S.liftedToPrio.has(t.id))return true;
-    const m=catMode(t.category);
-    if(m==='both')return tlvl(t)===activeLvl.work||tlvl(t)===activeLvl.private;
-    return tlvl(t)===activeLvl[m];
+    if(!onActive(t))return false;
+    return tlvl(t)>=2||urg(t)>=.75;
   });
   items.sort((a,b)=>urg(b)-urg(a));
   if(!items.length)return'';
