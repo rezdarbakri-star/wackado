@@ -503,11 +503,11 @@ function dlUrg(t){
   if(K>0)return DL_LOW+(DL_PEAK-DL_LOW)*((DL_RAMP-K)/DL_RAMP);
   return DL_PEAK;
 }
-const urg=t=>{
-  if(t.endDate)return dlUrg(t);
-  const ds=dsince(t.lastDone);
-  return ds===null?1:ds/effFreq(t);
-};
+// Två tal per uppgift, för de svarar på olika frågor.
+// rytm = ska den synas just nu? Bockar du av något går den till 0 och försvinner.
+// urg  = hur högt i listan. Har uppgiften deadline rankar kurvan ensam.
+const rytm=t=>{const ds=dsince(t.lastDone);return ds===null?1:ds/effFreq(t)};
+const urg=t=>t.endDate?dlUrg(t):rytm(t);
 // ── LEVEL GATING ──────────────────────────────
 // Stegen följer jobb/privat, inte kategori. Alla jobbkategorier delar en stege:
 // TikTok, Instagram, mejla sponsor och social proof är samma grund.
@@ -741,7 +741,7 @@ function rTodo(){
   for(const side of LEVEL_SIDES){
     const ts=sideTasks(side).filter(t=>!S.hiddenToday[t.id]&&modeOK(t));
     const lvls=[...new Set(ts.map(tlvl))].sort((x,y)=>x-y);
-    const active=lvls.find(L=>ts.some(t=>tlvl(t)===L&&urg(t)>=.75));
+    const active=lvls.find(L=>ts.some(t=>tlvl(t)===L&&rytm(t)>=.75));
     activeLvl[side]=active??lvls[lvls.length-1]??1;
   }
   // Samma regel på alla nivåer: avbockat försvinner, frekvensen avgör när
@@ -754,7 +754,7 @@ function rTodo(){
     if(S.hiddenToday[t.id]||!modeOK(t))return false;
     if(S.liftedToPrio.has(t.id))return true;
     if(!onActive(t))return false;
-    return urg(t)>=.75;
+    return rytm(t)>=.75;
   });
   items.sort((a,b)=>urg(b)-urg(a));
   if(!items.length)return'';
