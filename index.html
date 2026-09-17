@@ -501,10 +501,12 @@ function dlUrg(t){
   if(left>p3)return MID_DL+(PEAK_DL-MID_DL)*_S((p2-left)/(p2-p3));
   return PEAK_DL;
 }
+// Har tasken slutdatum styr kurvan ensam — rytmen är då en ambition,
+// inte en skuld, och frekvensen används bara för att räkna pass kvar.
 const urg=t=>{
+  if(t.endDate)return dlUrg(t);
   const ds=dsince(t.lastDone);
-  const rytm=ds===null?1:ds/effFreq(t);
-  return Math.max(rytm,dlUrg(t));
+  return ds===null?1:ds/effFreq(t);
 };
 // ── LEVEL GATING ──────────────────────────────
 // Only active in these categories for now. Level 1 = foundation (always visible).
@@ -757,6 +759,7 @@ function rTimeline(t){
 function rCard(t,i,ctx){
   const ds=dsince(t.lastDone);
   const daysNum=ds===null?'–':ds;
+  const _dl=dlLeft(t);
   const cat=getCats().find(c=>c.id===t.category);
   const shared=isShared(t.category);
   const isExp=S.expandedTask===t.id;
@@ -767,12 +770,14 @@ function rCard(t,i,ctx){
   const isL2=tlvl(t)>=2;
   let h=`<div><div class="tc ${urgCls(t)} ${extra}${shared?' shared':''}" style="animation-delay:${i*.03}s">`;
   // THE number: days since
-  h+=`<div class="tc-days"><div class="tc-days-num" style="color:${dayCol(t)}">${daysNum}</div><div class="tc-days-lbl">dagar sen</div></div>`;
+  // Med slutdatum är dagar kvar det som styr, så det är den siffran som visas.
+  const _big=_dl!==null?(_dl>0?_dl:Math.abs(_dl)):daysNum;
+  const _lbl=_dl!==null?(_dl>0?'dagar kvar':(_dl===0?'sista dagen':'dagar över')):'dagar sen';
+  h+=`<div class="tc-days"><div class="tc-days-num" style="color:${dayCol(t)}">${_big}</div><div class="tc-days-lbl">${_lbl}</div></div>`;
   // Signal lamp
   h+=`<div class="tc-lamp ${lampCls(t)}"></div>`;
   // Info
-  const _dl=dlLeft(t);
-  const dlMeta=_dl===null?'':`<span class="dot">\u00b7</span><span class="dl-meta${_dl<=0?' past':''}">${_dl>0?_dl+' dgr kvar':'slutdatum passerat'}</span>`;
+  const dlMeta='';
   const lvMeta=(isL2&&isPrio)?`<span class="dot">·</span><span class="lv-meta">Nivå ${tlvl(t)}</span>`:'';
   h+=`<div class="tc-info" data-action="toggleTask" data-id="${t.id}"><div class="tc-name">${t.name}${isLifted&&!isPrio?' <span class="prio-pin">📌</span>':''}${shared?' <span class="shared-tag">👥</span>':''}</div><div class="tc-meta">${cat?cat.icon+' '+cat.label:''}<span class="dot">·</span>${ffreqLabel(t)}${lvMeta}${dlMeta}</div></div>`;
   // Actions
