@@ -137,17 +137,15 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .tc.u-yel{border-color:rgba(255,212,59,.35);background:var(--yel-s)}
 .tc.u-org{border-color:rgba(255,140,66,.4);background:var(--org-s)}
 .tc.u-red{border-color:rgba(255,71,87,.45);background:var(--red-s)}
-/* Hero — översta pulsen. Storlek, höjd och luft; färgen är upptagen av brådska. */
-.tc.hero{padding:19px 18px;border-width:2.5px;box-shadow:0 6px 22px rgba(0,0,0,.13),0 1px 3px rgba(0,0,0,.08);margin-bottom:0;transform:translateZ(0);animation:heroIn .35s cubic-bezier(.2,.8,.2,1) forwards}
-.tc.hero .tc-name{font-size:17.5px;font-weight:700}
+/* Hero — översta pulsen. Bara vertikal emfas: alla lodräta kanter
+   (sidopadding, dagar-kolumn, knapp) hålls identiska med korten under. */
+.tc.hero{padding:22px 16px;box-shadow:0 6px 22px rgba(0,0,0,.13),0 1px 3px rgba(0,0,0,.08);margin-bottom:0;animation:heroIn .35s cubic-bezier(.2,.8,.2,1) forwards}
+.tc.hero .tc-name{font-size:17px;font-weight:700}
 .tc.hero .tc-days-num{font-size:30px}
-.tc.hero .tc-days{min-width:58px}
-.tc.hero .tc-days-lbl{font-size:9.5px}
-.tc.hero .tc-btn.check{width:46px;height:46px;font-size:19px}
-.tc.hero:hover{transform:translateY(-1px)}
-.hero-wrap{margin-bottom:18px;position:relative}
-.hero-wrap::after{content:'';position:absolute;left:12%;right:12%;bottom:-9px;height:1px;background:var(--brd)}
-@keyframes heroIn{from{opacity:0;transform:translateY(-6px) scale(.985)}to{opacity:1;transform:none}}
+.tc.hero .tc-days-lbl{margin-top:4px}
+.hero-wrap{margin-bottom:20px;position:relative}
+.hero-wrap::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:1px;background:var(--brd)}
+@keyframes heroIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 /* Shared */
 .tc.shared{box-shadow:inset 3px 0 0 var(--acc)}
 .shared-tag{font-size:9px;font-weight:600;padding:2px 5px;border-radius:4px;background:var(--acc-g);color:var(--acc)}
