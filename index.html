@@ -137,6 +137,17 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .tc.u-yel{border-color:rgba(255,212,59,.35);background:var(--yel-s)}
 .tc.u-org{border-color:rgba(255,140,66,.4);background:var(--org-s)}
 .tc.u-red{border-color:rgba(255,71,87,.45);background:var(--red-s)}
+/* Hero — översta pulsen. Storlek, höjd och luft; färgen är upptagen av brådska. */
+.tc.hero{padding:19px 18px;border-width:2.5px;box-shadow:0 6px 22px rgba(0,0,0,.13),0 1px 3px rgba(0,0,0,.08);margin-bottom:0;transform:translateZ(0);animation:heroIn .35s cubic-bezier(.2,.8,.2,1) forwards}
+.tc.hero .tc-name{font-size:17.5px;font-weight:700}
+.tc.hero .tc-days-num{font-size:30px}
+.tc.hero .tc-days{min-width:58px}
+.tc.hero .tc-days-lbl{font-size:9.5px}
+.tc.hero .tc-btn.check{width:46px;height:46px;font-size:19px}
+.tc.hero:hover{transform:translateY(-1px)}
+.hero-wrap{margin-bottom:18px;position:relative}
+.hero-wrap::after{content:'';position:absolute;left:12%;right:12%;bottom:-9px;height:1px;background:var(--brd)}
+@keyframes heroIn{from{opacity:0;transform:translateY(-6px) scale(.985)}to{opacity:1;transform:none}}
 /* Shared */
 .tc.shared{box-shadow:inset 3px 0 0 var(--acc)}
 .shared-tag{font-size:9px;font-weight:600;padding:2px 5px;border-radius:4px;background:var(--acc-g);color:var(--acc)}
@@ -471,7 +482,10 @@ function findTask(id){let t=S.tasks.find(x=>x.id===id);if(t)return{task:t,src:'p
 // Color = urgency signal based on ratio
 // ═══════════════════════════════════════════
 const gid=()=>Date.now().toString(36)+Math.random().toString(36).substr(2,5);
-const dsince=d=>{if(!d)return null;return Math.floor((new Date()-new Date(d))/864e5)};
+// Kalenderdygn, inte förfluten tid. Bockar du av kl 18 på måndag ska det
+// stå 1 dag på tisdag morgon, inte vänta till kl 18 på tisdag.
+const midnight=d=>{const x=new Date(d);x.setHours(0,0,0,0);return x};
+const dsince=d=>{if(!d)return null;return Math.round((midnight(new Date())-midnight(d))/864e5)};
 // Effective frequency in days for urgency ratio
 function effFreq(t){
   if(t.freqType==='weekly')return 7;
@@ -487,7 +501,7 @@ function effFreq(t){
 // det är det som gör att dagar kvar betyder samma sak överallt.
 const DL_RAMP=21, DL_LEAD=42;          // klättring resp. första synlighet, dagar före P3
 const DL_LOW=0.25, DL_PEAK=1.6;        // låg platå resp. tak
-const daysUntil=d=>d?Math.ceil((new Date(d+'T00:00:00')-new Date(today()+'T00:00:00'))/864e5):null;
+const daysUntil=d=>d?Math.round((midnight(new Date(d+'T00:00:00'))-midnight(new Date()))/864e5):null;
 const dlLeft=t=>daysUntil(t.endDate);                       // dagar till deadline
 const clearDate=t=>t.clearBy||t.endDate||null;              // P3, faller tillbaka på P4
 const dlClear=t=>daysUntil(clearDate(t));                   // dagar till klart-senast
@@ -759,7 +773,7 @@ function rTodo(){
   items.sort((a,b)=>urg(b)-urg(a));
   if(!items.length)return'';
   let h=`<div style="margin-bottom:4px">`;
-  items.forEach((t,i)=>{h+=rCard(t,i,'prio')});
+  items.forEach((t,i)=>{h+=rCard(t,i,'prio',false,i===0&&items.length>1)});
   return h+'</div>';
 }
 
@@ -785,7 +799,7 @@ function rTimeline(t){
       :(d4===0?'Deadline idag':`${Math.abs(d4)} dag${Math.abs(d4)!==1?'ar':''} över deadline`)}
   return`<div class="tl"><div class="tl-bar"><div class="tl-fill${late?' late':''}" style="width:${used*100}%"></div><span class="tl-tick" style="left:${m2}%"></span><span class="tl-tick strong" style="left:${m3}%"></span></div><div class="tl-note${late?' late':''}">${note}</div></div>`;
 }
-function rCard(t,i,ctx,dim){
+function rCard(t,i,ctx,dim,hero){
   const ds=dsince(t.lastDone);
   const daysNum=ds===null?'–':ds;
   const _dl=dlLeft(t);
@@ -797,7 +811,7 @@ function rCard(t,i,ctx,dim){
   const extra=isPrio?'':'cat-card';
 
   const isL2=tlvl(t)>=2;
-  let h=`<div><div class="tc ${urgCls(t)} ${extra}${shared?' shared':''}${dim?' lvl-ghost':''}" style="animation-delay:${i*.03}s">`;
+  let h=`<div class="${hero?'hero-wrap':''}"><div class="tc ${urgCls(t)} ${extra}${shared?' shared':''}${dim?' lvl-ghost':''}${hero?' hero':''}" style="animation-delay:${hero?0:i*.03}s">`;
   // THE number: days since
   h+=`<div class="tc-days"><div class="tc-days-num" style="color:${dayCol(t)}">${daysNum}</div><div class="tc-days-lbl">dagar sen</div></div>`;
   // Signal lamp
