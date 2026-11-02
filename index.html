@@ -114,11 +114,20 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .vac-strip .vac-txt{font-size:12px;font-family:'Space Mono',monospace;font-weight:600;color:var(--acc)}
 .vac-empty{display:flex;align-items:center;gap:6px;padding:6px 0 8px;cursor:pointer;font-size:12px;color:var(--t3);border-bottom:1px solid var(--brd)}
 .vac-empty:hover{color:var(--acc)}
-/* Trip work-hours countdown */
-.trip-strip{padding:7px 0 8px;border-bottom:1px solid var(--brd)}
-.trip-strip .tr1{display:flex;align-items:center;gap:8px;font-size:12px}
-.trip-strip .tr-big{font-family:'Space Mono',monospace;font-weight:600;color:var(--acc);margin-left:auto}
-.trip-strip .tr2{display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-top:3px}
+/* Hero: arbetstid-timer */
+.hero{margin:14px 0 6px;padding:18px 18px 16px;border-radius:20px;background:var(--bg3);border:1px solid var(--brd2);cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition:transform .12s ease}
+.hero:active{transform:scale(.985)}
+.hero:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.hero-top{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--t2)}
+.hero-dots{display:flex;gap:5px}.hero-dots i{width:6px;height:6px;border-radius:50%;background:var(--tm);transition:background .2s,width .2s}.hero-dots i.on{width:16px;border-radius:3px;background:var(--hc)}
+.hero-time{font-family:'Space Mono',monospace;font-weight:700;font-size:clamp(46px,14vw,64px);line-height:1;letter-spacing:-2px;margin:12px 0 14px;color:var(--hc);font-variant-numeric:tabular-nums}
+.hero-time .s{opacity:.45}
+.hero.paused .hero-time{opacity:.4}
+.hero-bar{height:6px;border-radius:3px;background:var(--bg-in);overflow:hidden}
+.hero-bar b{display:block;height:100%;border-radius:3px;background:var(--hc);transition:width 1s linear}
+.hero-sub{display:flex;justify-content:space-between;font-size:12px;color:var(--t3);margin-top:9px}
+.hero.paused .hero-sub span:first-child{color:var(--t2)}
+@media (prefers-reduced-motion:reduce){.hero,.hero-bar b,.hero-dots i{transition:none}}
 
 /* Stats */
 .stats-inline{display:flex;align-items:center;gap:12px;padding:4px 0 10px;font-size:12px;color:var(--t3)}
@@ -644,6 +653,7 @@ function R(){
   else{
     const all=allTasks().filter(t=>taskOpen(t)&&modeOK(t));
     const red=all.filter(t=>urg(t)>=1).length,org=all.filter(t=>{const u=urg(t);return u>=.75&&u<1}).length,grn=all.filter(t=>urg(t)<.5).length,allOk=red===0&&org===0;
+    if(!S.expandedCat)html+=rHero();
     html+=rStats(red,org,grn,allOk);
     if(S.expandedCat){html+=rCatView()}
     else{html+=rTodo()+rDivider()+rCats()}
@@ -666,7 +676,7 @@ function rHeader(){
   // Menyknappen får en prick när något kräver uppmärksamhet — synken fick vara
   // tyst i ett halvår en gång, det ska inte hända igen.
   const needs=!S.user||S.syncStatus==='error'||!!S.syncErr;
-  return`<header class="hdr"><div class="hdr-row"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1><button class="burger" data-action="toggleProfile" aria-label="Meny"><span></span><span></span><span></span>${needs?'<i class="burger-dot"></i>':''}</button></div>${rVacation()}${rTrip()}</header>`;
+  return`<header class="hdr"><div class="hdr-row"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1><button class="burger" data-action="toggleProfile" aria-label="Meny"><span></span><span></span><span></span>${needs?'<i class="burger-dot"></i>':''}</button></div>${rVacation()}</header>`;
 }
 function rDrawer(){
   if(!S.profileOpen)return'';
@@ -1687,11 +1697,41 @@ function workLeft(now,dep){let day=0,eve=0;const d=new Date(now);d.setHours(0,0,
 function fmtH(ms){const m=Math.round(ms/6e4);return Math.floor(m/60)+' h'+(m%60?' '+(m%60)+' min':'')}
 function tripDep(){return new Date(TRIP.depart+'T00:00:00')}
 function todayNote(n){const w=n.getDay();if(w===0||w===6)return'Helg';return iPick(n)?'🧒 Du hämtar · åk 16:00':'🧒 Johanna hämtar · jobba till 18:00'}
-function rTrip(){const dep=tripDep(),n=new Date();if(n>=dep)return'';const{day,eve}=workLeft(n,dep);const dl=Math.ceil((dep-n)/864e5);
-  return`<div class="trip-strip" id="tripStrip"><div class="tr1"><span>✈️</span><span style="color:var(--t3)">${TRIP.name} om ${dl}d</span><span class="tr-big">${fmtH(day)}</span></div><div class="tr2"><span>${todayNote(n)}</span><span>+ ${fmtH(eve)} kvällar</span></div></div>`}
-function updTrip(){const el=document.getElementById('tripStrip');if(!el)return;const h=rTrip();if(!h){el.remove();return}el.outerHTML=h}
-setInterval(updTrip,60000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)updTrip()});
+const TRIP_FROM='2026-11-02'; // när nedräkningen startade (för baren i läget totalt)
+const HERO_MODES=['paus','idag','totalt'];
+let heroMode=(()=>{try{const m=localStorage.getItem('puls-hero');return HERO_MODES.includes(m)?m:'paus'}catch(e){return'paus'}})();
+const hm=t=>String(t[0]).padStart(2,'0')+':'+String(t[1]).padStart(2,'0');
+const WDN=['sön','mån','tis','ons','tors','fre','lör'];
+function nowState(n){ // aktuellt pass eller nästa start
+  const b=dayBlocks(n).day;for(const x of b)if(n>=x[0]&&n<x[1])return{on:x};
+  for(let i=0;i<8;i++){const d=new Date(n);d.setDate(d.getDate()+i);for(const x of dayBlocks(d).day)if(x[0]>n)return{next:x}}return{}}
+function clock(ms){ms=Math.max(0,ms);const t=Math.floor(ms/1000),h=Math.floor(t/3600),m=Math.floor(t%3600/60),sec=t%60;
+  return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+'<span class="s">:'+String(sec).padStart(2,'0')+'</span>'}
+function pauseText(n,nx){if(!nx)return'Pausad';const st=nx[0],same=midnight(st).getTime()===midnight(n).getTime();
+  const t=hm([st.getHours(),st.getMinutes()]);
+  if(same&&n>=atT(n,WS.lunch[0])&&n<atT(n,WS.lunch[1]))return'⏸ Lunch, fortsätter '+t;
+  if(same)return'⏸ Börjar '+t;
+  const w=n.getDay();return(w===0||w===6||(w===5&&!same)?'⏸ Helg, börjar ':'⏸ Klar för idag, börjar ')+WDN[st.getDay()]+' '+t}
+function rHero(){const dep=tripDep(),n=new Date();if(n>=dep)return'';
+  const st=nowState(n),on=!!st.on;
+  const todayEnd=new Date(n);todayEnd.setHours(24,0,0,0);
+  let label,left,budget;
+  if(heroMode==='paus'){const blk=st.on||st.next;
+    if(blk){const e=blk[1],eh=[e.getHours(),e.getMinutes()];
+      const k=hm(eh)===hm(WS.lunch[0])?0:hm(eh)===hm(WS.endPick)?1:2;
+      label=['Till lunch','Till hämtning','Till dagens slut'][k];var pTxt=['Lunch ','Hämtning ','Slut '][k]+hm(eh);
+      budget=blk[1]-blk[0];left=on?blk[1]-n:budget}else{label='Till paus';left=budget=0}}
+  else if(heroMode==='idag'){label='Kvar idag';const b=dayBlocks(n).day;budget=b.reduce((a,x)=>a+(x[1]-x[0]),0);left=workLeft(n,todayEnd).day}
+  else{label='Kvar till '+TRIP.name;budget=workLeft(new Date(TRIP_FROM+'T00:00:00'),dep).day;left=workLeft(n,dep).day}
+  const frac=budget?Math.min(1,left/budget):0;
+  const hc=!on?'var(--t2)':frac<.1?'var(--red)':frac<.25?'var(--org)':'var(--acc)';
+  const sub=on?(heroMode==='totalt'?Math.ceil((dep-n)/864e5)+' dagar till avresa':heroMode==='idag'?'Slutar '+(iPick(n)?'16:00, du hämtar':'18:00, Johanna hämtar'):pTxt):(st.next&&st.next[0]>=dep?'⏸ Klar, avresa '+WDN[dep.getDay()]:pauseText(n,st.next));
+  return`<div class="hero${on?'':' paused'}" id="hero" style="--hc:${hc}" role="button" tabindex="0" aria-label="${label}, tryck för att byta läge" onclick="heroCycle()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();heroCycle()}"><div class="hero-top"><span>${label}</span><span class="hero-dots">${HERO_MODES.map(m=>`<i class="${m===heroMode?'on':''}"></i>`).join('')}</span></div><div class="hero-time">${clock(left)}</div><div class="hero-bar"><b style="width:${(frac*100).toFixed(2)}%"></b></div><div class="hero-sub"><span>${sub}</span><span>✈️ ${TRIP.name}</span></div></div>`}
+function heroCycle(){heroMode=HERO_MODES[(HERO_MODES.indexOf(heroMode)+1)%3];try{localStorage.setItem('puls-hero',heroMode)}catch(e){}tickHero()}
+function tickHero(){const el=document.getElementById('hero');if(!el)return;const h=rHero();if(!h){el.remove();return}
+  const f=document.activeElement===el;el.outerHTML=h;if(f)document.getElementById('hero')?.focus()}
+setInterval(tickHero,1000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)tickHero()});
 
 function pNav(){history.pushState({},'');}
 window.addEventListener('popstate',()=>{if(S.modal){S.modal=null;R()}else if(S.expandedCat){S.expandedCat=null;S.datePicking=null;S.expandedTask=null;R()}});
