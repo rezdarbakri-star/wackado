@@ -114,6 +114,11 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .vac-strip .vac-txt{font-size:12px;font-family:'Space Mono',monospace;font-weight:600;color:var(--acc)}
 .vac-empty{display:flex;align-items:center;gap:6px;padding:6px 0 8px;cursor:pointer;font-size:12px;color:var(--t3);border-bottom:1px solid var(--brd)}
 .vac-empty:hover{color:var(--acc)}
+/* Trip work-hours countdown */
+.trip-strip{padding:7px 0 8px;border-bottom:1px solid var(--brd)}
+.trip-strip .tr1{display:flex;align-items:center;gap:8px;font-size:12px}
+.trip-strip .tr-big{font-family:'Space Mono',monospace;font-weight:600;color:var(--acc);margin-left:auto}
+.trip-strip .tr2{display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-top:3px}
 
 /* Stats */
 .stats-inline{display:flex;align-items:center;gap:12px;padding:4px 0 10px;font-size:12px;color:var(--t3)}
@@ -523,7 +528,18 @@ const gid=()=>Date.now().toString(36)+Math.random().toString(36).substr(2,5);
 // Kalenderdygn, inte förfluten tid. Bockar du av kl 18 på måndag ska det
 // stå 1 dag på tisdag morgon, inte vänta till kl 18 på tisdag.
 const midnight=d=>{const x=new Date(d);x.setHours(0,0,0,0);return x};
-const dsince=d=>{if(!d)return null;return Math.round((midnight(new Date())-midnight(d))/864e5)};
+const dsinceRaw=d=>{if(!d)return null;return Math.round((midnight(new Date())-midnight(d))/864e5)};
+// Semesterlogg ligger på semester-tasken: vt.log=[{start,end|null}] (ISO). Pulser pausas under semester.
+const vacTask=()=>S.tasks.find(t=>t.id==='__vacation__');
+const vacLog=()=>vacTask()?.log||[];
+const vacActive=()=>vacLog().find(v=>!v.end)||null;
+function vacPaused(from){const f=midnight(from),n=midnight(new Date());let ms=0;
+  vacLog().forEach(v=>{const a=midnight(v.start),b=v.end?midnight(v.end):n;ms+=Math.max(0,Math.min(b,n)-Math.max(a,f))});
+  return Math.round(ms/864e5)}
+const dsince=d=>{if(!d)return null;return Math.max(0,dsinceRaw(d)-vacPaused(d))};
+const ldate=(d=new Date())=>{const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')};
+const vacDays=v=>Math.round((midnight(v.end||new Date())-midnight(v.start))/864e5);
+const fmtD=d=>new Date(d).toLocaleDateString('sv-SE',{day:'numeric',month:'short',year:'numeric'});
 // Effective frequency in days for urgency ratio
 function effFreq(t){
   if(t.freqType==='weekly')return 7;
@@ -650,7 +666,7 @@ function rHeader(){
   // Menyknappen får en prick när något kräver uppmärksamhet — synken fick vara
   // tyst i ett halvår en gång, det ska inte hända igen.
   const needs=!S.user||S.syncStatus==='error'||!!S.syncErr;
-  return`<header class="hdr"><div class="hdr-row"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1><button class="burger" data-action="toggleProfile" aria-label="Meny"><span></span><span></span><span></span>${needs?'<i class="burger-dot"></i>':''}</button></div>${rVacation()}</header>`;
+  return`<header class="hdr"><div class="hdr-row"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1><button class="burger" data-action="toggleProfile" aria-label="Meny"><span></span><span></span><span></span>${needs?'<i class="burger-dot"></i>':''}</button></div>${rVacation()}${rTrip()}</header>`;
 }
 function rDrawer(){
   if(!S.profileOpen)return'';
@@ -686,7 +702,8 @@ function rModeBar(){
 function rVacation(){
   const vt=S.tasks.find(t=>t.id==='__vacation__');if(!vt)return'';
   if(!vt.lastDone)return`<div class="vac-empty" data-action="editVacation">🏖 Ställ in semester →</div>`;
-  const ds=dsince(vt.lastDone),p=Math.min(ds/vt.frequencyDays,1),dl=Math.max(0,vt.frequencyDays-ds);
+  const av=vacActive();if(av)return`<div class="vac-strip" data-action="editVacation"><span style="font-size:14px">🏖</span><span style="font-size:11px;color:var(--acc);font-weight:600">På semester · dag ${vacDays(av)+1}</span><span style="flex:1"></span><span class="vac-txt">⏸ pulser pausade</span></div>`;
+  const ds=dsinceRaw(vt.lastDone),p=Math.min(ds/vt.frequencyDays,1),dl=Math.max(0,vt.frequencyDays-ds);
   return`<div class="vac-strip" data-action="editVacation"><span style="font-size:14px">🏖</span><span style="font-size:11px;color:var(--t3)">Semester</span><div class="vac-prog"><div class="vac-prog-fill" style="width:${p*100}%"></div></div><span class="vac-txt">${dl===0?'🎉 Dags!':dl+'d'}</span></div>`;
 }
 function rOnboarding(){
@@ -1118,7 +1135,14 @@ function rModal(){
   if(m.type==='confirm')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><h3 style="font-size:18px;margin-bottom:8px;font-weight:600">Ta bort?</h3><p style="color:var(--t2);font-size:14px;margin-bottom:20px">Kan inte ångras.</p><div class="br"><button class="bs" data-action="closeModal">Avbryt</button><button class="bp" style="background:var(--red)" data-action="confirmDelete" data-id="${m.taskId}">Ta bort</button></div></div></div>`;
   if(m.type==='authError')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">Problem</h2><button class="md-close" data-action="closeModal">✕</button></div><p style="color:var(--t2);font-size:14px;margin-bottom:16px">${m.msg}</p><div class="br"><button class="bp" data-action="openAuth">Försök igen</button></div></div></div>`;
   if(m.type==='auth')return rAuthModal();
-  if(m.type==='vacation'){const vt=S.tasks.find(t=>t.id==='__vacation__');return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">🏖 Semester</h2><button class="md-close" data-action="closeModal">✕</button></div><div class="fg"><label class="fl">Var X:e dag</label><input class="fi" type="number" id="vf" value="${vt?vt.frequencyDays:90}" min="1"><p class="fh">T.ex. 90 = var 3:e månad</p></div><div class="fg"><label class="fl">Senaste semester</label><input class="fi" type="date" id="vl" value="${vt?.lastDone?vt.lastDone.split('T')[0]:today()}" max="${today()}"></div><div class="br"><button class="bp" data-action="saveVacation">Spara</button></div></div></div>`}
+  if(m.type==='vacation'){const vt=vacTask(),av=vacActive(),log=vacLog().filter(v=>v.end).slice().reverse();
+    const tot=log.reduce((a,v)=>a+vacDays(v),0);
+    let h=`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">🏖 Semester</h2><button class="md-close" data-action="closeModal">✕</button></div>`;
+    if(av){h+=`<div class="fg"><p style="font-size:14px;margin-bottom:10px">På semester sedan <b>${fmtD(av.start)}</b> · dag ${vacDays(av)+1}<br><span style="color:var(--t3);font-size:12px">Alla pulser är pausade.</span></p><label class="fl">Tillbaka datum</label><input class="fi" type="date" id="vEnd" value="${ldate()}" min="${ldate(av.start)}"></div><div class="br"><button class="bp" data-action="vacEnd">🔁 Tillbaka till rutiner</button></div>`}
+    else{h+=`<div class="fg"><label class="fl">Första semesterdag</label><input class="fi" type="date" id="vStart" value="${ldate()}"><p class="fh">Pulserna pausas från den här dagen tills du trycker Tillbaka till rutiner.</p></div><div class="br" style="margin-bottom:18px"><button class="bp" data-action="vacStart">🏖 Ta semester</button></div>`}
+    if(log.length)h+=`<div class="fg"><label class="fl">Tidigare semestrar · totalt ${tot} dagar</label>${log.map(v=>`<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--brd)"><span>${fmtD(v.start)} – ${fmtD(v.end)}</span><span style="font-family:'Space Mono',monospace;color:var(--acc)">${vacDays(v)} d</span></div>`).join('')}</div>`;
+    if(!av)h+=`<details style="margin-top:6px"><summary style="font-size:12px;color:var(--t3);cursor:pointer">Inställningar</summary><div class="fg" style="margin-top:10px"><label class="fl">Var X:e dag</label><input class="fi" type="number" id="vf" value="${vt?vt.frequencyDays:90}" min="1"><p class="fh">T.ex. 90 = var 3:e månad</p></div><div class="fg"><label class="fl">Senaste semester</label><input class="fi" type="date" id="vl" value="${vt?.lastDone?ldate(vt.lastDone):ldate()}" max="${ldate()}"></div><div class="br"><button class="bs" data-action="saveVacation">Spara</button></div></details>`;
+    return h+`</div></div>`}
   if(m.type==='household')return rHHModal();
   if(m.type==='todo')return rTodoModal();
   return rTaskModal();
@@ -1548,6 +1572,8 @@ function H(e){
     case 'editTask':{e.stopPropagation();const f=findTask(el.dataset.id);if(f){S.modal={type:'task',task:{...f.task},source:f.src};S.expandedTask=null;pNav();R()}break}
     case 'closeModal':S.modal=null;R();break;
     case 'editVacation':S.modal={type:'vacation'};pNav();R();break;
+    case 'vacStart':{const v=document.getElementById('vStart').value||ldate();let vt=vacTask();if(!vt){vt={...VTASK};S.tasks.push(vt)}vt.log=vt.log||[];if(!vt.log.some(x=>!x.end)){const st=new Date(v+'T12:00:00').toISOString();vt.log.push({start:st,end:null});vt.lastDone=st}S.modal=null;save();R();break}
+    case 'vacEnd':{const vt=vacTask(),av=vacActive();if(av){const v=document.getElementById('vEnd').value||ldate();av.end=new Date(v+'T12:00:00').toISOString();vt.lastDone=av.end}S.modal=null;save();R();break}
     case 'saveVacation':{const f=parseInt(document.getElementById('vf').value)||90,ld=document.getElementById('vl').value;let vt=S.tasks.find(t=>t.id==='__vacation__');if(!vt){vt={...VTASK};S.tasks.push(vt)}vt.frequencyDays=f;vt.lastDone=ld?new Date(ld+'T12:00:00').toISOString():new Date().toISOString();S.modal=null;save();R();break}
     case 'setCat':{document.querySelectorAll('.co').forEach(b=>{b.classList.remove('sel');b.removeAttribute('style')});el.classList.add('sel');el.style.cssText=`border-color:${ccol(el.dataset.cat)};color:${ccol(el.dataset.cat)};font-weight:600`;document.getElementById('catGrid').dataset.selected=el.dataset.cat;break}
     case 'setFreq':{const f=el.dataset.freq;document.getElementById('tf').value=f;document.querySelectorAll('.fb').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');const h=el.closest('.fg')?.querySelector('.fh');if(h)h.textContent='= var '+ffreq(f);break}
@@ -1642,6 +1668,30 @@ function H(e){
     case 'pushCal':{e.stopPropagation();const t=S.todos.find(x=>x.id===el.dataset.id);if(t&&t.dueDate){const d=t.dueDate.replace(/-/g,'');const next=new Date(t.dueDate);next.setDate(next.getDate()+1);const d2=next.toISOString().split('T')[0].replace(/-/g,'');const title=encodeURIComponent((t.group?t.group+': ':'')+t.name);const details=encodeURIComponent(t.note||'');const url=`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${d}/${d2}&details=${details}`;window.open(url,'_blank')}break}
   }
 }
+
+
+// ═══════════════════════════════════════════
+// ARBETSTID-NEDRÄKNING (resa)
+// ═══════════════════════════════════════════
+const TRIP={name:'Östtimor',depart:'2026-11-06'}; // avresedag, räknar fram till 00:00 den dagen
+const WS={start:[9,30],lunch:[[12,0],[12,50]],endPick:[16,0],endOther:[18,0],eve:[[20,30],[24,0]],
+  pick:{odd:[1,3],even:[2,3,5]}}; // 1=mån … 5=fre, vem som hämtar = du
+function isoWeek(d){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const n=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-n);const y=new Date(Date.UTC(t.getUTCFullYear(),0,1));return Math.ceil(((t-y)/864e5+1)/7)}
+function iPick(d){return(isoWeek(d)%2?WS.pick.odd:WS.pick.even).includes(d.getDay())}
+function atT(d,[h,m]){const x=new Date(d);x.setHours(0,0,0,0);x.setMinutes(h*60+m);return x}
+function dayBlocks(d){const w=d.getDay();if(w===0||w===6)return{day:[],eve:[]};const end=iPick(d)?WS.endPick:WS.endOther;
+  return{day:[[atT(d,WS.start),atT(d,WS.lunch[0])],[atT(d,WS.lunch[1]),atT(d,end)]],eve:[[atT(d,WS.eve[0]),atT(d,WS.eve[1])]]}}
+function ovl([a,b],f,t){return Math.max(0,Math.min(b,t)-Math.max(a,f))}
+function workLeft(now,dep){let day=0,eve=0;const d=new Date(now);d.setHours(0,0,0,0);
+  while(d<dep){const b=dayBlocks(d);b.day.forEach(x=>day+=ovl(x,now,dep));b.eve.forEach(x=>eve+=ovl(x,now,dep));d.setDate(d.getDate()+1)}return{day,eve}}
+function fmtH(ms){const m=Math.round(ms/6e4);return Math.floor(m/60)+' h'+(m%60?' '+(m%60)+' min':'')}
+function tripDep(){return new Date(TRIP.depart+'T00:00:00')}
+function todayNote(n){const w=n.getDay();if(w===0||w===6)return'Helg';return iPick(n)?'🧒 Du hämtar · åk 16:00':'🧒 Johanna hämtar · jobba till 18:00'}
+function rTrip(){const dep=tripDep(),n=new Date();if(n>=dep)return'';const{day,eve}=workLeft(n,dep);const dl=Math.ceil((dep-n)/864e5);
+  return`<div class="trip-strip" id="tripStrip"><div class="tr1"><span>✈️</span><span style="color:var(--t3)">${TRIP.name} om ${dl}d</span><span class="tr-big">${fmtH(day)}</span></div><div class="tr2"><span>${todayNote(n)}</span><span>+ ${fmtH(eve)} kvällar</span></div></div>`}
+function updTrip(){const el=document.getElementById('tripStrip');if(!el)return;const h=rTrip();if(!h){el.remove();return}el.outerHTML=h}
+setInterval(updTrip,60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)updTrip()});
 
 function pNav(){history.pushState({},'');}
 window.addEventListener('popstate',()=>{if(S.modal){S.modal=null;R()}else if(S.expandedCat){S.expandedCat=null;S.datePicking=null;S.expandedTask=null;R()}});
