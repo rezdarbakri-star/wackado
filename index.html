@@ -1735,11 +1735,14 @@ function rHero(){const dep=tripDep(),n=new Date();if(n>=dep&&heroMode==='totalt'
   else if(heroMode==='idag'){label='Kvar idag';const b=dayBlocks(n).day;budget=b.reduce((a,x)=>a+(x[1]-x[0]),0);left=workLeft(n,todayEnd).day}
   else{label='Kvar till '+TRIP.name;budget=workLeft(new Date(TRIP_FROM+'T00:00:00'),dep).day;left=workLeft(n,dep).day}
   const frac=budget?Math.min(1,left/budget):0;
+  // Baren fylls framåt mot deadline: tom vid start, full när tiden är slut.
+  // frac är kvarvarande tid och styr fortfarande färgen (lite kvar = rött).
+  const done=budget?Math.max(0,Math.min(1,1-left/budget)):0;
   const hc=!on?'var(--t2)':frac<.1?'var(--red)':frac<.25?'var(--org)':'var(--acc)';
   const sub=on?(heroMode==='totalt'?Math.ceil((dep-n)/864e5)+' dagar till avresa':heroMode==='idag'?'Slutar '+(iPick(n)?'16:00, du hämtar':'18:00, Johanna hämtar'):pTxt):(st.next&&st.next[0]>=dep?'⏸ Klar, avresa '+WDN[dep.getDay()]:pauseText(n,st.next));
   const tg=`<button class="hero-tg" onclick="heroToggle(event)" aria-label="${heroMin?'Visa timer':'Minimera timer'}" aria-expanded="${!heroMin}">⌃</button>`;
   const dots=`<span class="hero-dots">${HERO_MODES.map(m=>`<i class="${m===heroMode?'on':''}"></i>`).join('')}</span>`;
-  const bar=`<div class="hero-bar"><b style="width:${(frac*100).toFixed(2)}%"></b></div>`;
+  const bar=`<div class="hero-bar"><b style="width:${(done*100).toFixed(2)}%"></b></div>`;
   const attrs=`id="hero" style="--hc:${hc}" role="button" tabindex="0" aria-label="${label}, tryck för att byta läge" onclick="heroCycle()" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();heroCycle()}"`;
   if(heroMin)return`<div class="hero min${on?'':' paused'}" ${attrs}><div class="hero-top"><span>${label}</span><span class="hero-mini">${clock(left).replace(/<[^>]+>/g,'')}</span>${tg}</div>${bar}</div>`;
   return`<div class="hero${on?'':' paused'}" ${attrs}><div class="hero-top"><span>${label}</span><span class="hero-r">${dots}${tg}</span></div><div class="hero-time">${clock(left)}</div>${bar}<div class="hero-sub"><span>${sub}</span><span>✈️ ${TRIP.name}</span></div></div>`}
