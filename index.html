@@ -146,9 +146,9 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .si-dot{width:6px;height:6px;border-radius:50%}
 .all-clear{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--grn);font-weight:500}
 
-/* ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê */
+/* ═════════════════════════════════════════════ */
 /* TASK CARD                                     */
-/* ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê */
+/* ═════════════════════════════════════════════ */
 .tc{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:14px 16px;border-radius:12px;background:var(--bg2);border:2px solid var(--brd);margin-bottom:6px;transition:all .25s;animation:fadeSlideIn .25s ease forwards;opacity:0;cursor:pointer}
 .tc:hover{background:var(--bg3)}
 /* Color shift by urgency */
@@ -156,13 +156,13 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .tc.u-yel{border-color:rgba(255,212,59,.35);background:var(--yel-s)}
 .tc.u-org{border-color:rgba(255,140,66,.4);background:var(--org-s)}
 .tc.u-red{border-color:rgba(255,71,87,.45);background:var(--red-s)}
-/* Hero ‚Äî √∂versta pulsen. Identiska m√•tt som alla andra kort;
-   mark√∂ren √§r enbart skuggan som lyfter det och luften under. */
+/* Hero — översta pulsen. Identiska mått som alla andra kort;
+   markören är enbart skuggan som lyfter det och luften under. */
 .tc.hero{box-shadow:0 5px 18px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.06);margin-bottom:0;animation:heroIn .3s cubic-bezier(.2,.8,.2,1) forwards}
 .hero-wrap{margin-bottom:20px;position:relative}
 .hero-wrap::after{content:'';position:absolute;left:0;right:0;bottom:-10px;height:1px;background:var(--brd)}
 @keyframes heroIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
-/* ‚îÄ‚îÄ Meny (burger + drawer) ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ */
+/* ── Meny (burger + drawer) ───────────────── */
 .burger{position:relative;width:40px;height:40px;border-radius:11px;border:1px solid var(--brd);background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:background .15s}
 .burger:hover{background:var(--bg3)}
 .burger span{display:block;width:16px;height:1.8px;border-radius:2px;background:var(--t2)}
@@ -189,7 +189,7 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .dr-row.accent{color:var(--acc);font-weight:600}
 .dr-row.danger{color:var(--red)}
 
-/* ‚îÄ‚îÄ L√§gesv√§ljare l√§ngst ner ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ */
+/* ── Lägesväljare längst ner ──────────────── */
 #app{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
 .mode-bar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;justify-content:center;padding:10px 16px calc(12px + env(safe-area-inset-bottom,0px));pointer-events:none;background:linear-gradient(to top,var(--bg) 55%,transparent)}
 .mb-track{pointer-events:auto;position:relative;display:grid;grid-template-columns:repeat(3,1fr);width:min(340px,100%);padding:4px;border-radius:14px;background:var(--bg2);border:1px solid var(--brd);box-shadow:0 6px 22px rgba(0,0,0,.10)}
@@ -200,7 +200,7 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .tc.shared{box-shadow:inset 3px 0 0 var(--acc)}
 .shared-tag{font-size:9px;font-weight:600;padding:2px 5px;border-radius:4px;background:var(--acc-g);color:var(--acc)}
 
-/* Days since ‚Äì THE number */
+/* Days since – THE number */
 .tc-days{text-align:center;min-width:48px;flex-shrink:0}
 .tc-days-num{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;line-height:1}
 .tc-days-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
@@ -275,7 +275,7 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .cat-back{display:flex;align-items:center;gap:6px;padding:8px 0;cursor:pointer;font-size:13px;color:var(--t2);margin-bottom:4px}
 .cat-back:hover{color:var(--t1)}
 
-/* ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê MODALS ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê */
+/* ═════════ MODALS ═════════ */
 .mo{position:fixed;inset:0;background:var(--ov);z-index:100;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .15s ease;backdrop-filter:blur(6px)}
 @media(min-width:500px){.mo{align-items:center}}
 .md{background:var(--bg-modal);border-radius:20px 20px 0 0;padding:24px 20px env(safe-area-inset-bottom,20px);width:100%;max-width:460px;max-height:90vh;overflow-y:auto;animation:slideUp .25s ease;border:1px solid var(--brd);box-shadow:0 -8px 40px rgba(0,0,0,.3)}
@@ -379,8 +379,8 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .todo-card.drag-over-below{box-shadow:0 2px 0 var(--acc)}
 .drag-ghost{position:fixed;z-index:500;pointer-events:none;opacity:.85;transform:rotate(1.5deg);box-shadow:0 8px 30px rgba(0,0,0,.4);border-radius:10px;transition:none}
 /* Todo groups */
-/* Varje projekt √§r ett eget kort, s√• flera √∂ppna projekt inte flyter ihop.
-   Uppgifterna inuti blir l√§ttare s√• det inte blir kort-i-kort-tungt. */
+/* Varje projekt är ett eget kort, så flera öppna projekt inte flyter ihop.
+   Uppgifterna inuti blir lättare så det inte blir kort-i-kort-tungt. */
 .todo-group{margin-bottom:10px;border:1px solid var(--brd);border-radius:14px;background:var(--bg2);padding:4px 10px;transition:border-color .2s,box-shadow .2s}
 .todo-group.open{padding-bottom:10px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
 .todo-group.complete{opacity:.7}
@@ -393,7 +393,7 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 .grp-grip{color:var(--tm);font-size:14px;touch-action:none;cursor:grab;padding:4px 6px;opacity:.5;user-select:none;transition:opacity .15s}
 .todo-group-hdr:hover .grp-grip,.grp-grip:hover{opacity:1;color:var(--acc)}
 .todo-group.grp-dragging{opacity:.3}
-/* Redigera/radera: synliga n√§r projektet √§r √∂ppet, s√• de g√•r att n√• p√• mobilen */
+/* Redigera/radera: synliga när projektet är öppet, så de går att nå på mobilen */
 .grp-acts{display:flex;gap:2px;margin-left:auto;flex-shrink:0}
 .grp-act{font-size:12px;color:var(--t3);cursor:pointer;padding:5px 7px;border-radius:6px;opacity:0;transition:opacity .15s,background .15s}
 .todo-group.open .grp-act{opacity:.55}
@@ -415,27 +415,27 @@ body{min-height:100%;background:var(--bg);font-family:'DM Sans',system-ui,sans-s
 <body>
 <div class="app" id="app"></div>
 <script>
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 // FIREBASE
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 firebase.initializeApp({apiKey:"AIzaSyD-n66FkaZuWkLN8r2i-iMBv-FBXklwLbM",authDomain:"puls-whack-a-do.firebaseapp.com",projectId:"puls-whack-a-do",storageBucket:"puls-whack-a-do.firebasestorage.app",messagingSenderId:"348032853742",appId:"1:348032853742:web:2a9b573470f28c5dedf5ff",measurementId:"G-Q6W3PVF0ZY"});
 const auth=firebase.auth(),db=firebase.firestore();
 const gProv=new firebase.auth.GoogleAuthProvider();
 db.enablePersistence({synchronizeTabs:true}).catch(e=>console.log('P:',e.code));
 
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 // CONFIG
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 const DEFAULT_CATS=[
-  {id:'content',label:'Content',icon:'üé¨',v:'--c-cnt'},
-  {id:'fitness',label:'Fitness',icon:'üí™',v:'--c-fit'},
-  {id:'hem',label:'Hem',icon:'üè†',v:'--c-hem'},
-  {id:'personligt',label:'Personligt',icon:'‚ú®',v:'--c-per'},
-  {id:'business',label:'Business',icon:'üíº',v:'--c-biz'},
-  {id:'recovery',label:'√Öterh√§mtning',icon:'üåø',v:'--c-rec'},
-  {id:'other',label:'√ñvrigt',icon:'üìå',v:'--c-oth'},
+  {id:'content',label:'Content',icon:'🎬',v:'--c-cnt'},
+  {id:'fitness',label:'Fitness',icon:'💪',v:'--c-fit'},
+  {id:'hem',label:'Hem',icon:'🏠',v:'--c-hem'},
+  {id:'personligt',label:'Personligt',icon:'✨',v:'--c-per'},
+  {id:'business',label:'Business',icon:'💼',v:'--c-biz'},
+  {id:'recovery',label:'Återhämtning',icon:'🌿',v:'--c-rec'},
+  {id:'other',label:'Övrigt',icon:'📌',v:'--c-oth'},
 ];
-const EMOJI_POOL=['üéØ','üßπ','üë∂','üé®','üìö','üèÉ','üéµ','üêæ','üå±','üíä','üõí','üç≥','üì±','üöó','‚ù§','üéì'];
+const EMOJI_POOL=['🎯','🧹','👶','🎨','📚','🏃','🎵','🐾','🌱','💊','🛒','🍳','📱','🚗','❤','🎓'];
 // Work / private split. Mode lives on the category, tasks inherit it.
 // 'both' = always visible in either mode.
 const DEFAULT_CATMODE={content:'work',business:'work',fitness:'private',hem:'private',personligt:'private',recovery:'both',other:'both'};
@@ -446,14 +446,14 @@ const VTASK={id:'__vacation__',name:'Semester',category:'recovery',frequencyDays
 function daysAgo(n){const d=new Date();d.setDate(d.getDate()-n);return d.toISOString()}
 const DEFAULTS=[
   {id:'d1',name:'Gymma',category:'fitness',frequencyDays:2,lastDone:daysAgo(5)},
-  {id:'d2',name:'St√§da hemma',category:'hem',frequencyDays:7,lastDone:daysAgo(6)},
+  {id:'d2',name:'Städa hemma',category:'hem',frequencyDays:7,lastDone:daysAgo(6)},
   {id:'d3',name:'Handla mat',category:'hem',frequencyDays:5,lastDone:daysAgo(2)},
   {...VTASK,frequencyDays:90},
 ];
 
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 // STATE
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 let S={
   tasks:[],customCats:[],theme:'light',expandedCat:null,peekLvl:{},mode:'all',catMode:{},
   modal:null,datePicking:null,expandedTask:null,showCats:false,
@@ -466,9 +466,9 @@ let S={
 let _unsub=null,_hhUnsub=null;
 function getCats(){return[...DEFAULT_CATS,...S.customCats]}
 
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 // PERSISTENCE
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 function saveLocal(){try{localStorage.setItem('puls',JSON.stringify({tasks:S.tasks,todos:S.todos,todoGroups:S.todoGroups,todoHistory:S.todoHistory,collapsedGroups:S.collapsedGroups,theme:S.theme,householdId:S.householdId,customCats:S.customCats,catMode:S.catMode,mode:S.mode,hiddenToday:S.hiddenToday,onboarded:S.onboarding===-1}))}catch(e){}}
 function loadLocal(){
   try{const d=JSON.parse(localStorage.getItem('puls'));
@@ -487,12 +487,12 @@ function loadLocal(){
 function ensV(){if(!S.tasks.find(t=>t.id==='__vacation__'))S.tasks.push({...VTASK});const v=S.tasks.find(t=>t.id==='__vacation__');if(v)v.isProtected=true}
 
 function syncErrMsg(code){
-  if(code==='permission-denied')return'Firestore-reglerna blockerar skrivning. Troligen har test-reglerna g√•tt ut (de g√§ller 30 dagar). Uppdatera reglerna i Firebase Console.';
+  if(code==='permission-denied')return'Firestore-reglerna blockerar skrivning. Troligen har test-reglerna gått ut (de gäller 30 dagar). Uppdatera reglerna i Firebase Console.';
   if(code==='unauthenticated')return'Inte inloggad mot Firebase. Logga ut och in igen.';
-  if(code==='resource-exhausted')return'Firestore-kvoten √§r slut f√∂r idag.';
-  if(code==='unavailable')return'Ingen kontakt med Firestore ‚Äî troligen offline.';
-  if(code==='failed-precondition')return'Firestore-databasen saknas eller √§r inte aktiverad i projektet.';
-  return code||'Ok√§nt fel';
+  if(code==='resource-exhausted')return'Firestore-kvoten är slut för idag.';
+  if(code==='unavailable')return'Ingen kontakt med Firestore — troligen offline.';
+  if(code==='failed-precondition')return'Firestore-databasen saknas eller är inte aktiverad i projektet.';
+  return code||'Okänt fel';
 }
 async function saveCloud(){if(!S.user||S.user.isAnonymous)return;S.syncStatus='syncing';try{await db.collection('users').doc(S.user.uid).set({tasks:S.tasks,todos:S.todos,todoGroups:S.todoGroups,todoHistory:S.todoHistory,theme:S.theme,householdId:S.householdId||null,customCats:S.customCats,catMode:S.catMode,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});S.syncStatus='synced';S.syncErr=null;_qR()}catch(e){console.error('Firestore write:',e.code,e.message);S.syncErr={code:e.code,msg:syncErrMsg(e.code)};S.syncStatus=e.code==='unavailable'?'offline':'error';_qR()}}
 async function saveHH(){if(!S.household||!S.householdId)return;try{await db.collection('households').doc(S.householdId).set({members:S.household.members,sharedCats:S.household.sharedCats||[],tasks:S.household.tasks||[],updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.error('HH:',e)}}
@@ -503,21 +503,21 @@ function startSync(){if(_unsub)_unsub();if(!S.user||S.user.isAnonymous)return;
   _unsub=db.collection('users').doc(S.user.uid).onSnapshot(s=>{if(s.exists){const d=s.data();if(d.tasks){S.tasks=d.tasks;ensV();saveLocal()}if(d.todos)S.todos=d.todos;if(d.todoGroups)S.todoGroups=[...new Set(d.todoGroups)];if(d.todoHistory)S.todoHistory=d.todoHistory;if(d.theme)S.theme=d.theme;if(d.customCats)S.customCats=d.customCats;if(d.catMode)S.catMode=d.catMode;if(d.householdId&&d.householdId!==S.householdId){S.householdId=d.householdId;startHHSync()}S.syncStatus='synced';S.syncErr=null;_qR()}},e=>{console.error('Firestore listen:',e.code,e.message);S.syncErr={code:e.code,msg:syncErrMsg(e.code)};S.syncStatus=e.code==='unavailable'?'offline':'error';_qR()})}
 function startHHSync(){if(_hhUnsub)_hhUnsub();if(!S.householdId)return;
   _hhUnsub=db.collection('households').doc(S.householdId).onSnapshot(s=>{if(s.exists){S.household={code:S.householdId,...s.data()};_qR()}else{S.household=null;S.householdId=null;saveLocal();_qR()}},e=>console.error('HH:',e))}
-// Queued render ‚Äì debounce snapshot re-renders, skip if modal open
+// Queued render – debounce snapshot re-renders, skip if modal open
 let _qT=null;function _qR(){clearTimeout(_qT);_qT=setTimeout(()=>{if(!S.modal)R()},300)}
 async function mergeUp(){if(!S.user||S.user.isAnonymous)return;const s=await db.collection('users').doc(S.user.uid).get();if(s.exists&&s.data().tasks?.length>0){if(s.data().householdId)S.householdId=s.data().householdId;return}await saveCloud()}
 
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 // AUTH
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 async function authWithProvider(prov){try{await auth.signInWithPopup(prov)}catch(e){if(e.code==='auth/popup-blocked')await auth.signInWithRedirect(prov);else{S.modal={type:'authError',msg:e.message};R()}}}
 async function anonSignIn(){try{await auth.signInAnonymously()}catch(e){S.modal={type:'authError',msg:e.message};R()}}
 async function doSignOut(){if(_unsub){_unsub();_unsub=null}if(_hhUnsub){_hhUnsub();_hhUnsub=null}await auth.signOut();S.user=null;S.syncStatus='offline';S.profileOpen=false;S.household=null;R()}
 auth.onAuthStateChanged(async u=>{S.user=u;if(u){if(u.isAnonymous){S.syncStatus='offline';R();return}S.syncStatus='syncing';R();await mergeUp();startSync();if(S.householdId)startHHSync()}else{S.syncStatus='offline';if(_unsub){_unsub();_unsub=null}if(_hhUnsub){_hhUnsub();_hhUnsub=null}R()}});
 
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 // HOUSEHOLD
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 function genHHCode(){const c='ABCDEFGHJKLMNPRSTUVWXYZ23456789';let r='';for(let i=0;i<6;i++)r+=c[Math.floor(Math.random()*c.length)];return r}
 async function createHH(){if(!S.user)return;const code=genHHCode();const me={uid:S.user.uid,name:S.user.displayName||'Du',photo:S.user.photoURL||''};await db.collection('households').doc(code).set({members:[me],sharedCats:[],tasks:[],createdAt:firebase.firestore.FieldValue.serverTimestamp()});S.householdId=code;await saveCloud();startHHSync()}
 async function joinHH(code){if(!S.user)return false;code=code.toUpperCase().trim();const snap=await db.collection('households').doc(code).get();if(!snap.exists)return false;const d=snap.data();if(d.members.length>=2||d.members.find(m=>m.uid===S.user.uid))return false;d.members.push({uid:S.user.uid,name:S.user.displayName||'Du',photo:S.user.photoURL||''});await db.collection('households').doc(code).update({members:d.members});S.householdId=code;await saveCloud();startHHSync();return true}
@@ -531,23 +531,23 @@ function toggleSharedCat(cid){
 function isShared(cid){return S.household?.sharedCats?.includes(cid)||false}
 function getPartner(){return S.household?.members?.find(m=>m.uid!==S.user?.uid)||null}
 
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 // TASK HELPERS
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 function allTasks(){return[...S.tasks.filter(t=>t.id!=='__vacation__'),...(S.household?.tasks||[])]}
 function ctasks(cid){if(isShared(cid))return(S.household?.tasks||[]).filter(t=>t.category===cid);return S.tasks.filter(t=>t.category===cid&&t.id!=='__vacation__')}
 function findTask(id){let t=S.tasks.find(x=>x.id===id);if(t)return{task:t,src:'p'};t=(S.household?.tasks||[]).find(x=>x.id===id);if(t)return{task:t,src:'h'};return null}
 
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
-// UTILS ‚Äî ONE number: days since last done
+// ═══════════════════════════════════════════
+// UTILS — ONE number: days since last done
 // Color = urgency signal based on ratio
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 const gid=()=>Date.now().toString(36)+Math.random().toString(36).substr(2,5);
-// Kalenderdygn, inte f√∂rfluten tid. Bockar du av kl 18 p√• m√•ndag ska det
-// st√• 1 dag p√• tisdag morgon, inte v√§nta till kl 18 p√• tisdag.
+// Kalenderdygn, inte förfluten tid. Bockar du av kl 18 på måndag ska det
+// stå 1 dag på tisdag morgon, inte vänta till kl 18 på tisdag.
 const midnight=d=>{const x=new Date(d);x.setHours(0,0,0,0);return x};
 const dsinceRaw=d=>{if(!d)return null;return Math.round((midnight(new Date())-midnight(d))/864e5)};
-// Semesterlogg ligger p√• semester-tasken: vt.log=[{start,end|null}] (ISO). Pulser pausas under semester.
+// Semesterlogg ligger på semester-tasken: vt.log=[{start,end|null}] (ISO). Pulser pausas under semester.
 const vacTask=()=>S.tasks.find(t=>t.id==='__vacation__');
 const vacLog=()=>vacTask()?.log||[];
 const vacActive=()=>vacLog().find(v=>!v.end)||null;
@@ -567,15 +567,15 @@ function effFreq(t){
   }
   return t.frequencyDays||7;
 }
-// ‚îÄ‚îÄ DEADLINE-KURVA ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
-// Tv√• datum: endDate (P4, deadline) och clearBy (P3, klart senast).
-// P2 och P1 r√§knas bak√•t fr√•n P3 med samma skala f√∂r ALLA uppgifter ‚Äî
-// det √§r det som g√∂r att dagar kvar betyder samma sak √∂verallt.
-const DL_RAMP=21, DL_LEAD=42;          // kl√§ttring resp. f√∂rsta synlighet, dagar f√∂re P3
-const DL_LOW=0.25, DL_PEAK=1.6;        // l√•g plat√• resp. tak
+// ── DEADLINE-KURVA ────────────────────────────
+// Två datum: endDate (P4, deadline) och clearBy (P3, klart senast).
+// P2 och P1 räknas bakåt från P3 med samma skala för ALLA uppgifter —
+// det är det som gör att dagar kvar betyder samma sak överallt.
+const DL_RAMP=21, DL_LEAD=42;          // klättring resp. första synlighet, dagar före P3
+const DL_LOW=0.25, DL_PEAK=1.6;        // låg platå resp. tak
 const daysUntil=d=>d?Math.round((midnight(new Date(d+'T00:00:00'))-midnight(new Date()))/864e5):null;
 const dlLeft=t=>daysUntil(t.endDate);                       // dagar till deadline
-const clearDate=t=>t.clearBy||t.endDate||null;              // P3, faller tillbaka p√• P4
+const clearDate=t=>t.clearBy||t.endDate||null;              // P3, faller tillbaka på P4
 const dlClear=t=>daysUntil(clearDate(t));                   // dagar till klart-senast
 function dlPoints(t){
   if(!t.endDate)return null;
@@ -589,19 +589,19 @@ function dlUrg(t){
   if(K>0)return DL_LOW+(DL_PEAK-DL_LOW)*((DL_RAMP-K)/DL_RAMP);
   return DL_PEAK;
 }
-// Tv√• tal per uppgift, f√∂r de svarar p√• olika fr√•gor.
-// rytm = ska den synas just nu? Bockar du av n√•got g√•r den till 0 och f√∂rsvinner.
-// urg  = hur h√∂gt i listan. Har uppgiften deadline rankar kurvan ensam.
+// Två tal per uppgift, för de svarar på olika frågor.
+// rytm = ska den synas just nu? Bockar du av något går den till 0 och försvinner.
+// urg  = hur högt i listan. Har uppgiften deadline rankar kurvan ensam.
 const rytm=t=>{const ds=dsince(t.lastDone);return ds===null?1:ds/effFreq(t)};
 const urg=t=>t.endDate?dlUrg(t):rytm(t);
-// ‚îÄ‚îÄ LEVEL GATING ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ‚îÄ
-// Stegen f√∂ljer jobb/privat, inte kategori. Alla jobbkategorier delar en stege:
-// TikTok, Instagram, mejla sponsor och social proof √§r samma grund.
-// Privat har sin egen stege och blockerar aldrig jobb, eller tv√§rtom.
+// ── LEVEL GATING ──────────────────────────────
+// Stegen följer jobb/privat, inte kategori. Alla jobbkategorier delar en stege:
+// TikTok, Instagram, mejla sponsor och social proof är samma grund.
+// Privat har sin egen stege och blockerar aldrig jobb, eller tvärtom.
 const LEVEL_SIDES=['work','private'];
 const sideOf=cid=>catMode(cid)==='work'?'work':(catMode(cid)==='private'?'private':'both');
 const tlvl=t=>t.level||1;
-// Uppgifter p√• samma sida av stegen. 'both' r√§knas till b√•da.
+// Uppgifter på samma sida av stegen. 'both' räknas till båda.
 const sideTasks=side=>allTasks().filter(t=>{const m=catMode(t.category);return m===side||m==='both'});
 const maxLvl=side=>Math.max(1,...sideTasks(side).map(tlvl));
 function blockers(side,lvl){
@@ -636,22 +636,22 @@ function archiveDoneTodos(){
   S.todoHistory.sort((a,b)=>b.weekId.localeCompare(a.weekId));
   saveLocal();
 }
-const WEEKDAYS=['M√•n','Tis','Ons','Tor','Fre','L√∂r','S√∂n'];
-const WEEKDAYS_FULL=['m√•ndag','tisdag','onsdag','torsdag','fredag','l√∂rdag','s√∂ndag'];
+const WEEKDAYS=['Mån','Tis','Ons','Tor','Fre','Lör','Sön'];
+const WEEKDAYS_FULL=['måndag','tisdag','onsdag','torsdag','fredag','lördag','söndag'];
 function ffreqLabel(t){
   if(t.freqType==='weekly'&&t.freqWeekday!=null)return'varje '+WEEKDAYS_FULL[t.freqWeekday];
-  if(t.freqType==='monthly'&&t.freqMonthDay)return t.freqMonthDay+':e varje m√•nad';
+  if(t.freqType==='monthly'&&t.freqMonthDay)return t.freqMonthDay+':e varje månad';
   return'var '+ffreq(t.frequencyDays||7);
 }
-const ffreq=d=>{d=parseInt(d);return d===1?'dag':d===7?'vecka':d===14?'annan vecka':d===30?'m√•nad':d+':e dag'};
+const ffreq=d=>{d=parseInt(d);return d===1?'dag':d===7?'vecka':d===14?'annan vecka':d===30?'månad':d+':e dag'};
 
 function sortTasks(arr){
   return[...arr].sort((a,b)=>urg(b)-urg(a));
 }
 
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 // RENDER
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 function R(){
   const app=document.getElementById('app');if(!app)return;
   document.documentElement.setAttribute('data-theme',S.theme);
@@ -667,7 +667,7 @@ function R(){
     if(S.expandedCat){html+=rCatView()}
     else{html+=rTodo()+rDivider()+rCats()}
   }
-  // L√§gesv√§ljaren g√§ller bara pulserna ‚Äî Att g√∂ra har inget l√§ge
+  // Lägesväljaren gäller bara pulserna — Att göra har inget läge
   if(S.tab!=='todos')html+=rModeBar();
   html+=rDrawer();
   html+=S.modal?rModal():'';
@@ -678,41 +678,41 @@ function rTabs(){
   const all=allTasks().filter(t=>taskOpen(t)&&modeOK(t));
   const urgN=all.filter(t=>urg(t)>=.75).length;
   const todoN=S.todos.filter(t=>!t.done).length;
-  return`<div class="tabs"><button class="tab${S.tab==='pulser'?' on':''}" data-action="setTab" data-tab="pulser">‚ö° Pulser${urgN?` <span class="tab-count hot">${urgN}</span>`:''}</button><button class="tab${S.tab==='todos'?' on':''}" data-action="setTab" data-tab="todos">‚òë Att g√∂ra${todoN?` <span class="tab-count">${todoN}</span>`:''}</button><button class="add-btn" data-action="addTask" style="height:36px;padding:0 12px;font-size:12px;flex:0 0 auto"><span>+</span></button></div>`;
+  return`<div class="tabs"><button class="tab${S.tab==='pulser'?' on':''}" data-action="setTab" data-tab="pulser">⚡ Pulser${urgN?` <span class="tab-count hot">${urgN}</span>`:''}</button><button class="tab${S.tab==='todos'?' on':''}" data-action="setTab" data-tab="todos">☑ Att göra${todoN?` <span class="tab-count">${todoN}</span>`:''}</button><button class="add-btn" data-action="addTask" style="height:36px;padding:0 12px;font-size:12px;flex:0 0 auto"><span>+</span></button></div>`;
 }
 
 function rHeader(){
-  // Menyknappen f√•r en prick n√§r n√•got kr√§ver uppm√§rksamhet ‚Äî synken fick vara
-  // tyst i ett halv√•r en g√•ng, det ska inte h√§nda igen.
+  // Menyknappen får en prick när något kräver uppmärksamhet — synken fick vara
+  // tyst i ett halvår en gång, det ska inte hända igen.
   const needs=!S.user||S.syncStatus==='error'||!!S.syncErr;
-  return`<header class="hdr"><div class="hdr-row"><h1 class="logo"><span class="logo-z">‚ö°</span> PULS</h1><button class="burger" data-action="toggleProfile" aria-label="Meny"><span></span><span></span><span></span>${needs?'<i class="burger-dot"></i>':''}</button></div>${rVacation()}</header>`;
+  return`<header class="hdr"><div class="hdr-row"><h1 class="logo"><span class="logo-z">⚡</span> PULS</h1><button class="burger" data-action="toggleProfile" aria-label="Meny"><span></span><span></span><span></span>${needs?'<i class="burger-dot"></i>':''}</button></div>${rVacation()}</header>`;
 }
 function rDrawer(){
   if(!S.profileOpen)return'';
   const u=S.user, anon=u?.isAnonymous;
   let h='<div class="drawer-bg" data-action="toggleProfile"></div><aside class="drawer" onclick="event.stopPropagation()">';
-  h+='<div class="dr-head"><span class="dr-title">Meny</span><button class="dr-close" data-action="toggleProfile">‚úï</button></div>';
+  h+='<div class="dr-head"><span class="dr-title">Meny</span><button class="dr-close" data-action="toggleProfile">✕</button></div>';
   // Konto
   if(u){
-    const st={synced:'Synkad',syncing:'Synkar...',error:'Synkfel',offline:anon?'Bara p√• den h√§r enheten':'Offline'}[S.syncStatus]||'Offline';
-    const av=u.photoURL?`<img src="${u.photoURL}" referrerpolicy="no-referrer">`:`<span>${anon?'üëª':'üë§'}</span>`;
+    const st={synced:'Synkad',syncing:'Synkar...',error:'Synkfel',offline:anon?'Bara på den här enheten':'Offline'}[S.syncStatus]||'Offline';
+    const av=u.photoURL?`<img src="${u.photoURL}" referrerpolicy="no-referrer">`:`<span>${anon?'👻':'👤'}</span>`;
     h+=`<div class="dr-acct"><div class="dr-av">${av}</div><div class="dr-who"><b>${anon?'Anonym':(u.displayName||'Inloggad')}</b>${!anon&&u.email?`<span>${u.email}</span>`:''}<span class="dr-sync"><i class="sync-dot ${S.syncStatus}"></i>${st}</span></div></div>`;
-    if(S.syncErr)h+=`<div class="p-syncerr"><b>${S.syncErr.code||'fel'}</b><br>${S.syncErr.msg}</div><button class="dr-row accent" data-action="retrySync">‚Üª F√∂rs√∂k synka igen</button>`;
-    if(anon)h+=`<button class="dr-row accent" data-action="openAuth">üîó Koppla konto s√• det synkar</button>`;
+    if(S.syncErr)h+=`<div class="p-syncerr"><b>${S.syncErr.code||'fel'}</b><br>${S.syncErr.msg}</div><button class="dr-row accent" data-action="retrySync">↻ Försök synka igen</button>`;
+    if(anon)h+=`<button class="dr-row accent" data-action="openAuth">🔗 Koppla konto så det synkar</button>`;
   }else{
-    h+=`<div class="dr-acct"><div class="dr-av"><span>üîë</span></div><div class="dr-who"><b>Inte inloggad</b><span class="dr-sync"><i class="sync-dot offline"></i>Ingen synk</span></div></div>`;
+    h+=`<div class="dr-acct"><div class="dr-av"><span>🔑</span></div><div class="dr-who"><b>Inte inloggad</b><span class="dr-sync"><i class="sync-dot offline"></i>Ingen synk</span></div></div>`;
     h+=`<button class="dr-row accent" data-action="openAuth">Logga in</button>`;
   }
   h+='<div class="dr-sep"></div>';
-  // Inst√§llningar
-  h+=`<button class="dr-row" data-action="openCatMode"><span>üíº</span>Jobb / Privat<em>vilka kategorier h√∂r var</em></button>`;
-  if(u&&!anon)h+=`<button class="dr-row" data-action="openHousehold"><span>üè†</span>Hush√•ll${S.household?`<em>${S.householdId}</em>`:''}</button>`;
-  h+=`<button class="dr-row" data-action="toggleTheme"><span>${S.theme==='dark'?'‚òÄ':'üåô'}</span>${S.theme==='dark'?'Ljust l√§ge':'M√∂rkt l√§ge'}</button>`;
+  // Inställningar
+  h+=`<button class="dr-row" data-action="openCatMode"><span>💼</span>Jobb / Privat<em>vilka kategorier hör var</em></button>`;
+  if(u&&!anon)h+=`<button class="dr-row" data-action="openHousehold"><span>🏠</span>Hushåll${S.household?`<em>${S.householdId}</em>`:''}</button>`;
+  h+=`<button class="dr-row" data-action="toggleTheme"><span>${S.theme==='dark'?'☀':'🌙'}</span>${S.theme==='dark'?'Ljust läge':'Mörkt läge'}</button>`;
   if(u){h+='<div class="dr-sep"></div><button class="dr-row danger" data-action="signOut">Logga ut</button>'}
   h+='</aside>';
   return h;
 }
-// L√§gesv√§ljaren sitter l√§ngst ner, d√§r tummen n√•r
+// Lägesväljaren sitter längst ner, där tummen når
 function rModeBar(){
   const opts=[['all','Allt'],['work','Jobb'],['private','Privat']];
   const idx=Math.max(0,opts.findIndex(o=>o[0]===S.mode));
@@ -720,32 +720,32 @@ function rModeBar(){
 }
 function rVacation(){
   const vt=S.tasks.find(t=>t.id==='__vacation__');if(!vt)return'';
-  if(!vt.lastDone)return`<div class="vac-empty" data-action="editVacation">üèñ St√§ll in semester ‚Üí</div>`;
-  const av=vacActive();if(av)return`<div class="vac-strip" data-action="editVacation"><span style="font-size:14px">üèñ</span><span style="font-size:11px;color:var(--acc);font-weight:600">P√• semester ¬∑ dag ${vacDays(av)+1}</span><span style="flex:1"></span><span class="vac-txt">‚è∏ pulser pausade</span></div>`;
+  if(!vt.lastDone)return`<div class="vac-empty" data-action="editVacation">🏖 Ställ in semester →</div>`;
+  const av=vacActive();if(av)return`<div class="vac-strip" data-action="editVacation"><span style="font-size:14px">🏖</span><span style="font-size:11px;color:var(--acc);font-weight:600">På semester · dag ${vacDays(av)+1}</span><span style="flex:1"></span><span class="vac-txt">⏸ pulser pausade</span></div>`;
   const ds=dsinceRaw(vt.lastDone),p=Math.min(ds/vt.frequencyDays,1),dl=Math.max(0,vt.frequencyDays-ds);
-  return`<div class="vac-strip" data-action="editVacation"><span style="font-size:14px">üèñ</span><span style="font-size:11px;color:var(--t3)">Semester</span><div class="vac-prog"><div class="vac-prog-fill" style="width:${p*100}%"></div></div><span class="vac-txt">${dl===0?'üéâ Dags!':dl+'d'}</span></div>`;
+  return`<div class="vac-strip" data-action="editVacation"><span style="font-size:14px">🏖</span><span style="font-size:11px;color:var(--t3)">Semester</span><div class="vac-prog"><div class="vac-prog-fill" style="width:${p*100}%"></div></div><span class="vac-txt">${dl===0?'🎉 Dags!':dl+'d'}</span></div>`;
 }
 function rOnboarding(){
   const step=S.onboarding;
   const dots=`<div class="ob-dots"><div class="ob-dot${step===1?' on':''}"></div><div class="ob-dot${step===2?' on':''}"></div><div class="ob-dot${step===3?' on':''}"></div></div>`;
-  if(step===1)return`<div class="ob"><div class="ob-step"><div class="ob-icon">‚ö°</div><div class="ob-title">H√•ll koll p√• allt<br>som beh√∂ver g√∂ras</div><div class="ob-desc">Puls r√§knar dagar sedan du senast gjorde n√•got. Siffran tickar upp ‚Äî f√§rgen hj√§lper dig prioritera.</div><div class="ob-demo" style="padding:0;border:none;background:none"><div class="tc u-red" style="animation:none;opacity:1"><div class="tc-days"><div class="tc-days-num" style="color:var(--red)">5</div><div class="tc-days-lbl">dagar sen</div></div><div class="tc-lamp red"></div><div class="tc-info"><div class="tc-name">Gymma</div><div class="tc-meta">üí™ Fitness<span class="dot">¬∑</span>var 2:e dag</div></div><div class="tc-actions"><button class="tc-btn check" style="pointer-events:none">‚úì</button></div></div></div>${dots}<button class="ob-next" data-action="obNext">N√§sta ‚Üí</button><button class="ob-skip" data-action="obSkip">Hoppa √∂ver</button></div></div>`;
-  if(step===2)return`<div class="ob"><div class="ob-step"><div class="ob-icon">üîÑ</div><div class="ob-title">S√§tt frekvens,<br>sen gl√∂m det</div><div class="ob-desc">Puls h√•ller koll √•t dig och lyfter upp det n√§r det b√∂rjar bli dags igen.</div><div id="ob-anim" style="padding:0;border:none;background:none;display:flex;flex-direction:column;gap:6px;position:relative"></div>${dots}<button class="ob-next" data-action="obNext">N√§sta ‚Üí</button><button class="ob-skip" data-action="obSkip">Hoppa √∂ver</button></div></div>`;
-  if(step===3)return`<div class="ob"><div class="ob-step"><div class="ob-icon">üöÄ</div><div class="ob-title">Redo!</div><div class="ob-desc">Vi har lagt in 3 exempel-pulser √•t dig. Redigera, ta bort eller l√§gg till egna ‚Äî det √§r din puls.</div><div class="ob-demo" style="text-align:center"><div style="display:flex;justify-content:center;gap:16px;padding:6px 0"><div><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--red)">5</div><div style="font-size:10px;color:var(--t3)">Gymma</div></div><div><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--org)">6</div><div style="font-size:10px;color:var(--t3)">St√§da</div></div><div><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--grn)">2</div><div style="font-size:10px;color:var(--t3)">Handla mat</div></div></div></div>${dots}<button class="ob-next" data-action="obDone">K√∂r ig√•ng! ‚ö°</button></div></div>`;
+  if(step===1)return`<div class="ob"><div class="ob-step"><div class="ob-icon">⚡</div><div class="ob-title">Håll koll på allt<br>som behöver göras</div><div class="ob-desc">Puls räknar dagar sedan du senast gjorde något. Siffran tickar upp — färgen hjälper dig prioritera.</div><div class="ob-demo" style="padding:0;border:none;background:none"><div class="tc u-red" style="animation:none;opacity:1"><div class="tc-days"><div class="tc-days-num" style="color:var(--red)">5</div><div class="tc-days-lbl">dagar sen</div></div><div class="tc-lamp red"></div><div class="tc-info"><div class="tc-name">Gymma</div><div class="tc-meta">💪 Fitness<span class="dot">·</span>var 2:e dag</div></div><div class="tc-actions"><button class="tc-btn check" style="pointer-events:none">✓</button></div></div></div>${dots}<button class="ob-next" data-action="obNext">Nästa →</button><button class="ob-skip" data-action="obSkip">Hoppa över</button></div></div>`;
+  if(step===2)return`<div class="ob"><div class="ob-step"><div class="ob-icon">🔄</div><div class="ob-title">Sätt frekvens,<br>sen glöm det</div><div class="ob-desc">Puls håller koll åt dig och lyfter upp det när det börjar bli dags igen.</div><div id="ob-anim" style="padding:0;border:none;background:none;display:flex;flex-direction:column;gap:6px;position:relative"></div>${dots}<button class="ob-next" data-action="obNext">Nästa →</button><button class="ob-skip" data-action="obSkip">Hoppa över</button></div></div>`;
+  if(step===3)return`<div class="ob"><div class="ob-step"><div class="ob-icon">🚀</div><div class="ob-title">Redo!</div><div class="ob-desc">Vi har lagt in 3 exempel-pulser åt dig. Redigera, ta bort eller lägg till egna — det är din puls.</div><div class="ob-demo" style="text-align:center"><div style="display:flex;justify-content:center;gap:16px;padding:6px 0"><div><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--red)">5</div><div style="font-size:10px;color:var(--t3)">Gymma</div></div><div><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--org)">6</div><div style="font-size:10px;color:var(--t3)">Städa</div></div><div><div style="font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--grn)">2</div><div style="font-size:10px;color:var(--t3)">Handla mat</div></div></div></div>${dots}<button class="ob-next" data-action="obDone">Kör igång! ⚡</button></div></div>`;
   return'';
 }
 
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 // ONBOARDING STEP 2 ANIMATION
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 let _obAnimTimer=null;
 function stopObAnim(){if(_obAnimTimer){clearTimeout(_obAnimTimer);_obAnimTimer=null}}
 function initObAnim(){
   stopObAnim();
   const box=document.getElementById('ob-anim');if(!box)return;
   const items=[
-    {id:'gym',name:'Gymma',cat:'üí™ Fitness',freq:2,days:0,hero:true},
-    {id:'stad',name:'St√§da hemma',cat:'üè† Hem',freq:7,days:4},
-    {id:'mat',name:'Handla mat',cat:'üõí Hem',freq:5,days:3}
+    {id:'gym',name:'Gymma',cat:'💪 Fitness',freq:2,days:0,hero:true},
+    {id:'stad',name:'Städa hemma',cat:'🏠 Hem',freq:7,days:4},
+    {id:'mat',name:'Handla mat',cat:'🛒 Hem',freq:5,days:3}
   ];
   function col(d,f){const u=d/f;return u>=1?'var(--red)':u>=.75?'var(--org)':u>=.5?'var(--yel)':'var(--grn)'}
   function cls(d,f){const u=d/f;return u>=1?'u-red':u>=.75?'u-org':u>=.5?'u-yel':'u-grn'}
@@ -758,7 +758,7 @@ function initObAnim(){
     box.innerHTML=sorted.map(it=>{
       const c=col(it.days,it.freq),l=lamp(it.days,it.freq),u=cls(it.days,it.freq);
       const hl=highlight===it.id;
-      return`<div class="tc ${u}" data-ob="${it.id}" style="animation:none;opacity:1;transition:transform .6s cubic-bezier(.4,0,.2,1)${hl?';box-shadow:0 0 0 2px '+c:''}"><div class="tc-days"><div class="tc-days-num" style="color:${c};transition:color .5s">${it.days}</div><div class="tc-days-lbl">dagar sen</div></div><div class="tc-lamp ${l}"></div><div class="tc-info"><div class="tc-name">${it.name}</div><div class="tc-meta">${it.cat}<span class="dot">¬∑</span>var ${it.freq===1?'dag':it.freq+':e dag'}</div></div><div class="tc-actions"><button class="tc-btn check" style="pointer-events:none">‚úì</button></div></div>`;
+      return`<div class="tc ${u}" data-ob="${it.id}" style="animation:none;opacity:1;transition:transform .6s cubic-bezier(.4,0,.2,1)${hl?';box-shadow:0 0 0 2px '+c:''}"><div class="tc-days"><div class="tc-days-num" style="color:${c};transition:color .5s">${it.days}</div><div class="tc-days-lbl">dagar sen</div></div><div class="tc-lamp ${l}"></div><div class="tc-info"><div class="tc-name">${it.name}</div><div class="tc-meta">${it.cat}<span class="dot">·</span>var ${it.freq===1?'dag':it.freq+':e dag'}</div></div><div class="tc-actions"><button class="tc-btn check" style="pointer-events:none">✓</button></div></div>`;
     }).join('');
     if(Object.keys(oldPos).length){
       box.querySelectorAll('.tc[data-ob]').forEach(el=>{
@@ -782,11 +782,11 @@ function initObAnim(){
   renderCards();
   const steps=[
     // [delay, action]
-    // Gymma ticks up: 0‚Üí1‚Üí2‚Üí3, climbing through colors
+    // Gymma ticks up: 0→1→2→3, climbing through colors
     [1200, ()=>{items[0].days=1;renderCards('gym')}],
     [1400, ()=>{items[0].days=2;renderCards('gym')}],   // hits yellow, passes Handla
     [1400, ()=>{items[0].days=3;renderCards('gym')}],   // hits red, climbs to top
-    // Pause at top ‚Äî let it breathe
+    // Pause at top — let it breathe
     [2000, ()=>{
       // Flash the check button
       const card=box.querySelector('[data-ob="gym"]');
@@ -797,12 +797,12 @@ function initObAnim(){
         card.style.transition='box-shadow .3s';
       }
     }],
-    // Reset gymma ‚Üí drops to bottom
+    // Reset gymma → drops to bottom
     [800, ()=>{items[0].days=0;renderCards()}],
     // Meanwhile others tick up
     [1400, ()=>{items[1].days=5;items[2].days=4;renderCards()}],
-    [1400, ()=>{items[1].days=6;items[2].days=5;renderCards('stad')}],  // St√§da climbing
-    [1400, ()=>{items[1].days=7;renderCards('stad')}],  // St√§da hits orange/red
+    [1400, ()=>{items[1].days=6;items[2].days=5;renderCards('stad')}],  // Städa climbing
+    [1400, ()=>{items[1].days=7;renderCards('stad')}],  // Städa hits orange/red
     [1800, ()=>{
       const card=box.querySelector('[data-ob="stad"]');
       if(card){
@@ -830,22 +830,22 @@ function initObAnim(){
 }
 
 function rStats(red,org,grn,allOk){
-  if(allOk)return`<div class="stats-inline"><div class="all-clear">‚ú® Allt i fas ‚Äî pulserna dyker upp igen n√§r det b√∂rjar bli dags</div></div>`;
+  if(allOk)return`<div class="stats-inline"><div class="all-clear">✨ Allt i fas — pulserna dyker upp igen när det börjar bli dags</div></div>`;
   let h='<div class="stats-inline">';
-  if(red>0)h+=`<div class="si"><div class="si-dot" style="background:var(--red)"></div><span class="si-num red">${red}</span> g√∂r nu</div>`;
+  if(red>0)h+=`<div class="si"><div class="si-dot" style="background:var(--red)"></div><span class="si-num red">${red}</span> gör nu</div>`;
   if(org>0)h+=`<div class="si"><div class="si-dot" style="background:var(--org)"></div><span class="si-num org">${org}</span> snart</div>`;
   h+=`<div class="si"><div class="si-dot" style="background:var(--grn)"></div><span class="si-num grn">${grn}</span> lugnt</div>`;
   return h+'</div>';
 }
 
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
-// TODO section ‚Äì urgent + lifted
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
+// TODO section – urgent + lifted
+// ═══════════════════════════════════════════
 function rTodo(){
   const all=allTasks();
-  // En aktiv niv√• per sida (jobb / privat). Den l√§gsta niv√• som fortfarande
-  // har n√•got att g√∂ra styr. Hela den niv√•n visas ‚Äî ingen tr√∂skel, ingen
-  // delvis niv√•. H√∂gre niv√•er syns inte alls f√∂rr√§n den √§r tom.
+  // En aktiv nivå per sida (jobb / privat). Den lägsta nivå som fortfarande
+  // har något att göra styr. Hela den nivån visas — ingen tröskel, ingen
+  // delvis nivå. Högre nivåer syns inte alls förrän den är tom.
   const activeLvl={};
   for(const side of LEVEL_SIDES){
     const ts=sideTasks(side).filter(t=>!S.hiddenToday[t.id]&&modeOK(t));
@@ -853,8 +853,8 @@ function rTodo(){
     const active=lvls.find(L=>ts.some(t=>tlvl(t)===L&&rytm(t)>=.75));
     activeLvl[side]=active??lvls[lvls.length-1]??1;
   }
-  // Samma regel p√• alla niv√•er: avbockat f√∂rsvinner, frekvensen avg√∂r n√§r
-  // det kommer tillbaka. Niv√•n avg√∂r bara vilka uppgifter som √§r i spel.
+  // Samma regel på alla nivåer: avbockat försvinner, frekvensen avgör när
+  // det kommer tillbaka. Nivån avgör bara vilka uppgifter som är i spel.
   const onActive=t=>{
     const m=catMode(t.category);
     return m==='both'?(tlvl(t)===activeLvl.work||tlvl(t)===activeLvl.private):tlvl(t)===activeLvl[m];
@@ -872,15 +872,15 @@ function rTodo(){
   return h+'</div>';
 }
 
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
-// CARD ‚Äì universal, used in both views
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
-// Tidslinje: P1 ‚Üí P4. Fylld del √§r f√∂rbrukad tid.
-// Markeringar vid P2 (b√∂rjar kl√§ttra) och P3 (ska vara klart).
+// ═══════════════════════════════════════════
+// CARD – universal, used in both views
+// ═══════════════════════════════════════════
+// Tidslinje: P1 → P4. Fylld del är förbrukad tid.
+// Markeringar vid P2 (börjar klättra) och P3 (ska vara klart).
 function rTimeline(t){
   if(!t.endDate)return'';
   const K=dlClear(t);
-  if(K>DL_LEAD)return'';                       // f√∂re P1 syns ingenting
+  if(K>DL_LEAD)return'';                       // före P1 syns ingenting
   const buf=Math.max(0,daysUntil(t.endDate)-K);// dagar mellan P3 och P4
   const span=DL_LEAD+buf;                      // hela linjen, P1 till P4
   const gone=DL_LEAD-K;
@@ -890,13 +890,13 @@ function rTimeline(t){
   if(K>DL_RAMP)note=`${K} dagar tills det ska vara klart`;
   else if(K>0)note=`${K} dag${K>1?'ar':''} kvar att bli klar`;
   else{late=true;const d4=daysUntil(t.endDate);
-    note=d4>0?`Skulle varit klart ‚Äî ${d4} dag${d4>1?'ar':''} till deadline`
-      :(d4===0?'Deadline idag':`${Math.abs(d4)} dag${Math.abs(d4)!==1?'ar':''} √∂ver deadline`)}
+    note=d4>0?`Skulle varit klart — ${d4} dag${d4>1?'ar':''} till deadline`
+      :(d4===0?'Deadline idag':`${Math.abs(d4)} dag${Math.abs(d4)!==1?'ar':''} över deadline`)}
   return`<div class="tl"><div class="tl-bar"><div class="tl-fill${late?' late':''}" style="width:${used*100}%"></div><span class="tl-tick" style="left:${m2}%"></span><span class="tl-tick strong" style="left:${m3}%"></span></div><div class="tl-note${late?' late':''}">${note}</div></div>`;
 }
 function rCard(t,i,ctx,dim,hero){
   const ds=dsince(t.lastDone);
-  const daysNum=ds===null?'‚Äì':ds;
+  const daysNum=ds===null?'–':ds;
   const _dl=dlLeft(t);
   const cat=getCats().find(c=>c.id===t.category);
   const shared=isShared(t.category);
@@ -913,26 +913,26 @@ function rCard(t,i,ctx,dim,hero){
   h+=`<div class="tc-lamp ${lampCls(t)}"></div>`;
   // Info
   const dlMeta='';
-  const lvMeta=(isL2&&isPrio)?`<span class="dot">¬∑</span><span class="lv-meta">Niv√• ${tlvl(t)}</span>`:'';
-  h+=`<div class="tc-info" data-action="toggleTask" data-id="${t.id}"><div class="tc-name">${t.name}${isLifted&&!isPrio?' <span class="prio-pin">üìå</span>':''}${shared?' <span class="shared-tag">üë•</span>':''}</div><div class="tc-meta">${cat?cat.icon+' '+cat.label:''}<span class="dot">¬∑</span>${ffreqLabel(t)}${lvMeta}${dlMeta}</div></div>`;
+  const lvMeta=(isL2&&isPrio)?`<span class="dot">·</span><span class="lv-meta">Nivå ${tlvl(t)}</span>`:'';
+  h+=`<div class="tc-info" data-action="toggleTask" data-id="${t.id}"><div class="tc-name">${t.name}${isLifted&&!isPrio?' <span class="prio-pin">📌</span>':''}${shared?' <span class="shared-tag">👥</span>':''}</div><div class="tc-meta">${cat?cat.icon+' '+cat.label:''}<span class="dot">·</span>${ffreqLabel(t)}${lvMeta}${dlMeta}</div></div>`;
   // Actions
   h+=`<div class="tc-actions">`;
-  if(isPrio)h+=`<span style="font-size:10px;color:var(--tm);cursor:pointer;white-space:nowrap" data-action="hideToday" data-id="${t.id}">d√∂lj</span>`;
-  else h+=`<button class="tc-btn" data-action="${isLifted?'unliftPrio':'liftPrio'}" data-id="${t.id}">${isLifted?'üìå':'‚Üë'}</button>`;
-  h+=`<button class="tc-btn check" data-action="checkTask" data-id="${t.id}">‚úì</button></div>${rTimeline(t)}</div>`;
+  if(isPrio)h+=`<span style="font-size:10px;color:var(--tm);cursor:pointer;white-space:nowrap" data-action="hideToday" data-id="${t.id}">dölj</span>`;
+  else h+=`<button class="tc-btn" data-action="${isLifted?'unliftPrio':'liftPrio'}" data-id="${t.id}">${isLifted?'📌':'↑'}</button>`;
+  h+=`<button class="tc-btn check" data-action="checkTask" data-id="${t.id}">✓</button></div>${rTimeline(t)}</div>`;
   // Expanded
   if(isExp){
-    h+=`<div class="tc-expand"><button class="tc-expand-btn" data-action="editTask" data-id="${t.id}">‚úè Redigera</button><button class="tc-expand-btn" data-action="pickDate" data-id="${t.id}">üìÖ Datum</button>${!t.isProtected?`<button class="tc-expand-btn del" data-action="deleteTask" data-id="${t.id}">üóë</button>`:''}</div>`;
+    h+=`<div class="tc-expand"><button class="tc-expand-btn" data-action="editTask" data-id="${t.id}">✏ Redigera</button><button class="tc-expand-btn" data-action="pickDate" data-id="${t.id}">📅 Datum</button>${!t.isProtected?`<button class="tc-expand-btn del" data-action="deleteTask" data-id="${t.id}">🗑</button>`:''}</div>`;
     if(S.datePicking===t.id)h+=`<div class="date-pick"><input type="date" id="dp-${t.id}" value="${today()}" max="${today()}"><button style="background:var(--acc);color:#fff" data-action="confirmDate" data-id="${t.id}">Spara</button><button style="background:var(--bg2);color:var(--t2);border:1px solid var(--brd)" data-action="cancelDate">Avbryt</button></div>`;
   }
   return h+'</div>';
 }
 
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
-// CATEGORIES ‚Äì hidden by default
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
+// CATEGORIES – hidden by default
+// ═══════════════════════════════════════════
 function rDivider(){
-  return`<div class="divider" data-action="toggleCats"><div class="divider-line"></div><div class="divider-text">${S.showCats?'‚ñæ D√∂lj kategorier':'‚ñ∏ Visa kategorier'}</div><div class="divider-line"></div></div>`;
+  return`<div class="divider" data-action="toggleCats"><div class="divider-line"></div><div class="divider-text">${S.showCats?'▾ Dölj kategorier':'▸ Visa kategorier'}</div><div class="divider-line"></div></div>`;
 }
 function rCats(){
   if(!S.showCats)return'';
@@ -943,23 +943,23 @@ function rCats(){
     const open=ts.filter(taskOpen);
     const urgN=open.filter(t=>urg(t)>=.75).length;
     const lockedN=ts.length-open.length;
-    const lockTag=lockedN?`<span class="cc-lock">üîí${lockedN}</span>`:'';
-    h+=`<div class="cat-chip" data-action="expandCat" data-cat="${cat.id}"><span>${cat.icon}</span><span>${cat.label}</span>${lockTag}<span class="cc-cnt${urgN?' cc-urg':''}">${urgN?'‚ö† '+urgN:open.length}</span></div>`;
+    const lockTag=lockedN?`<span class="cc-lock">🔒${lockedN}</span>`:'';
+    h+=`<div class="cat-chip" data-action="expandCat" data-cat="${cat.id}"><span>${cat.icon}</span><span>${cat.label}</span>${lockTag}<span class="cc-cnt${urgN?' cc-urg':''}">${urgN?'⚠ '+urgN:open.length}</span></div>`;
   }
   return h+'</div>';
 }
 
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 // CATEGORY VIEW
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 function rCatView(){
   const cat=getCats().find(c=>c.id===S.expandedCat);if(!cat)return'';
   const ts=ctasks(cat.id);
   const shared=isShared(cat.id);
   const side=sideOf(cat.id);
-  let h=`<div><div class="cat-back" data-action="collapseCat">‚Üê ${cat.icon} ${cat.label}${shared?' <span class="shared-tag">üë•</span>':''} <span style="color:var(--t3);margin-left:auto;font-size:11px">${ts.length}</span></div>`;
+  let h=`<div><div class="cat-back" data-action="collapseCat">← ${cat.icon} ${cat.label}${shared?' <span class="shared-tag">👥</span>':''} <span style="color:var(--t3);margin-left:auto;font-size:11px">${ts.length}</span></div>`;
   const lvlsHere=[...new Set(ts.map(tlvl))];
-  // Ingen niv√•uppdelning beh√∂vs om allt h√§r ligger p√• niv√• 1
+  // Ingen nivåuppdelning behövs om allt här ligger på nivå 1
   if(side==='both'||(lvlsHere.length===1&&lvlsHere[0]===1)){
     sortTasks(ts).forEach((t,i)=>{h+=rCard(t,i,'cat')});
     return h+'</div>';
@@ -969,26 +969,26 @@ function rCatView(){
   sortTasks(ts.filter(t=>tlvl(t)===1)).forEach(t=>{h+=rCard(t,idx++,'cat')});
   for(let lvl=2;lvl<=top;lvl++){
     const items=sortTasks(ts.filter(t=>tlvl(t)===lvl));
-    const open=lvlOpen(side,lvl);          // l√•set g√§ller hela sidan, inte bara denna kategori
+    const open=lvlOpen(side,lvl);          // låset gäller hela sidan, inte bara denna kategori
     const blocks=blockers(side,lvl);
     const shown=!!S.peekLvl[cat.id+':'+lvl];
     const cnt=items.length?` (${items.length})`:'';
-    h+=`<div class="divider lvl-div${open?' open':''}" data-action="peekLvl" data-cat="${cat.id}" data-lvl="${lvl}"><div class="divider-line"></div><div class="divider-text">${shown?'‚ñæ':'‚ñ∏'} ${open?'üîì':'üîí'} Niv√• ${lvl}${cnt}</div><div class="divider-line"></div></div>`;
+    h+=`<div class="divider lvl-div${open?' open':''}" data-action="peekLvl" data-cat="${cat.id}" data-lvl="${lvl}"><div class="divider-line"></div><div class="divider-text">${shown?'▾':'▸'} ${open?'🔓':'🔒'} Nivå ${lvl}${cnt}</div><div class="divider-line"></div></div>`;
     if(!shown)continue;
-    if(!open)h+=`<div class="lvl-block">L√•s upp genom att g√∂ra:${blocks.map(b=>{const bc=getCats().find(c=>c.id===b.category);return `<div class="lvl-block-item"><span class="lvl-block-dot"></span>${bc?bc.icon+' ':''}${b.name} <span class="lvl-block-days">${dsince(b.lastDone)??'‚Äì'} dagar sen</span></div>`}).join('')}</div>`;
-    if(!items.length)h+=`<div class="lvl-empty">Inget h√§r √§n. S√§tt en uppgift till niv√• ${lvl} n√§r du redigerar den.</div>`;
+    if(!open)h+=`<div class="lvl-block">Lås upp genom att göra:${blocks.map(b=>{const bc=getCats().find(c=>c.id===b.category);return `<div class="lvl-block-item"><span class="lvl-block-dot"></span>${bc?bc.icon+' ':''}${b.name} <span class="lvl-block-days">${dsince(b.lastDone)??'–'} dagar sen</span></div>`}).join('')}</div>`;
+    if(!items.length)h+=`<div class="lvl-empty">Inget här än. Sätt en uppgift till nivå ${lvl} när du redigerar den.</div>`;
     items.forEach(t=>{h+=rCard(t,idx++,'cat',!open)});
   }
   return h+'</div>';
 }
 // Dimmed, non-actionable preview of a locked task
 
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 // MODALS
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
-// TODOS VIEW ‚Äì one-off tasks
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════
+// TODOS VIEW – one-off tasks
+// ═══════════════════════════════════════════
 function rTodosView(){
   const all=S.todos;
   let h='';
@@ -1005,17 +1005,17 @@ function rTodosView(){
   });
   let idx=0;
   // New project input at top
-  h+=`<div class="todo-quick-add" style="margin-bottom:10px"><input class="todo-quick-input" id="new-project-input" placeholder="+ Nytt √§mne..." style="border-style:dashed" data-action-enter="quickAddProject"></div>`;
+  h+=`<div class="todo-quick-add" style="margin-bottom:10px"><input class="todo-quick-input" id="new-project-input" placeholder="+ Nytt ämne..." style="border-style:dashed" data-action-enter="quickAddProject"></div>`;
   // Toggle all (only show if groups exist)
   if(allGroups.length>1){
     const allCollapsed=allGroups.every(g=>S.collapsedGroups[g]);
-    h+=`<div style="text-align:right;margin-bottom:4px"><span data-action="toggleAllGroups" style="font-size:10px;color:var(--tm);cursor:pointer;text-transform:lowercase">${allCollapsed?'visa alla':'d√∂lj alla'}</span></div>`;
+    h+=`<div style="text-align:right;margin-bottom:4px"><span data-action="toggleAllGroups" style="font-size:10px;color:var(--tm);cursor:pointer;text-transform:lowercase">${allCollapsed?'visa alla':'dölj alla'}</span></div>`;
   }
   // Deadline priority section
   const deadlineTodos=all.filter(t=>t.dueDate&&!t.done).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
   if(deadlineTodos.length){
     h+=`<div style="margin-bottom:12px">`;
-    h+=`<div style="font-size:11px;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;padding:0 0 6px;font-weight:600;display:flex;align-items:center;gap:4px">üìÖ Deadline</div>`;
+    h+=`<div style="font-size:11px;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;padding:0 0 6px;font-weight:600;display:flex;align-items:center;gap:4px">📅 Deadline</div>`;
     deadlineTodos.forEach(t=>{h+=rTodoCard(t,idx++,false)});
     h+=`</div>`;
   }
@@ -1032,33 +1032,33 @@ function rTodosView(){
     const pendingN=gPending.length;
     h+=`<div class="todo-group${collapsed?' closed':' open'}${allComplete?' complete':''}" data-grp="${gname}">`;
     h+=`<div class="todo-group-hdr" data-action="toggleGroup" data-gname="${gname}">`;
-    h+=`<span class="grp-grip" data-grp-drag="${gname}">‚†ø</span>`;
-    h+=`<span style="font-size:10px;color:var(--tm);margin-right:2px">${collapsed?'‚ñ∏':'‚ñæ'}</span>`;
+    h+=`<span class="grp-grip" data-grp-drag="${gname}">⠿</span>`;
+    h+=`<span style="font-size:10px;color:var(--tm);margin-right:2px">${collapsed?'▸':'▾'}</span>`;
     if(S.editingGroup===gname){
       h+=`<input class="grp-name-input" id="grp-rename" value="${gname.replace(/"/g,'&quot;')}" data-old="${gname.replace(/"/g,'&quot;')}" onclick="event.stopPropagation()">`;
     }else{
-      h+=`<div class="todo-group-name"${allComplete?' style="color:var(--grn)"':''}>${allComplete?'‚úì ':''}${gname}</div>`;
+      h+=`<div class="todo-group-name"${allComplete?' style="color:var(--grn)"':''}>${allComplete?'✓ ':''}${gname}</div>`;
     }
     if(total>0){
-      h+=`<span class="todo-group-count">${collapsed&&pendingN>0?pendingN+' kvar ¬∑ ':''}${doneN}/${total}</span>`;
+      h+=`<span class="todo-group-count">${collapsed&&pendingN>0?pendingN+' kvar · ':''}${doneN}/${total}</span>`;
       h+=`<div class="todo-group-prog"><div class="todo-group-prog-fill" style="width:${pct}%${allComplete?';background:var(--grn)':''}"></div></div>`;
     }
-    h+=`<span class="grp-acts" onclick="event.stopPropagation()"><span class="grp-act" data-action="editGroup" data-gname="${gname}" title="Byt namn">‚úé</span><span class="grp-act del" data-action="deleteGroup" data-gname="${gname}" title="Radera">‚úï</span></span>`;
+    h+=`<span class="grp-acts" onclick="event.stopPropagation()"><span class="grp-act" data-action="editGroup" data-gname="${gname}" title="Byt namn">✎</span><span class="grp-act del" data-action="deleteGroup" data-gname="${gname}" title="Radera">✕</span></span>`;
     h+=`</div>`;
     if(!collapsed){
       gPending.forEach(t=>{h+=rTodoCard(t,idx++,false)});
-      if(allComplete&&gDone.length){h+=`<div style="font-size:11px;color:var(--t3);padding:4px 0 2px;text-align:center">üéâ Klart!</div>`}
+      if(allComplete&&gDone.length){h+=`<div style="font-size:11px;color:var(--t3);padding:4px 0 2px;text-align:center">🎉 Klart!</div>`}
       if(gDone.length){gDone.forEach(t=>{h+=rTodoCard(t,idx++,true)})}
-      h+=`<div class="todo-quick-add"><input class="todo-quick-input" data-group="${gname}" placeholder="+ L√§gg till..." data-action-enter="quickAddTodo"></div>`;
+      h+=`<div class="todo-quick-add"><input class="todo-quick-input" data-group="${gname}" placeholder="+ Lägg till..." data-action-enter="quickAddTodo"></div>`;
     }
     h+=`</div>`;
   }
-  if(!allGroups.length){h+=`<div style="text-align:center;padding:30px 0;color:var(--tm);font-size:13px">Skapa ditt f√∂rsta √§mne ovan</div>`}
+  if(!allGroups.length){h+=`<div style="text-align:center;padding:30px 0;color:var(--tm);font-size:13px">Skapa ditt första ämne ovan</div>`}
   // History
   if(S.todoHistory.length){
     const total=S.todoHistory.reduce((s,w)=>s+w.items.length,0);
     h+=`<div style="margin-top:16px;border-top:1px solid var(--brd);padding-top:10px">`;
-    h+=`<span data-action="toggleHistory" style="font-size:11px;color:var(--tm);cursor:pointer">${S.showHistory?'‚ñæ':'‚ñ∏'} Historik (${total} klara)</span></div>`;
+    h+=`<span data-action="toggleHistory" style="font-size:11px;color:var(--tm);cursor:pointer">${S.showHistory?'▾':'▸'} Historik (${total} klara)</span></div>`;
     if(S.showHistory){
       const weeks=S.todoHistory;
       const pg=Math.min(S.historyPage||0,weeks.length-1);
@@ -1067,18 +1067,18 @@ function rTodosView(){
         h+=`<div style="margin-top:8px">`;
         // Nav
         h+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">`;
-        h+=pg<weeks.length-1?`<span data-action="historyPrev" style="cursor:pointer;padding:6px 12px;font-size:13px;color:var(--acc)">&larr; √Ñldre</span>`:`<span style="padding:6px 12px"></span>`;
+        h+=pg<weeks.length-1?`<span data-action="historyPrev" style="cursor:pointer;padding:6px 12px;font-size:13px;color:var(--acc)">&larr; Äldre</span>`:`<span style="padding:6px 12px"></span>`;
         h+=`<span style="font-size:13px;font-weight:600;color:var(--t1)">${week.label}</span>`;
         h+=pg>0?`<span data-action="historyNext" style="cursor:pointer;padding:6px 12px;font-size:13px;color:var(--acc)">Nyare &rarr;</span>`:`<span style="padding:6px 12px"></span>`;
         h+=`</div>`;
         // Items by group
-        const byGroup={};week.items.forEach(it=>{const g=it.group||'√ñvrigt';if(!byGroup[g])byGroup[g]=[];byGroup[g].push(it)});
+        const byGroup={};week.items.forEach(it=>{const g=it.group||'Övrigt';if(!byGroup[g])byGroup[g]=[];byGroup[g].push(it)});
         for(const[g,items]of Object.entries(byGroup)){
           h+=`<div style="font-size:11px;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;padding:6px 0 3px;font-weight:600">${g} <span style="font-weight:400">(${items.length})</span></div>`;
           items.forEach(it=>{
             const d=it.doneAt?new Date(it.doneAt).toLocaleDateString('sv-SE',{weekday:'short',day:'numeric',month:'short'}):'';
             h+=`<div style="font-size:13px;color:var(--t2);padding:4px 0 4px 12px;display:flex;justify-content:space-between;border-bottom:1px solid var(--brd)">`;
-            h+=`<span style="text-decoration:line-through;opacity:.7">‚úì ${it.name}</span>`;
+            h+=`<span style="text-decoration:line-through;opacity:.7">✓ ${it.name}</span>`;
             if(d)h+=`<span style="font-size:10px;color:var(--t3);white-space:nowrap">${d}</span>`;
             h+=`</div>`;
           });
@@ -1091,15 +1091,15 @@ function rTodosView(){
   return h;
 }
 
-// Byter namn p√• ett projekt √∂verallt d√§r namnet anv√§nds. Finns det nya
-// namnet redan sl√•s projekten ihop, efter bekr√§ftelse.
+// Byter namn på ett projekt överallt där namnet används. Finns det nya
+// namnet redan slås projekten ihop, efter bekräftelse.
 function renameGroup(oldN,newN){
   newN=(newN||'').trim();
   if(!newN||newN===oldN)return false;
   const exists=(S.todoGroups||[]).includes(newN)||S.todos.some(t=>t.group===newN);
-  if(exists&&!confirm('"'+newN+'" finns redan. Sl√• ihop projekten?'))return false;
+  if(exists&&!confirm('"'+newN+'" finns redan. Slå ihop projekten?'))return false;
   S.todos.forEach(t=>{if(t.group===oldN)t.group=newN});
-  // Byt varje f√∂rekomst ‚Äî listan har haft dubbletter
+  // Byt varje förekomst — listan har haft dubbletter
   S.todoGroups=[...new Set((S.todoGroups||[]).map(x=>x===oldN?newN:x))];
   if(oldN in S.collapsedGroups){S.collapsedGroups[newN]=S.collapsedGroups[oldN];delete S.collapsedGroups[oldN]}
   (S.todoHistory||[]).forEach(w=>(w.items||[]).forEach(it=>{if(it.group===oldN)it.group=newN}));
@@ -1110,22 +1110,22 @@ function rTodoCard(t,i,isDone){
   const overdue=ds!==null&&ds<0&&!isDone;
   let due='';
   if(t.dueDate){
-    const label=ds===0?'Idag':ds===1?'Imorgon':ds===-1?'Ig√•r':ds<0?Math.abs(ds)+' dagar sen':ds+' dagar';
-    due=`<div class="todo-due${overdue?' overdue':''}">üìÖ ${label}</div>`;
+    const label=ds===0?'Idag':ds===1?'Imorgon':ds===-1?'Igår':ds<0?Math.abs(ds)+' dagar sen':ds+' dagar';
+    due=`<div class="todo-due${overdue?' overdue':''}">📅 ${label}</div>`;
   }
-  const calBtn=t.dueDate&&!isDone?`<button class="todo-del" data-action="pushCal" data-id="${t.id}" title="Google Kalender" style="color:var(--t3);font-size:11px">üìÖ</button>`:'';
-  const grip=!isDone?`<div class="todo-grip" data-drag-handle>‚†ø</div>`:'';
-  return`<div class="todo-card${isDone?' done':''}" data-todo-id="${t.id}" style="animation-delay:${i*.03}s">${grip}<button class="todo-check${isDone?' checked':''}" data-action="toggleTodo" data-id="${t.id}">${isDone?'‚úì':''}</button><div class="todo-info" data-action="editTodo" data-id="${t.id}"><div class="todo-name">${t.name}</div>${t.note?`<div class="todo-note">${t.note}</div>`:''}${due}</div>${calBtn}<button class="todo-del" data-action="deleteTodo" data-id="${t.id}">‚úï</button></div>`;
+  const calBtn=t.dueDate&&!isDone?`<button class="todo-del" data-action="pushCal" data-id="${t.id}" title="Google Kalender" style="color:var(--t3);font-size:11px">📅</button>`:'';
+  const grip=!isDone?`<div class="todo-grip" data-drag-handle>⠿</div>`:'';
+  return`<div class="todo-card${isDone?' done':''}" data-todo-id="${t.id}" style="animation-delay:${i*.03}s">${grip}<button class="todo-check${isDone?' checked':''}" data-action="toggleTodo" data-id="${t.id}">${isDone?'✓':''}</button><div class="todo-info" data-action="editTodo" data-id="${t.id}"><div class="todo-name">${t.name}</div>${t.note?`<div class="todo-note">${t.note}</div>`:''}${due}</div>${calBtn}<button class="todo-del" data-action="deleteTodo" data-id="${t.id}">✕</button></div>`;
 }
 
 function rCatModeModal(){
   let h='<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()">';
-  h+='<div class="md-head"><h2 class="md-title">üíº Jobb / Privat</h2><button class="md-close" data-action="closeModal">‚úï</button></div>';
-  h+='<p style="font-size:12px;color:var(--t2);margin-bottom:14px">Var h√∂r varje kategori hemma? "B√•da" syns alltid.</p>';
+  h+='<div class="md-head"><h2 class="md-title">💼 Jobb / Privat</h2><button class="md-close" data-action="closeModal">✕</button></div>';
+  h+='<p style="font-size:12px;color:var(--t2);margin-bottom:14px">Var hör varje kategori hemma? "Båda" syns alltid.</p>';
   for(const c of getCats()){
     const m=catMode(c.id);
     h+=`<div class="cm-row"><span class="cm-name">${c.icon} ${c.label}</span><div class="cm-opts">`;
-    h+=[['work','üíº'],['private','üè†'],['both','B√•da']].map(([v,l])=>`<button class="cm-b${m===v?' on':''}" data-action="setCatMode" data-cat="${c.id}" data-m="${v}">${l}</button>`).join('');
+    h+=[['work','💼'],['private','🏠'],['both','Båda']].map(([v,l])=>`<button class="cm-b${m===v?' on':''}" data-action="setCatMode" data-cat="${c.id}" data-m="${v}">${l}</button>`).join('');
     h+='</div></div>';
   }
   h+='<div class="br"><button class="bp" data-action="closeModal">Klart</button></div></div></div>';
@@ -1137,11 +1137,11 @@ function rExpiredModal(){
   let h='<div class="mo"><div class="md" onclick="event.stopPropagation()">';
   h+='<div class="md-head"><h2 class="md-title">Slutdatum passerat</h2></div>';
   h+=`<p style="font-size:13px;color:var(--t2);margin-bottom:6px"><b>${t.name}</b></p>`;
-  h+=`<p style="font-size:12px;color:var(--t3);margin-bottom:16px">Slutdatumet var ${t.endDate}${past?` ‚Äî ${past} dag${past>1?'ar':''} sedan`:''}.</p>`;
-  h+='<div class="fg"><label class="fl">F√∂rnya med nytt slutdatum</label>';
+  h+=`<p style="font-size:12px;color:var(--t3);margin-bottom:16px">Slutdatumet var ${t.endDate}${past?` — ${past} dag${past>1?'ar':''} sedan`:''}.</p>`;
+  h+='<div class="fg"><label class="fl">Förnya med nytt slutdatum</label>';
   h+=`<input class="fi" type="date" id="exp-date" min="${today()}">`;
-  h+=`<p class="fh">Samma framf√∂rh√•llning (${Math.max(0,daysUntil(t.endDate)-dlClear(t))} dagar) f√∂ljer med.</p></div>`;
-  h+='<button class="bp" data-action="expRenew" style="margin-bottom:8px">F√∂rnya</button>';
+  h+=`<p class="fh">Samma framförhållning (${Math.max(0,daysUntil(t.endDate)-dlClear(t))} dagar) följer med.</p></div>`;
+  h+='<button class="bp" data-action="expRenew" style="margin-bottom:8px">Förnya</button>';
   h+='<button class="bs" data-action="expClear" style="margin-bottom:8px">Bocka av, ta bort slutdatum</button>';
   h+='<button class="bd" data-action="expDelete" style="width:100%">Ta bort uppgiften helt</button>';
   h+='</div></div>';
@@ -1151,16 +1151,16 @@ function rModal(){
   const m=S.modal;if(!m)return'';
   if(m.type==='expired')return rExpiredModal();
   if(m.type==='catmode')return rCatModeModal();
-  if(m.type==='confirm')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><h3 style="font-size:18px;margin-bottom:8px;font-weight:600">Ta bort?</h3><p style="color:var(--t2);font-size:14px;margin-bottom:20px">Kan inte √•ngras.</p><div class="br"><button class="bs" data-action="closeModal">Avbryt</button><button class="bp" style="background:var(--red)" data-action="confirmDelete" data-id="${m.taskId}">Ta bort</button></div></div></div>`;
-  if(m.type==='authError')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">Problem</h2><button class="md-close" data-action="closeModal">‚úï</button></div><p style="color:var(--t2);font-size:14px;margin-bottom:16px">${m.msg}</p><div class="br"><button class="bp" data-action="openAuth">F√∂rs√∂k igen</button></div></div></div>`;
+  if(m.type==='confirm')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><h3 style="font-size:18px;margin-bottom:8px;font-weight:600">Ta bort?</h3><p style="color:var(--t2);font-size:14px;margin-bottom:20px">Kan inte ångras.</p><div class="br"><button class="bs" data-action="closeModal">Avbryt</button><button class="bp" style="background:var(--red)" data-action="confirmDelete" data-id="${m.taskId}">Ta bort</button></div></div></div>`;
+  if(m.type==='authError')return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">Problem</h2><button class="md-close" data-action="closeModal">✕</button></div><p style="color:var(--t2);font-size:14px;margin-bottom:16px">${m.msg}</p><div class="br"><button class="bp" data-action="openAuth">Försök igen</button></div></div></div>`;
   if(m.type==='auth')return rAuthModal();
   if(m.type==='vacation'){const vt=vacTask(),av=vacActive(),log=vacLog().filter(v=>v.end).slice().reverse();
     const tot=log.reduce((a,v)=>a+vacDays(v),0);
-    let h=`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">üèñ Semester</h2><button class="md-close" data-action="closeModal">‚úï</button></div>`;
-    if(av){h+=`<div class="fg"><p style="font-size:14px;margin-bottom:10px">P√• semester sedan <b>${fmtD(av.start)}</b> ¬∑ dag ${vacDays(av)+1}<br><span style="color:var(--t3);font-size:12px">Alla pulser √§r pausade.</span></p><label class="fl">Tillbaka datum</label><input class="fi" type="date" id="vEnd" value="${ldate()}" min="${ldate(av.start)}"></div><div class="br"><button class="bp" data-action="vacEnd">üîÅ Tillbaka till rutiner</button></div>`}
-    else{h+=`<div class="fg"><label class="fl">F√∂rsta semesterdag</label><input class="fi" type="date" id="vStart" value="${ldate()}"><p class="fh">Pulserna pausas fr√•n den h√§r dagen tills du trycker Tillbaka till rutiner.</p></div><div class="br" style="margin-bottom:18px"><button class="bp" data-action="vacStart">üèñ Ta semester</button></div>`}
-    if(log.length)h+=`<div class="fg"><label class="fl">Tidigare semestrar ¬∑ totalt ${tot} dagar</label>${log.map(v=>`<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--brd)"><span>${fmtD(v.start)} ‚Äì ${fmtD(v.end)}</span><span style="font-family:'Space Mono',monospace;color:var(--acc)">${vacDays(v)} d</span></div>`).join('')}</div>`;
-    if(!av)h+=`<details style="margin-top:6px"><summary style="font-size:12px;color:var(--t3);cursor:pointer">Inst√§llningar</summary><div class="fg" style="margin-top:10px"><label class="fl">Var X:e dag</label><input class="fi" type="number" id="vf" value="${vt?vt.frequencyDays:90}" min="1"><p class="fh">T.ex. 90 = var 3:e m√•nad</p></div><div class="fg"><label class="fl">Senaste semester</label><input class="fi" type="date" id="vl" value="${vt?.lastDone?ldate(vt.lastDone):ldate()}" max="${ldate()}"></div><div class="br"><button class="bs" data-action="saveVacation">Spara</button></div></details>`;
+    let h=`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()"><div class="md-head"><h2 class="md-title">🏖 Semester</h2><button class="md-close" data-action="closeModal">✕</button></div>`;
+    if(av){h+=`<div class="fg"><p style="font-size:14px;margin-bottom:10px">På semester sedan <b>${fmtD(av.start)}</b> · dag ${vacDays(av)+1}<br><span style="color:var(--t3);font-size:12px">Alla pulser är pausade.</span></p><label class="fl">Tillbaka datum</label><input class="fi" type="date" id="vEnd" value="${ldate()}" min="${ldate(av.start)}"></div><div class="br"><button class="bp" data-action="vacEnd">🔁 Tillbaka till rutiner</button></div>`}
+    else{h+=`<div class="fg"><label class="fl">Första semesterdag</label><input class="fi" type="date" id="vStart" value="${ldate()}"><p class="fh">Pulserna pausas från den här dagen tills du trycker Tillbaka till rutiner.</p></div><div class="br" style="margin-bottom:18px"><button class="bp" data-action="vacStart">🏖 Ta semester</button></div>`}
+    if(log.length)h+=`<div class="fg"><label class="fl">Tidigare semestrar · totalt ${tot} dagar</label>${log.map(v=>`<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--brd)"><span>${fmtD(v.start)} – ${fmtD(v.end)}</span><span style="font-family:'Space Mono',monospace;color:var(--acc)">${vacDays(v)} d</span></div>`).join('')}</div>`;
+    if(!av)h+=`<details style="margin-top:6px"><summary style="font-size:12px;color:var(--t3);cursor:pointer">Inställningar</summary><div class="fg" style="margin-top:10px"><label class="fl">Var X:e dag</label><input class="fi" type="number" id="vf" value="${vt?vt.frequencyDays:90}" min="1"><p class="fh">T.ex. 90 = var 3:e månad</p></div><div class="fg"><label class="fl">Senaste semester</label><input class="fi" type="date" id="vl" value="${vt?.lastDone?ldate(vt.lastDone):ldate()}" max="${ldate()}"></div><div class="br"><button class="bs" data-action="saveVacation">Spara</button></div></details>`;
     return h+`</div></div>`}
   if(m.type==='household')return rHHModal();
   if(m.type==='todo')return rTodoModal();
@@ -1169,8 +1169,8 @@ function rModal(){
 
 function rAuthModal(){
   let h='<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()">';
-  h+='<div class="md-head"><h2 class="md-title">Logga in</h2><button class="md-close" data-action="closeModal">‚úï</button></div>';
-  h+='<p style="font-size:13px;color:var(--t2);margin-bottom:18px">Synka mellan enheter och dela med hush√•ll.</p>';
+  h+='<div class="md-head"><h2 class="md-title">Logga in</h2><button class="md-close" data-action="closeModal">✕</button></div>';
+  h+='<p style="font-size:13px;color:var(--t2);margin-bottom:18px">Synka mellan enheter och dela med hushåll.</p>';
   h+='<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">';
   h+='<button class="auth-provider-btn" data-action="signInGoogle">';
   h+='<svg viewBox="0 0 48 48" style="width:18px;height:18px;flex-shrink:0">';
@@ -1183,8 +1183,8 @@ function rAuthModal(){
   h+='<div style="flex:1;height:1px;background:var(--brd)"></div>';
   h+='<span style="font-size:11px;color:var(--tm)">ELLER</span>';
   h+='<div style="flex:1;height:1px;background:var(--brd)"></div></div>';
-  h+='<button class="auth-provider-btn" data-action="signInAnon" style="border-style:dashed;color:var(--t3)">üëª Forts√§tt utan konto</button>';
-  h+='<p style="font-size:11px;color:var(--t3);margin-top:8px;text-align:center">Utan konto = ingen synk, bara lokalt p√• enheten.</p>';
+  h+='<button class="auth-provider-btn" data-action="signInAnon" style="border-style:dashed;color:var(--t3)">👻 Fortsätt utan konto</button>';
+  h+='<p style="font-size:11px;color:var(--t3);margin-top:8px;text-align:center">Utan konto = ingen synk, bara lokalt på enheten.</p>';
   h+='</div></div>';
   return h;
 }
@@ -1192,24 +1192,24 @@ function rAuthModal(){
 function rHHModal(){
   let c='';
   if(S.household){
-    const mem=S.household.members.map(m=>`<div class="hh-member">${m.photo?`<img src="${m.photo}" referrerpolicy="no-referrer">`:'<span style="font-size:20px">üë§</span>'}<span class="hh-member-name">${m.name}</span>${m.uid===S.user?.uid?'<span class="hh-member-you">Du</span>':''}</div>`).join('');
+    const mem=S.household.members.map(m=>`<div class="hh-member">${m.photo?`<img src="${m.photo}" referrerpolicy="no-referrer">`:'<span style="font-size:20px">👤</span>'}<span class="hh-member-name">${m.name}</span>${m.uid===S.user?.uid?'<span class="hh-member-you">Du</span>':''}</div>`).join('');
     const cats=getCats().filter(x=>x.id!=='recovery').map(x=>{const on=isShared(x.id);return`<div class="hh-cat-toggle"><div class="hh-cat-l"><span>${x.icon}</span><span>${x.label}</span></div><button class="toggle ${on?'on':''}" data-action="toggleSharedCat" data-cat="${x.id}"></button></div>`}).join('');
-    c='<div class="md-head"><h2 class="md-title">üè† Hush√•ll</h2><button class="md-close" data-action="closeModal">‚úï</button></div>';
+    c='<div class="md-head"><h2 class="md-title">🏠 Hushåll</h2><button class="md-close" data-action="closeModal">✕</button></div>';
     c+=`<div class="fg"><label class="fl">Kod</label><div class="hh-code">${S.householdId}</div></div>`;
     c+=`<div class="fg"><label class="fl">Medlemmar</label><div class="hh-members">${mem}</div></div>`;
     c+=`<div class="fg"><label class="fl">Delade kategorier</label><p style="font-size:12px;color:var(--t3);margin-bottom:10px">Tasks i delade kategorier synkas.</p>${cats}</div>`;
-    c+='<div class="br"><button class="bd" data-action="leaveHousehold">L√§mna</button></div>';
+    c+='<div class="br"><button class="bd" data-action="leaveHousehold">Lämna</button></div>';
   }else{
-    c='<div class="md-head"><h2 class="md-title">üè† Hush√•ll</h2><button class="md-close" data-action="closeModal">‚úï</button></div>';
+    c='<div class="md-head"><h2 class="md-title">🏠 Hushåll</h2><button class="md-close" data-action="closeModal">✕</button></div>';
     c+='<p style="font-size:13px;color:var(--t2);margin-bottom:20px">Dela uppgifter med din partner.</p>';
-    c+='<div class="fg"><button class="bp" data-action="createHousehold" style="margin-bottom:12px">Skapa nytt hush√•ll</button>';
+    c+='<div class="fg"><button class="bp" data-action="createHousehold" style="margin-bottom:12px">Skapa nytt hushåll</button>';
     c+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">';
     c+='<div style="flex:1;height:1px;background:var(--brd)"></div><span style="font-size:11px;color:var(--tm)">ELLER</span>';
     c+='<div style="flex:1;height:1px;background:var(--brd)"></div></div>';
-    c+='<label class="fl">G√• med</label><div style="display:flex;gap:8px">';
+    c+='<label class="fl">Gå med</label><div style="display:flex;gap:8px">';
     c+='<input class="fi" id="hh-code-input" placeholder="6-siffrig kod" maxlength="6" style="text-transform:uppercase;letter-spacing:3px;font-family:\'Space Mono\',monospace;text-align:center">';
-    c+='<button class="bp" data-action="joinHousehold" style="flex:0 0 auto;padding:13px 20px">G√• med</button></div>';
-    c+='<p id="hh-error" style="font-size:12px;color:var(--red);margin-top:8px;display:none">Kunde inte g√• med.</p></div>';
+    c+='<button class="bp" data-action="joinHousehold" style="flex:0 0 auto;padding:13px 20px">Gå med</button></div>';
+    c+='<p id="hh-error" style="font-size:12px;color:var(--red);margin-top:8px;display:none">Kunde inte gå med.</p></div>';
   }
   return`<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()">${c}</div></div>`;
 }
@@ -1226,17 +1226,17 @@ function rTodoModal(){
   groupPicker+=`<option value="__new__">+ Nytt projekt...</option></select>`;
   groupPicker+=`<input class="fi" id="todo-group-new" placeholder="Projektnamn..." style="font-size:13px;margin-top:6px;display:${t.group&&!existingGroups.includes(t.group)?'block':'none'}"></div>`;
   let calBtn='';
-  if(isE&&t.dueDate){calBtn=`<button class="bs" data-action="pushCal" data-id="${t.id}" style="font-size:12px;display:flex;align-items:center;gap:5px;justify-content:center">üìÖ Google Kalender</button>`}
+  if(isE&&t.dueDate){calBtn=`<button class="bs" data-action="pushCal" data-id="${t.id}" style="font-size:12px;display:flex;align-items:center;gap:5px;justify-content:center">📅 Google Kalender</button>`}
   let h='<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()">';
-  h+=`<div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny att-g√∂ra'}</h2><button class="md-close" data-action="closeModal">‚úï</button></div>`;
+  h+=`<div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny att-göra'}</h2><button class="md-close" data-action="closeModal">✕</button></div>`;
   h+=groupPicker;
-  h+=`<div class="fg"><label class="fl">Vad ska g√∂ras?</label><input class="fi" id="todo-name" value="${t.name||''}" placeholder="T.ex. Skicka CV till f√∂retaget" autofocus></div>`;
-  h+=`<div class="fg"><label class="fl">Anteckning (valfritt)</label><input class="fi" id="todo-note" value="${t.note||''}" placeholder="Detaljer, l√§nk, kontaktinfo..."></div>`;
+  h+=`<div class="fg"><label class="fl">Vad ska göras?</label><input class="fi" id="todo-name" value="${t.name||''}" placeholder="T.ex. Skicka CV till företaget" autofocus></div>`;
+  h+=`<div class="fg"><label class="fl">Anteckning (valfritt)</label><input class="fi" id="todo-note" value="${t.note||''}" placeholder="Detaljer, länk, kontaktinfo..."></div>`;
   h+=`<div class="fg"><label class="fl">Deadline (valfritt)</label><input class="fi" type="date" id="todo-due" value="${t.dueDate||''}"></div>`;
   if(calBtn)h+=`<div class="fg">${calBtn}</div>`;
   h+='<div class="br">';
-  if(isE)h+=`<button class="bd" data-action="deleteTodoConfirm" data-id="${t.id}">üóë</button>`;
-  h+=`<button class="bp" data-action="saveTodo">${isE?'Spara':'L√§gg till'}</button></div></div></div>`;
+  if(isE)h+=`<button class="bd" data-action="deleteTodoConfirm" data-id="${t.id}">🗑</button>`;
+  h+=`<button class="bp" data-action="saveTodo">${isE?'Spara':'Lägg till'}</button></div></div></div>`;
   return h;
 }
 
@@ -1248,10 +1248,10 @@ function rTaskModal(){
   let assignF='';
   if(shared&&S.household&&isE){
     const mems=[{uid:null,name:'Vem som helst',photo:null},...S.household.members];
-    assignF=`<div class="fg"><label class="fl">Tilldelad</label><div class="assign-row">${mems.map(mem=>`<button class="assign-opt ${(t.assignedTo||null)===(mem.uid)?'sel':''}" data-action="setAssign" data-uid="${mem.uid||''}">${mem.photo?`<img src="${mem.photo}" referrerpolicy="no-referrer">`:'üë§'} ${mem.uid===S.user?.uid?'Jag':mem.name}</button>`).join('')}</div></div>`;
+    assignF=`<div class="fg"><label class="fl">Tilldelad</label><div class="assign-row">${mems.map(mem=>`<button class="assign-opt ${(t.assignedTo||null)===(mem.uid)?'sel':''}" data-action="setAssign" data-uid="${mem.uid||''}">${mem.photo?`<img src="${mem.photo}" referrerpolicy="no-referrer">`:'👤'} ${mem.uid===S.user?.uid?'Jag':mem.name}</button>`).join('')}</div></div>`;
   }
   // Frequency section
-  let freqHTML=`<div class="fg"><label class="fl">Frekvens</label><div class="freq-tabs"><button class="freq-tab${ft==='days'?' on':''}" data-action="setFreqType" data-ft="days">Dagar</button><button class="freq-tab${ft==='weekly'?' on':''}" data-action="setFreqType" data-ft="weekly">Veckodag</button><button class="freq-tab${ft==='monthly'?' on':''}" data-action="setFreqType" data-ft="monthly">M√•nad</button></div>`;
+  let freqHTML=`<div class="fg"><label class="fl">Frekvens</label><div class="freq-tabs"><button class="freq-tab${ft==='days'?' on':''}" data-action="setFreqType" data-ft="days">Dagar</button><button class="freq-tab${ft==='weekly'?' on':''}" data-action="setFreqType" data-ft="weekly">Veckodag</button><button class="freq-tab${ft==='monthly'?' on':''}" data-action="setFreqType" data-ft="monthly">Månad</button></div>`;
   if(ft==='days'){
     freqHTML+=`<div class="fr">${[1,2,3,7,14,21,30].map(d=>`<button class="fb ${parseInt(t.frequencyDays||7)===d?'sel':''}" data-action="setFreq" data-freq="${d}">${d}</button>`).join('')}<input class="fi" style="width:65px;text-align:center" id="tf" type="number" min="1" value="${t.frequencyDays||7}"></div><p class="fh">= var ${ffreq(t.frequencyDays||7)}</p>`;
   }else if(ft==='weekly'){
@@ -1263,19 +1263,19 @@ function rTaskModal(){
   }
   freqHTML+=`</div>`;
   let h='<div class="mo" data-action="closeModal"><div class="md" onclick="event.stopPropagation()">';
-  h+=`<div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny uppgift'}</h2><button class="md-close" data-action="closeModal">‚úï</button></div>`;
+  h+=`<div class="md-head"><h2 class="md-title">${isE?'Redigera':'Ny uppgift'}</h2><button class="md-close" data-action="closeModal">✕</button></div>`;
   h+=`<div class="fg"><label class="fl">Namn</label><input class="fi" id="tn" value="${t.name||''}" placeholder="T.ex. Gymma" autofocus></div>`;
   h+='<div class="fg"><label class="fl">Kategori</label><div class="cg" id="catGrid">';
   h+=allCats.map(c=>{const sel=(t.category||S.expandedCat||'content')===c.id;return`<button class="co ${sel?'sel':''}" data-action="setCat" data-cat="${c.id}" style="${sel?`border-color:${ccol(c.id)};color:${ccol(c.id)};font-weight:600`:''}">${c.icon} ${c.label}</button>`}).join('');
   h+='</div><div class="add-cat-row"><input id="new-cat-name" placeholder="Ny kategori..." maxlength="20">';
-  h+='<button data-action="addCategory">+ L√§gg till</button></div></div>';
+  h+='<button data-action="addCategory">+ Lägg till</button></div></div>';
   h+=freqHTML;
-  // Niv√• ‚Äî stegen delas av alla jobbkategorier
+  // Nivå — stegen delas av alla jobbkategorier
   const cl=tlvl(t);
-  h+='<div class="fg"><label class="fl">Niv√•</label><div class="lvl-pick" id="lvlPick" data-level="'+cl+'">';
-  h+=`<button class="lvl-opt${cl===1?' sel':''}" data-action="setLevel" data-lvl="1"><b>Niv√• 1</b><span>Grund</span></button>`;
-  h+=`<button class="lvl-opt${cl===2?' sel':''}" data-action="setLevel" data-lvl="2"><b>Niv√• 2</b><span>√ñppnas n√§r niv√• 1 √§r gr√∂n</span></button>`;
-  h+=`<button class="lvl-opt${cl===3?' sel':''}" data-action="setLevel" data-lvl="3"><b>Niv√• 3</b><span>√ñppnas n√§r 1 och 2 √§r gr√∂na</span></button>`;
+  h+='<div class="fg"><label class="fl">Nivå</label><div class="lvl-pick" id="lvlPick" data-level="'+cl+'">';
+  h+=`<button class="lvl-opt${cl===1?' sel':''}" data-action="setLevel" data-lvl="1"><b>Nivå 1</b><span>Grund</span></button>`;
+  h+=`<button class="lvl-opt${cl===2?' sel':''}" data-action="setLevel" data-lvl="2"><b>Nivå 2</b><span>Öppnas när nivå 1 är grön</span></button>`;
+  h+=`<button class="lvl-opt${cl===3?' sel':''}" data-action="setLevel" data-lvl="3"><b>Nivå 3</b><span>Öppnas när 1 och 2 är gröna</span></button>`;
   h+='</div><p class="fh">Stegen delas av alla jobbkategorier. Privat har sin egen.</p></div>';
   // Deadline (P4) + klart senast (P3)
   const ed=t.endDate||'', cb=t.clearBy||'';
@@ -1288,17 +1288,17 @@ function rTaskModal(){
   if(isE)h+=`<div class="fg"><label class="fl">Senast gjord</label><input class="fi" type="date" id="tl" value="${t.lastDone?t.lastDone.split('T')[0]:''}" max="${today()}"></div>`;
   h+=assignF;
   h+='<div class="br">';
-  if(isE&&!t.isProtected)h+=`<button class="bd" data-action="deleteTask" data-id="${t.id}">üóë</button>`;
-  h+=`<button class="bp" data-action="saveTask">${isE?'Spara':'L√§gg till'}</button></div></div></div>`;
+  if(isE&&!t.isProtected)h+=`<button class="bd" data-action="deleteTask" data-id="${t.id}">🗑</button>`;
+  h+=`<button class="bp" data-action="saveTask">${isE?'Spara':'Lägg till'}</button></div></div></div>`;
   return h;
 }
 
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 // EVENTS
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════
 // DRAG & DROP (todos only, touch + mouse)
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
+// ═══════════════════════════════════════════
 let _drag=null;
 function initDrag(){
   document.querySelectorAll('[data-drag-handle]').forEach(grip=>{
@@ -1477,7 +1477,7 @@ function bind(){
   const fi=document.getElementById('tf');
   if(fi)fi.addEventListener('input',()=>{const h=fi.closest('.fg')?.querySelector('.fh');if(h)h.textContent='= var '+ffreq(fi.value||'7');document.querySelectorAll('.fb').forEach(b=>b.classList.toggle('sel',b.dataset.freq===fi.value))});
   const af=document.querySelector('[autofocus]');if(af)setTimeout(()=>af.focus(),50);
-  // Byt namn p√• projekt
+  // Byt namn på projekt
   const gr=document.getElementById('grp-rename');
   if(gr){
     setTimeout(()=>{gr.focus();gr.select()},30);
@@ -1501,7 +1501,7 @@ function bind(){
       if(tm)tm.max=te.value;
       const base=tm?.value||te.value;
       const fmt=n=>{const x=new Date(base+'T00:00:00');x.setDate(x.getDate()-n);return x.toISOString().split('T')[0].slice(5)};
-      hint.textContent=`Syns ${fmt(42)} ¬∑ kl√§ttrar fr√•n ${fmt(21)} ¬∑ max ${base.slice(5)} ¬∑ deadline ${te.value.slice(5)}`;
+      hint.textContent=`Syns ${fmt(42)} · klättrar från ${fmt(21)} · max ${base.slice(5)} · deadline ${te.value.slice(5)}`;
     };
     te.addEventListener('change',upd);te.addEventListener('input',upd);
     tm?.addEventListener('input',upd);
@@ -1524,7 +1524,7 @@ function bind(){
           const name=inp.value.trim();if(!name)return;
           const action=inp.dataset.actionEnter;
           if(action==='quickAddProject'){
-            // Create group by adding first todo placeholder ‚Äî or just track group
+            // Create group by adding first todo placeholder — or just track group
             if(!S.todoGroups)S.todoGroups=[];
             if(!S.todoGroups.includes(name)){S.todoGroups.push(name)}
             save();R();
@@ -1601,7 +1601,7 @@ function H(e){
     case 'setMonthDay':{if(!S.modal.task)S.modal.task={};S.modal.task.freqMonthDay=parseInt(el.dataset.md);document.querySelectorAll('.md-btn').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');break}
     case 'setAssign':{if(S.modal?.task)S.modal.task.assignedTo=el.dataset.uid||null;document.querySelectorAll('.assign-opt').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');break}
     case 'setLevel':{if(!S.modal.task)S.modal.task={};S.modal.task.level=parseInt(el.dataset.lvl)||1;const lp=document.getElementById('lvlPick');if(lp)lp.dataset.level=S.modal.task.level;document.querySelectorAll('.lvl-opt').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');break}
-    case 'addCategory':{const inp=document.getElementById('new-cat-name');const name=inp?.value?.trim();if(!name)return;const id=name.toLowerCase().replace(/[^a-z√•√§√∂0-9]/g,'_');if(getCats().find(c=>c.id===id))return;const emoji=EMOJI_POOL[S.customCats.length%EMOJI_POOL.length];S.customCats.push({id,label:name,icon:emoji,v:'--c-oth'});save();R();break}
+    case 'addCategory':{const inp=document.getElementById('new-cat-name');const name=inp?.value?.trim();if(!name)return;const id=name.toLowerCase().replace(/[^a-zåäö0-9]/g,'_');if(getCats().find(c=>c.id===id))return;const emoji=EMOJI_POOL[S.customCats.length%EMOJI_POOL.length];S.customCats.push({id,label:name,icon:emoji,v:'--c-oth'});save();R();break}
     case 'saveTask':{
       const ne=document.getElementById('tn'),fe=document.getElementById('tf');
       const sc=document.getElementById('catGrid')?.dataset.selected||document.querySelector('.co.sel')?.dataset.cat||S.expandedCat||'content';
@@ -1632,10 +1632,10 @@ function H(e){
     case 'joinHousehold':{const inp=document.getElementById('hh-code-input');const err=document.getElementById('hh-error');if(inp?.value)joinHH(inp.value).then(ok=>{if(!ok&&err)err.style.display='block';else{S.modal={type:'household'};R()}});break}
     case 'leaveHousehold':leaveHH().then(()=>{S.modal=null;R()});break;
     case 'toggleSharedCat':toggleSharedCat(el.dataset.cat);break;
-    // ‚îÄ‚îÄ‚îÄ Onboarding ‚îÄ‚îÄ‚îÄ
+    // ─── Onboarding ───
     case 'obNext':stopObAnim();S.onboarding++;R();break;
     case 'obSkip':case 'obDone':stopObAnim();S.onboarding=-1;save();R();break;
-    // ‚îÄ‚îÄ‚îÄ Todo actions ‚îÄ‚îÄ‚îÄ
+    // ─── Todo actions ───
     case 'toggleTodo':{
       e.stopPropagation();
       const t=S.todos.find(x=>x.id===el.dataset.id);if(!t)break;
@@ -1671,7 +1671,7 @@ function H(e){
       if(hasPending){if(!confirm('Radera "'+g+'" och alla dess uppgifter?'))break;
         S.todos=S.todos.filter(t=>t.group!==g);
       }else{
-        // All done or empty ‚Äî just remove
+        // All done or empty — just remove
         S.todos=S.todos.filter(t=>t.group!==g);
       }
       S.todoGroups=S.todoGroups.filter(x=>x!==g);
@@ -1689,12 +1689,12 @@ function H(e){
 }
 
 
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
-// ARBETSTID-NEDR√ÑKNING (resa)
-// ‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê‚ïê
-const TRIP={name:'Timor 4 dec',depart:'2026-12-04'}; // avresedag, r√§knar fram till 00:00 den dagen
+// ═══════════════════════════════════════════
+// ARBETSTID-NEDRÄKNING (resa)
+// ═══════════════════════════════════════════
+const TRIP={name:'Timor 4 dec',depart:'2026-12-04'}; // avresedag, räknar fram till 00:00 den dagen
 const WS={start:[9,30],lunch:[[12,0],[12,50]],endPick:[16,0],endOther:[18,0],eve:[[20,30],[24,0]],
-  pick:{odd:[1,3],even:[2,3,5]}}; // 1=m√•n ‚Ä¶ 5=fre, vem som h√§mtar = du
+  pick:{odd:[1,3],even:[2,3,5]}}; // 1=mån … 5=fre, vem som hämtar = du
 function isoWeek(d){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const n=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-n);const y=new Date(Date.UTC(t.getUTCFullYear(),0,1));return Math.ceil(((t-y)/864e5+1)/7)}
 function iPick(d){return(isoWeek(d)%2?WS.pick.odd:WS.pick.even).includes(d.getDay())}
 function atT(d,[h,m]){const x=new Date(d);x.setHours(0,0,0,0);x.setMinutes(h*60+m);return x}
@@ -1705,24 +1705,24 @@ function workLeft(now,dep){let day=0,eve=0;const d=new Date(now);d.setHours(0,0,
   while(d<dep){const b=dayBlocks(d);b.day.forEach(x=>day+=ovl(x,now,dep));b.eve.forEach(x=>eve+=ovl(x,now,dep));d.setDate(d.getDate()+1)}return{day,eve}}
 function fmtH(ms){const m=Math.round(ms/6e4);return Math.floor(m/60)+' h'+(m%60?' '+(m%60)+' min':'')}
 function tripDep(){return new Date(TRIP.depart+'T00:00:00')}
-function todayNote(n){const w=n.getDay();if(w===0||w===6)return'Helg';return iPick(n)?'üßí Du h√§mtar ¬∑ √•k 16:00':'üßí Johanna h√§mtar ¬∑ jobba till 18:00'}
-const TRIP_FROM='2026-11-18'; // n√§r nedr√§kningen startade (f√∂r baren i l√§get totalt)
+function todayNote(n){const w=n.getDay();if(w===0||w===6)return'Helg';return iPick(n)?'🧒 Du hämtar · åk 16:00':'🧒 Johanna hämtar · jobba till 18:00'}
+const TRIP_FROM='2026-11-18'; // när nedräkningen startade (för baren i läget totalt)
 const HERO_MODES=['paus','idag','totalt'];
 let heroMin=(()=>{try{return localStorage.getItem('puls-hero-min')==='1'}catch(e){return false}})();
 function heroToggle(e){e.stopPropagation();heroMin=!heroMin;try{localStorage.setItem('puls-hero-min',heroMin?'1':'0')}catch(x){}tickHero()}
 let heroMode=(()=>{try{const m=localStorage.getItem('puls-hero');return HERO_MODES.includes(m)?m:'paus'}catch(e){return'paus'}})();
 const hm=t=>String(t[0]).padStart(2,'0')+':'+String(t[1]).padStart(2,'0');
-const WDN=['s√∂n','m√•n','tis','ons','tors','fre','l√∂r'];
-function nowState(n){ // aktuellt pass eller n√§sta start
+const WDN=['sön','mån','tis','ons','tors','fre','lör'];
+function nowState(n){ // aktuellt pass eller nästa start
   const b=dayBlocks(n).day;for(const x of b)if(n>=x[0]&&n<x[1])return{on:x};
   for(let i=0;i<8;i++){const d=new Date(n);d.setDate(d.getDate()+i);for(const x of dayBlocks(d).day)if(x[0]>n)return{next:x}}return{}}
 function clock(ms){ms=Math.max(0,ms);const t=Math.floor(ms/1000),h=Math.floor(t/3600),m=Math.floor(t%3600/60),sec=t%60;
   return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+'<span class="s">:'+String(sec).padStart(2,'0')+'</span>'}
 function pauseText(n,nx){if(!nx)return'Pausad';const st=nx[0],same=midnight(st).getTime()===midnight(n).getTime();
   const t=hm([st.getHours(),st.getMinutes()]);
-  if(same&&n>=atT(n,WS.lunch[0])&&n<atT(n,WS.lunch[1]))return'‚è∏ Lunch, forts√§tter '+t;
-  if(same)return'‚è∏ B√∂rjar '+t;
-  const w=n.getDay();return(w===0||w===6||(w===5&&!same)?'‚è∏ Helg, b√∂rjar ':'‚è∏ Klar f√∂r idag, b√∂rjar ')+WDN[st.getDay()]+' '+t}
+  if(same&&n>=atT(n,WS.lunch[0])&&n<atT(n,WS.lunch[1]))return'⏸ Lunch, fortsätter '+t;
+  if(same)return'⏸ Börjar '+t;
+  const w=n.getDay();return(w===0||w===6||(w===5&&!same)?'⏸ Helg, börjar ':'⏸ Klar för idag, börjar ')+WDN[st.getDay()]+' '+t}
 function rHero(){const dep=tripDep(),n=new Date();if(n>=dep&&heroMode==='totalt'){heroMode='idag';try{localStorage.setItem('puls-hero','idag')}catch(e){}}
   const st=nowState(n),on=!!st.on;
   const todayEnd=new Date(n);todayEnd.setHours(24,0,0,0);
@@ -1730,19 +1730,19 @@ function rHero(){const dep=tripDep(),n=new Date();if(n>=dep&&heroMode==='totalt'
   if(heroMode==='paus'){const blk=st.on||st.next;
     if(blk){const e=blk[1],eh=[e.getHours(),e.getMinutes()];
       const k=hm(eh)===hm(WS.lunch[0])?0:hm(eh)===hm(WS.endPick)?1:2;
-      label=['Till lunch','Till h√§mtning','Till dagens slut'][k];var pTxt=['Lunch ','H√§mtning ','Slut '][k]+hm(eh);
+      label=['Till lunch','Till hämtning','Till dagens slut'][k];var pTxt=['Lunch ','Hämtning ','Slut '][k]+hm(eh);
       budget=blk[1]-blk[0];left=on?blk[1]-n:budget}else{label='Till paus';left=budget=0}}
   else if(heroMode==='idag'){label='Kvar idag';const b=dayBlocks(n).day;budget=b.reduce((a,x)=>a+(x[1]-x[0]),0);left=workLeft(n,todayEnd).day}
   else{label='Kvar till '+TRIP.name;budget=workLeft(new Date(TRIP_FROM+'T00:00:00'),dep).day;left=workLeft(n,dep).day}
   const frac=budget?Math.min(1,left/budget):0;
   const hc=!on?'var(--t2)':frac<.1?'var(--red)':frac<.25?'var(--org)':'var(--acc)';
-  const sub=on?(heroMode==='totalt'?Math.ceil((dep-n)/864e5)+' dagar till avresa':heroMode==='idag'?'Slutar '+(iPick(n)?'16:00, du h√§mtar':'18:00, Johanna h√§mtar'):pTxt):(st.next&&st.next[0]>=dep?'‚è∏ Klar, avresa '+WDN[dep.getDay()]:pauseText(n,st.next));
-  const tg=`<button class="hero-tg" onclick="heroToggle(event)" aria-label="${heroMin?'Visa timer':'Minimera timer'}" aria-expanded="${!heroMin}">‚åÉ</button>`;
+  const sub=on?(heroMode==='totalt'?Math.ceil((dep-n)/864e5)+' dagar till avresa':heroMode==='idag'?'Slutar '+(iPick(n)?'16:00, du hämtar':'18:00, Johanna hämtar'):pTxt):(st.next&&st.next[0]>=dep?'⏸ Klar, avresa '+WDN[dep.getDay()]:pauseText(n,st.next));
+  const tg=`<button class="hero-tg" onclick="heroToggle(event)" aria-label="${heroMin?'Visa timer':'Minimera timer'}" aria-expanded="${!heroMin}">⌃</button>`;
   const dots=`<span class="hero-dots">${HERO_MODES.map(m=>`<i class="${m===heroMode?'on':''}"></i>`).join('')}</span>`;
   const bar=`<div class="hero-bar"><b style="width:${(frac*100).toFixed(2)}%"></b></div>`;
-  const attrs=`id="hero" style="--hc:${hc}" role="button" tabindex="0" aria-label="${label}, tryck f√∂r att byta l√§ge" onclick="heroCycle()" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();heroCycle()}"`;
+  const attrs=`id="hero" style="--hc:${hc}" role="button" tabindex="0" aria-label="${label}, tryck för att byta läge" onclick="heroCycle()" onkeydown="if(event.target===this&&(event.key==='Enter'||event.key===' ')){event.preventDefault();heroCycle()}"`;
   if(heroMin)return`<div class="hero min${on?'':' paused'}" ${attrs}><div class="hero-top"><span>${label}</span><span class="hero-mini">${clock(left).replace(/<[^>]+>/g,'')}</span>${tg}</div>${bar}</div>`;
-  return`<div class="hero${on?'':' paused'}" ${attrs}><div class="hero-top"><span>${label}</span><span class="hero-r">${dots}${tg}</span></div><div class="hero-time">${clock(left)}</div>${bar}<div class="hero-sub"><span>${sub}</span><span>‚úàÔ∏è ${TRIP.name}</span></div></div>`}
+  return`<div class="hero${on?'':' paused'}" ${attrs}><div class="hero-top"><span>${label}</span><span class="hero-r">${dots}${tg}</span></div><div class="hero-time">${clock(left)}</div>${bar}<div class="hero-sub"><span>${sub}</span><span>✈️ ${TRIP.name}</span></div></div>`}
 function heroCycle(){heroMode=HERO_MODES[(HERO_MODES.indexOf(heroMode)+1)%3];try{localStorage.setItem('puls-hero',heroMode)}catch(e){}tickHero()}
 function tickHero(){const el=document.getElementById('hero');if(!el)return;const h=rHero();if(!h){el.remove();return}
   const ae=document.activeElement,f=ae===el,ft=ae&&ae.classList&&ae.classList.contains('hero-tg');el.outerHTML=h;if(f)document.getElementById('hero')?.focus();else if(ft)document.querySelector('#hero .hero-tg')?.focus()}
